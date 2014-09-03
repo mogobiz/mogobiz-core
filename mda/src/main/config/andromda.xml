@@ -1,0 +1,128 @@
+<andromda xmlns="http://andromda.org/core/configuration">
+	<properties>
+		<property name="modelValidation">${validation}</property>
+		<property name="cartridgeFilter">${filter}</property>
+<!-- property name="loggingConfigurationUri">file:${project.basedir}/log4j.xml</property -->
+		<property name="outputEncoding">UTF-8</property>
+	</properties>
+	<server>
+		<host>localhost</host>
+		<port>4447</port>
+	</server>
+	<repositories>
+		<repository name="emf-uml2">
+			<models>
+				<model type="emf-uml2" lastModifiedCheck="${modification}">
+					<uri>${model.uri}</uri>
+					<modelPackages processAll="true">
+					</modelPackages>
+				</model>
+			</models>
+		</repository>
+	</repositories>
+	<namespaces>
+		<namespace name="default">
+			<properties>
+				<!--property name="enableTemplating">true</property -->
+				<property name="mergeLocation">${conf.dir}</property>
+				<property name="languageMappingsUri">
+					file:${conf.dir}/mappings/JavaExtMappings.xml
+				</property>
+				<property name="wrapperMappingsUri">JavaWrapper</property>
+				<property name="sqlMappingsUri">${sql.mappings}</property>
+				<property name="jdbcMappingsUri">JDBC</property>
+				<property name="maxSqlNameLength">30</property>
+				<property name="foreignKeySuffix">_FK</property>
+				<property name="ejbJndiNamePrefix">${application.id}-${pom.version}</property>
+				<!--
+					these masking properties allow you to configure the way your model
+					element names are generated
+				-->
+				<property name="classifierNameMask">none</property>
+				<property name="operationNameMask">none</property>
+				<property name="roleNameMask">none</property>
+				<property name="enumerationNameMask">none</property>
+				<property name="enumerationLiteralNameMask">upperunderscore</property>
+				<property name="entityNameMask">none</property>
+				<property name="entityPropertyNameMask">none</property>
+				<property name="parameterNameMask">none</property>
+				<property name="hibernateVersion">3</property>
+			</properties>
+		</namespace>
+		<namespace name="grails">
+			<properties>
+				<property name="mergeLocation">${conf.dir}</property>
+		        <property name="mergeMappingsUri">file:${conf.dir}/mergePoints/GrailsMergeMappings.xml</property>
+
+				<property name="dataSource">${dataSource}</property>
+				<property name="username">${jdbc.username}</property>
+				<property name="password">${jdbc.password}</property>
+				<property name="driver">${jdbc.driver}</property>
+				<property name="connectionUrl">${jdbc.url}</property>
+
+                <property name="hibernateDialect">${hibernate.dialect}</property>
+                <property name="hibernateShowSql">${hibernate.show.sql}</property>
+
+				<property name="hibernateTypeMappingsUri">Hibernate</property>
+
+				<property name="hibernateInheritanceStrategy">${hibernate.inheritance.strategy}</property>
+				<property name="defaultHibernateGeneratorClass">${hibernate.generatorClass}</property>
+				<property name="hibernateAggregationCascade">delete</property>
+				<property name="hibernateDefaultCascade">none</property>
+				<property name="customTypesPackage">${application.package}</property>
+				<property name="compositionDefinesEagerLoading">${eagerLoading}</property>
+
+				<property name="hibernateQueryUseNamedParameters">true</property>
+
+				<property name="hibernateConnectionReleaseMode">auto</property>
+
+				<property name="hibernateEnableCache">true</property>
+				<property name="hibernateUserQueryCache">true</property>
+				<property name="hibernateEnableAssociationsCache">true</property>
+				<property name="hibernateEntityCache">read-write</property>
+				<property name="hibernateAssociationCache">read-write</property>
+				<property name="hibernateCacheProvider">org.hibernate.cache.EhCacheProvider</property>
+				<property name="hibernateQueryCacheFactory">org.hibernate.cache.StandardQueryCacheFactory</property>
+
+                <property name="sessionFactory">org.springframework.orm.hibernate4.LocalSessionFactoryBean</property>
+		        <property name="transactionManager">org.springframework.orm.hibernate4.HibernateTransactionManager</property>
+                <property name="localTransactionManager">org.springframework.orm.hibernate4.HibernateTransactionManager</property>
+		        <!-- jta transaction properties
+		        <property name="transactionManager">org.springframework.transaction.jta.JtaTransactionManager</property>
+		        <property name="transactionManagerName">java:/TransactionManager</property>
+		        <property name="userTransactionName">UserTransaction</property>
+		         -->
+
+                <!-- gorm properties -->
+				<property name="optimisticLocking">false</property>
+
+                <property name="enumerations">${grails.output.dir}/domain</property>
+                <property name="entities">${grails.output.dir}/domain</property>
+                <property name="entity-delegators">${pom.basedir}/src/groovy</property>
+                <property name="json">${pom.basedir}/src/groovy</property>
+                <property name="service-interfaces">${pom.basedir}/src/groovy</property>
+                <property name="services">${pom.basedir}/src/groovy</property>
+                <property name="service-impls">${grails.output.dir}/services</property>
+                <property name="entity-tools">${pom.basedir}/src/groovy</property>
+                <property name="configuration">${grails.output.dir}/conf</property>
+                <!-- <property name="unit-tests">${pom.basedir}/test/unit</property>
+                <property name="controllers">${pom.basedir}/src/groovy</property>
+                <property name="controller-impls">${grails.output.dir}/controllers</property>
+                <property name="views">${grails.output.dir}/views</property>
+                 -->
+			</properties>
+		</namespace>
+		<namespace name="java">
+			<properties>
+				<property name="useArraysForMultiplicitiesOfTypeMany">true</property>
+				<!--
+				<property name="enumerations">${pom.basedir}/src/java</property>
+				<property name="interfaces">${pom.basedir}/src/java</property>
+				<property name="services">${pom.basedir}/src/java</property>
+				-->
+				<property name="exceptions">${pom.basedir}/src/java</property>
+				<property name="value-objects">${pom.basedir}/src/java</property>
+			</properties>
+		</namespace>
+	</namespaces>
+</andromda>

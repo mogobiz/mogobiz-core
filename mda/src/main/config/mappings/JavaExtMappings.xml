@@ -1,0 +1,20 @@
+<mappings name="JavaExt"> 
+    <extends>Java</extends> 
+    <mapping> 
+        <from>datatype::DateTime</from> 
+        <to>java.util.Calendar</to> 
+    </mapping>  
+    <mapping> 
+        <from>groovytype::def</from> 
+        <to>def</to> 
+    </mapping>  
+    <mapping> 
+        <from>groovytype::noType</from> 
+        <to></to> 
+    </mapping>  
+    <mapping> 
+        <from>groovytype::ListeProgressive</from> 
+        <to>com.com.mogobiz.utils.ListeProgressive</to>
+    </mapping>  
+    
+</mappings>   

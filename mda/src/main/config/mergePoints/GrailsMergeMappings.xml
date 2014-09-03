@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    This is used to map merge patterns in files generated
+    by grails to new patterns. Just add content to the
+    CDATA sections of the <to/> elements in order to
+    use the following merge points.
+-->
+<mappings name="GrailsMergePoints">
+    <mapping>
+
+        <from><![CDATA[// beans merge-point]]></from>
+
+        <to><![CDATA[
+	/*
+	messageSource(com.com.mogobiz.i18n.SiteMessageSource)
+	{ messageBundleMessageSource = ref("messageBundleMessageSource") }
+	messageBundleMessageSource(org.codehaus.groovy.grails.context.support.PluginAwareResourceBundleMessageSource) {
+		basenames = [
+			"WEB-INF/grails-app/i18n/messages",
+			"WEB-INF/grails-app/i18n/cmd_errors"
+		]
+	}
+	 customPropertyEditorRegistrar(com.com.mogobiz.utils.CustomPropertyEditorRegistrar) {
+	 dateEditor = { com.com.mogobiz.utils.CustomDateEditor e ->
+	 formats = [
+	 'yyyy/MM/dd',
+	 'yy-MM-dd HH:mm',
+	 'yy-MM-dd',
+	 'MM/dd/yy HH:mm',
+	 'MM/dd/yy'
+	 ]
+	 allowEmpty = true
+	 }
+	 }
+	 */
+
+	credentialMatcher(org.apache.shiro.authc.credential.Sha256CredentialsMatcher)
+
+	calendarConverter com.com.mogobiz.grails.CalendarValueConverter
+	defaultDateConverter com.com.mogobiz.grails.DateValueConverter
+
+	//loadBeans("classpath:*defaultResources.groovy")
+
+	sanitizeUrlService (com.com.mogobiz.service.SanitizeUrlService)
+	rateService (com.com.mogobiz.service.RateService)
+	taxRateService (com.com.mogobiz.service.TaxRateService)
+	cookieService (com.dalew.CookieService)
+	iperCookieService (com.com.mogobiz.service.IperCookieService) {
+		cookieService = ref("cookieService")
+	}
+	uuidDataService (com.com.mogobiz.service.UuidDataService) {
+		iperCookieService = ref("iperCookieService")
+	}
+	productService (com.com.mogobiz.service.ProductService) {
+		sanitizeUrlService = ref("sanitizeUrlService")
+		rateService = ref("rateService")
+		taxRateService = ref("taxRateService")
+		uuidDataService = ref("uuidDataService")
+	}
+	productRender (com.com.mogobiz.store.domain.ProductRender) {
+		productService = ref("productService")
+		taxRateService = ref("taxRateService")
+	}
+	suggestionRender (com.com.mogobiz.store.domain.SuggestionRender) {
+		productService = ref("productService")
+		}
+
+]]>
+        </to>
+    </mapping>
+
+    <mapping>
+        <from><![CDATA[// acquisitionService merge-point]]></from>
+        <to><![CDATA[
+            messageSource = ref("messageSource")
+			mailService = ref("mailService")
+        ]]></to>
+    </mapping>
+</mappings>
