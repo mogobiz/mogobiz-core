@@ -105,7 +105,7 @@ class EsEnv
     }
 
 
-    String toString(){return esEnvRender.asString(this)}
+    String toString(){return esEnvRender?.asString(this)}
 
     def beforeInsert = {
         esEnvValidation.beforeInsert(this)

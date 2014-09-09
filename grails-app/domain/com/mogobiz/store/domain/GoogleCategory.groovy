@@ -77,7 +77,7 @@ class GoogleCategory
     }
 
 
-    String toString(){return googleCategoryRender.asString(this)}
+    String toString(){return googleCategoryRender?.asString(this)}
 
     def beforeInsert = {
         googleCategoryValidation.beforeInsert(this)
