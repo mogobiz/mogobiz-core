@@ -168,7 +168,7 @@ class Suggestion
     }
     
 
-    String toString(){return suggestionRender.asString(this)}
+    String toString(){return suggestionRender?.asString(this)}
 
     def beforeInsert = {
         suggestionValidation.beforeInsert(this)

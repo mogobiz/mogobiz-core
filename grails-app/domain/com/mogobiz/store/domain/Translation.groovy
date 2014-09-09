@@ -83,7 +83,7 @@ class Translation
     }
 
 
-    String toString(){return translationRender.asString(this)}
+    String toString(){return translationRender?.asString(this)}
 
     def beforeInsert = {
         translationValidation.beforeInsert(this)

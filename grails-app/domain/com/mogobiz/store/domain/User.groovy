@@ -154,7 +154,7 @@ class User
     }
 
 
-    String toString(){return userRender.asString(this)}
+    String toString(){return userRender?.asString(this)}
 
     def beforeInsert = {
         userValidation.beforeInsert(this)

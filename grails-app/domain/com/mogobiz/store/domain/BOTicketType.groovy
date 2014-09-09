@@ -172,7 +172,7 @@ class BOTicketType
     }
     
 
-    String toString(){return BOTicketTypeRender.asString(this)}
+    String toString(){return BOTicketTypeRender?.asString(this)}
 
     def beforeInsert = {
         BOTicketTypeValidation.beforeInsert(this)

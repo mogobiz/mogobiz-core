@@ -122,6 +122,10 @@ class Product
     /**
      * 
      */
+    java.util.Date availabilityDate 
+    /**
+     * 
+     */
     com.mogobiz.geolocation.domain.Poi poi 
 
     /**
@@ -205,6 +209,7 @@ class Product
         startFeatureDate column:"start_feature_date",insertable:true,updateable:true,lazy:false,cache:false
         stopDate column:"stop_date",insertable:true,updateable:true,lazy:false,cache:false
         keywords column:"keywords",insertable:true,updateable:true,lazy:false,cache:false
+        availabilityDate column:"availability_date",insertable:true,updateable:true,lazy:false,cache:false
 
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -254,6 +259,7 @@ class Product
         startFeatureDate (nullable:true, unique:false)
         stopDate (nullable:true, unique:false)
         keywords (nullable:true, unique:false)
+        availabilityDate (nullable:true, unique:false)
         poi (nullable:true)
         category ( blank:false, nullable:false)
         brand (nullable:true)
@@ -266,7 +272,7 @@ class Product
     }
 
 
-    String toString(){return productRender.asString(this)}
+    String toString(){return productRender?.asString(this)}
 
     def beforeInsert = {
         productValidation.beforeInsert(this)

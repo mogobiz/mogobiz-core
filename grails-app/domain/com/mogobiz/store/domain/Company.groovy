@@ -271,7 +271,7 @@ class Company
         return ret.hasNext()?ret.next():null
     }
 
-    String toString(){return companyRender.asString(this)}
+    String toString(){return companyRender?.asString(this)}
 
     def beforeInsert = {
         companyValidation.beforeInsert(this)

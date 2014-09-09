@@ -242,7 +242,7 @@ class TicketType
     }
     
 
-    String toString(){return ticketTypeRender.asString(this)}
+    String toString(){return ticketTypeRender?.asString(this)}
 
     def beforeInsert = {
         ticketTypeValidation.beforeInsert(this)

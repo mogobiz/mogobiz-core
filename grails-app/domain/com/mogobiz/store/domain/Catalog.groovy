@@ -97,7 +97,7 @@ class Catalog
     }
 
 
-    String toString(){return catalogRender.asString(this)}
+    String toString(){return catalogRender?.asString(this)}
 
     def beforeInsert = {
         catalogValidation.beforeInsert(this)

@@ -73,7 +73,7 @@ class UserProperty
     }
 
 
-    String toString(){return userPropertyRender.asString(this)}
+    String toString(){return userPropertyRender?.asString(this)}
 
     def beforeInsert = {
         userPropertyValidation.beforeInsert(this)

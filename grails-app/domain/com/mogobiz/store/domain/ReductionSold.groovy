@@ -59,7 +59,7 @@ class ReductionSold
     }
 
 
-    String toString(){return reductionSoldRender.asString(this)}
+    String toString(){return reductionSoldRender?.asString(this)}
 
     def beforeInsert = {
         reductionSoldValidation.beforeInsert(this)

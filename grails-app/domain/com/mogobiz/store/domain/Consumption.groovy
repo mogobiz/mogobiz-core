@@ -112,7 +112,7 @@ class Consumption
     }
     
 
-    String toString(){return consumptionRender.asString(this)}
+    String toString(){return consumptionRender?.asString(this)}
 
     def beforeInsert = {
         consumptionValidation.beforeInsert(this)

@@ -81,7 +81,7 @@ class UserPermission
     }
 
 
-    String toString(){return userPermissionRender.asString(this)}
+    String toString(){return userPermissionRender?.asString(this)}
 
     def beforeInsert = {
         userPermissionValidation.beforeInsert(this)

@@ -95,7 +95,7 @@ class Variation
     }
 
 
-    String toString(){return variationRender.asString(this)}
+    String toString(){return variationRender?.asString(this)}
 
     def beforeInsert = {
         variationValidation.beforeInsert(this)

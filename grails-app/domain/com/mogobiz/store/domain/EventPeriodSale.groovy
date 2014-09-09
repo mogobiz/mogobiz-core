@@ -79,7 +79,7 @@ class EventPeriodSale
     }
 
 
-    String toString(){return eventPeriodSaleRender.asString(this)}
+    String toString(){return eventPeriodSaleRender?.asString(this)}
 
     def beforeInsert = {
         eventPeriodSaleValidation.beforeInsert(this)

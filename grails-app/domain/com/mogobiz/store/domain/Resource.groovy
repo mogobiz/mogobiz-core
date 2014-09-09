@@ -173,7 +173,7 @@ class Resource
     }
 
 
-    String toString(){return resourceRender.asString(this)}
+    String toString(){return resourceRender?.asString(this)}
 
     def beforeInsert = {
         resourceValidation.beforeInsert(this)

@@ -128,7 +128,7 @@ class Coupon
     }
 
 
-    String toString(){return couponRender.asString(this)}
+    String toString(){return couponRender?.asString(this)}
 
     def beforeInsert = {
         couponValidation.beforeInsert(this)

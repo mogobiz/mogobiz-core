@@ -97,7 +97,7 @@ class BOProduct
         return ret.hasNext()?ret.next():null
     }
 
-    String toString(){return BOProductRender.asString(this)}
+    String toString(){return BOProductRender?.asString(this)}
 
     def beforeInsert = {
         BOProductValidation.beforeInsert(this)

@@ -73,7 +73,7 @@ class CompanyProperty
     }
 
 
-    String toString(){return companyPropertyRender.asString(this)}
+    String toString(){return companyPropertyRender?.asString(this)}
 
     def beforeInsert = {
         companyPropertyValidation.beforeInsert(this)

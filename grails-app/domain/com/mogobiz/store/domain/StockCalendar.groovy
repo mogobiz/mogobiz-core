@@ -93,7 +93,7 @@ class StockCalendar
     }
 
 
-    String toString(){return stockCalendarRender.asString(this)}
+    String toString(){return stockCalendarRender?.asString(this)}
 
     def beforeInsert = {
         stockCalendarValidation.beforeInsert(this)

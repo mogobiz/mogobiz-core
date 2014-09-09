@@ -83,7 +83,7 @@ class GoogleVariationMapping
     }
 
 
-    String toString(){return googleVariationMappingRender.asString(this)}
+    String toString(){return googleVariationMappingRender?.asString(this)}
 
     def beforeInsert = {
         googleVariationMappingValidation.beforeInsert(this)

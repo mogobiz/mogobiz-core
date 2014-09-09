@@ -92,7 +92,7 @@ class ReductionRule
     }
 
 
-    String toString(){return reductionRuleRender.asString(this)}
+    String toString(){return reductionRuleRender?.asString(this)}
 
     def beforeInsert = {
         reductionRuleValidation.beforeInsert(this)

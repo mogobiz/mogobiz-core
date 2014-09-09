@@ -144,7 +144,7 @@ class IntraDayPeriod
     }
     
 
-    String toString(){return intraDayPeriodRender.asString(this)}
+    String toString(){return intraDayPeriodRender?.asString(this)}
 
     def beforeInsert = {
         intraDayPeriodValidation.beforeInsert(this)

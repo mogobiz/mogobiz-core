@@ -141,7 +141,7 @@ class Location
     }
     
 
-    String toString(){return locationRender.asString(this)}
+    String toString(){return locationRender?.asString(this)}
 
     def beforeInsert = {
         locationValidation.beforeInsert(this)

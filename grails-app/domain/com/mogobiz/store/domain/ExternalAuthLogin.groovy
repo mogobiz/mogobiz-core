@@ -181,7 +181,7 @@ class ExternalAuthLogin
     }
 
 
-    String toString(){return externalAuthLoginRender.asString(this)}
+    String toString(){return externalAuthLoginRender?.asString(this)}
 
     def beforeInsert = {
         externalAuthLoginValidation.beforeInsert(this)

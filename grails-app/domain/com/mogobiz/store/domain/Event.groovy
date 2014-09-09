@@ -95,7 +95,7 @@ class Event
     }
 
 
-    String toString(){return eventRender.asString(this)}
+    String toString(){return eventRender?.asString(this)}
 
     def beforeInsert = {
         eventValidation.beforeInsert(this)

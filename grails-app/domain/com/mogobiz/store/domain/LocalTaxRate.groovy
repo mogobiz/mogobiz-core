@@ -77,7 +77,7 @@ class LocalTaxRate
     }
 
 
-    String toString(){return localTaxRateRender.asString(this)}
+    String toString(){return localTaxRateRender?.asString(this)}
 
     def beforeInsert = {
         localTaxRateValidation.beforeInsert(this)

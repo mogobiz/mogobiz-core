@@ -176,7 +176,7 @@ class Poi
     }
     
 
-    String toString(){return poiRender.asString(this)}
+    String toString(){return poiRender?.asString(this)}
 
     def beforeInsert = {
         poiValidation.beforeInsert(this)

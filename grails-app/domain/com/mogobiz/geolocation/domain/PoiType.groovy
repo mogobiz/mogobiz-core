@@ -73,7 +73,7 @@ class PoiType
     }
 
 
-    String toString(){return poiTypeRender.asString(this)}
+    String toString(){return poiTypeRender?.asString(this)}
 
     def beforeInsert = {
         poiTypeValidation.beforeInsert(this)

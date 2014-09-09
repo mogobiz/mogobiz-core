@@ -133,7 +133,7 @@ class Category
     }
 
 
-    String toString(){return categoryRender.asString(this)}
+    String toString(){return categoryRender?.asString(this)}
 
     def beforeInsert = {
         categoryValidation.beforeInsert(this)

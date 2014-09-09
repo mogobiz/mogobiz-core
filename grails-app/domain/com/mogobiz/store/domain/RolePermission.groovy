@@ -81,7 +81,7 @@ class RolePermission
     }
 
 
-    String toString(){return rolePermissionRender.asString(this)}
+    String toString(){return rolePermissionRender?.asString(this)}
 
     def beforeInsert = {
         rolePermissionValidation.beforeInsert(this)

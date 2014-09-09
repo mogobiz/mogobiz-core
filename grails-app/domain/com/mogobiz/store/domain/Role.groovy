@@ -69,7 +69,7 @@ class Role
         return ret.hasNext()?ret.next():null
     }
 
-    String toString(){return roleRender.asString(this)}
+    String toString(){return roleRender?.asString(this)}
 
     def beforeInsert = {
         roleValidation.beforeInsert(this)

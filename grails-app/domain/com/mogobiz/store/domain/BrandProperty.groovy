@@ -73,7 +73,7 @@ class BrandProperty
     }
 
 
-    String toString(){return brandPropertyRender.asString(this)}
+    String toString(){return brandPropertyRender?.asString(this)}
 
     def beforeInsert = {
         brandPropertyValidation.beforeInsert(this)

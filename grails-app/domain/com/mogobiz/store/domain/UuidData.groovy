@@ -74,7 +74,7 @@ class UuidData
     }
 
 
-    String toString(){return uuidDataRender.asString(this)}
+    String toString(){return uuidDataRender?.asString(this)}
 
     def beforeInsert = {
         uuidDataValidation.beforeInsert(this)

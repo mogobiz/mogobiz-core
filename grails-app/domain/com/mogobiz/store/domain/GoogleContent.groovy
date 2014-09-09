@@ -83,7 +83,7 @@ class GoogleContent
     }
 
 
-    String toString(){return googleContentRender.asString(this)}
+    String toString(){return googleContentRender?.asString(this)}
 
     def beforeInsert = {
         googleContentValidation.beforeInsert(this)

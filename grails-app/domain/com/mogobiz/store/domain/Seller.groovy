@@ -76,7 +76,7 @@ class Seller
     }
 
 
-    String toString(){return sellerRender.asString(this)}
+    String toString(){return sellerRender?.asString(this)}
 
     def beforeInsert = {
         sellerValidation.beforeInsert(this)

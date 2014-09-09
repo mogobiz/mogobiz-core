@@ -119,7 +119,7 @@ class GoogleEnv
     }
 
 
-    String toString(){return googleEnvRender.asString(this)}
+    String toString(){return googleEnvRender?.asString(this)}
 
     def beforeInsert = {
         googleEnvValidation.beforeInsert(this)

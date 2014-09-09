@@ -91,7 +91,7 @@ class ExternalAccount
     }
 
 
-    String toString(){return externalAccountRender.asString(this)}
+    String toString(){return externalAccountRender?.asString(this)}
 
     def beforeInsert = {
         externalAccountValidation.beforeInsert(this)

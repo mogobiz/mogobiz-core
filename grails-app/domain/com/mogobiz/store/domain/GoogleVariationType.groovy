@@ -59,7 +59,7 @@ class GoogleVariationType
     }
 
 
-    String toString(){return googleVariationTypeRender.asString(this)}
+    String toString(){return googleVariationTypeRender?.asString(this)}
 
     def beforeInsert = {
         googleVariationTypeValidation.beforeInsert(this)

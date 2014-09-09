@@ -44,6 +44,14 @@ class Ibeacon
     /**
      * 
      */
+    String major  = 00000 
+    /**
+     * 
+     */
+    java.lang.String minor  = "00000" 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'ibeaconValidation', 'ibeaconRender' ]
@@ -69,6 +77,8 @@ class Ibeacon
         startDate column:"start_date",insertable:true,updateable:true,lazy:false,cache:false
         endDate column:"end_date",insertable:true,updateable:true,lazy:false,cache:false
         active column:"active",insertable:true,updateable:true,lazy:false,cache:false
+        major column:"major",insertable:true,updateable:true,lazy:false,cache:false
+        minor column:"minor",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -81,11 +91,13 @@ class Ibeacon
         startDate ( blank:false, nullable:false, unique:false)
         endDate ( blank:false, nullable:false, unique:false)
         active ( blank:false, nullable:false, unique:false)
+        major ( blank:false, nullable:false, unique:false)
+        minor ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
     }
 
 
-    String toString(){return ibeaconRender.asString(this)}
+    String toString(){return ibeaconRender?.asString(this)}
 
     def beforeInsert = {
         ibeaconValidation.beforeInsert(this)

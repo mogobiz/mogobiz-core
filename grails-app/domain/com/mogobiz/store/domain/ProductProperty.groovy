@@ -73,7 +73,7 @@ class ProductProperty
     }
 
 
-    String toString(){return productPropertyRender.asString(this)}
+    String toString(){return productPropertyRender?.asString(this)}
 
     def beforeInsert = {
         productPropertyValidation.beforeInsert(this)

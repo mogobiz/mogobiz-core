@@ -103,7 +103,7 @@ class Token
     }
 
 
-    String toString(){return tokenRender.asString(this)}
+    String toString(){return tokenRender?.asString(this)}
 
     def beforeInsert = {
         tokenValidation.beforeInsert(this)

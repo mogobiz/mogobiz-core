@@ -71,7 +71,7 @@ class TaxRate
     }
 
 
-    String toString(){return taxRateRender.asString(this)}
+    String toString(){return taxRateRender?.asString(this)}
 
     def beforeInsert = {
         taxRateValidation.beforeInsert(this)

@@ -105,7 +105,7 @@ class Feature
     }
 
 
-    String toString(){return featureRender.asString(this)}
+    String toString(){return featureRender?.asString(this)}
 
     def beforeInsert = {
         featureValidation.beforeInsert(this)

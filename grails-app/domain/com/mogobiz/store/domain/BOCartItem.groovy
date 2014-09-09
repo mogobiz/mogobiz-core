@@ -132,7 +132,7 @@ class BOCartItem
     }
 
 
-    String toString(){return BOCartItemRender.asString(this)}
+    String toString(){return BOCartItemRender?.asString(this)}
 
     def beforeInsert = {
         BOCartItemValidation.beforeInsert(this)

@@ -101,7 +101,7 @@ class Shipping
     }
 
 
-    String toString(){return shippingRender.asString(this)}
+    String toString(){return shippingRender?.asString(this)}
 
     def beforeInsert = {
         shippingValidation.beforeInsert(this)

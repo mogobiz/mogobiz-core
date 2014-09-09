@@ -113,7 +113,7 @@ class Brand
     }
 
 
-    String toString(){return brandRender.asString(this)}
+    String toString(){return brandRender?.asString(this)}
 
     def beforeInsert = {
         brandValidation.beforeInsert(this)

@@ -102,7 +102,7 @@ class DatePeriod
     }
     
 
-    String toString(){return datePeriodRender.asString(this)}
+    String toString(){return datePeriodRender?.asString(this)}
 
     def beforeInsert = {
         datePeriodValidation.beforeInsert(this)

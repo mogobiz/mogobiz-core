@@ -73,7 +73,7 @@ class Album
     }
 
 
-    String toString(){return albumRender.asString(this)}
+    String toString(){return albumRender?.asString(this)}
 
     def beforeInsert = {
         albumValidation.beforeInsert(this)

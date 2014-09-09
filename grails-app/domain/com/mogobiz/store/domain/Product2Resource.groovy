@@ -75,7 +75,7 @@ class Product2Resource
     }
 
 
-    String toString(){return product2ResourceRender.asString(this)}
+    String toString(){return product2ResourceRender?.asString(this)}
 
     def beforeInsert = {
         product2ResourceValidation.beforeInsert(this)
