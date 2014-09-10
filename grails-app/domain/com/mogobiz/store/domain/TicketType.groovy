@@ -109,6 +109,10 @@ class TicketType
     /**
      * 
      */
+    java.util.Calendar availabilityDate 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.VariationValue variation1 
 
     /**
@@ -166,6 +170,7 @@ class TicketType
         position column:"position",insertable:true,updateable:true,lazy:false,cache:false
         gtin column:"gtin",insertable:true,updateable:true,lazy:false,cache:false
         mpn column:"mpn",insertable:true,updateable:true,lazy:false,cache:false
+        availabilityDate column:"availability_date",insertable:true,updateable:true,lazy:false,cache:false
 
 
         variation1 column:"variation1_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -197,6 +202,7 @@ class TicketType
         position (nullable:true, unique:false)
         gtin (nullable:true, unique:false)
         mpn (nullable:true, unique:false)
+        availabilityDate (nullable:true, unique:false)
         variation1 (nullable:true)
         variation2 (nullable:true)
         product ( blank:false, nullable:false)
