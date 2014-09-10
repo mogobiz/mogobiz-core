@@ -122,7 +122,7 @@ class Product
     /**
      * 
      */
-    java.util.Date availabilityDate 
+    java.util.Calendar availabilityDate 
     /**
      * 
      */
