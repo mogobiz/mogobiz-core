@@ -167,7 +167,6 @@ class SaleServiceSpec extends Specification {
                 name:name,
                 xtype:ProductType.PRODUCT,
                 price:10000,
-                creationDate:new Date(),
                 nbSales:0,
                 hide:false,
                 sanitizedName:name,

@@ -59,7 +59,7 @@ class AbstractTestController {
 		produitPull = new Product(code: "Pull_Nike", name: "Pull Nike", price: 1000, description: "Pull Nike de très bonne qualité",
 			descriptionAsText: "Pull Nike de très bonne qualité", xtype: ProductType.PRODUCT, state: ProductState.ACTIVE,
 			startDate: getDateDebutAnnee(), stopDate: getDateFinAnnee(), startFeatureDate: getDateDebutMois(), stopFeatureDate: getDateFinMois(),
-			calendarType: ProductCalendar.DATE_TIME, creationDate: Calendar.getInstance(), company: company, brand: nike
+			calendarType: ProductCalendar.DATE_TIME, company: company, brand: nike
 		);
 		produitPull.addToCategories(category)
 		saveEntity(produitPull);

@@ -100,10 +100,6 @@ class Product
     /**
      * 
      */
-    java.util.Calendar creationDate 
-    /**
-     * 
-     */
     java.util.Calendar stopFeatureDate 
     /**
      * 
@@ -204,7 +200,6 @@ class Product
         sanitizedName column:"sanitized_name",insertable:true,updateable:true,lazy:false,cache:false
         startDate column:"start_date",insertable:true,updateable:true,lazy:false,cache:false
         modificationDate column:"modification_date",insertable:true,updateable:true,lazy:false,cache:false
-        creationDate column:"creation_date",insertable:true,updateable:true,lazy:false,cache:false
         stopFeatureDate column:"stop_feature_date",insertable:true,updateable:true,lazy:false,cache:false
         startFeatureDate column:"start_feature_date",insertable:true,updateable:true,lazy:false,cache:false
         stopDate column:"stop_date",insertable:true,updateable:true,lazy:false,cache:false
@@ -254,7 +249,6 @@ class Product
         sanitizedName ( blank:false, nullable:false, unique:false)
         startDate (nullable:true, unique:false)
         modificationDate (nullable:true, unique:false)
-        creationDate ( blank:false, nullable:false, unique:false)
         stopFeatureDate (nullable:true, unique:false)
         startFeatureDate (nullable:true, unique:false)
         stopDate (nullable:true, unique:false)

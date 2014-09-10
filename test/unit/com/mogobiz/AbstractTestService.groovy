@@ -184,7 +184,6 @@ class AbstractTestService {
 			startFeatureDate: getDateDebutMois(),
 			stopFeatureDate: getDateFinMois(),
 			calendarType: ProductCalendar.NO_DATE,
-			creationDate: Calendar.getInstance(),
 			company: company,
 			brand: brand,
 			taxRate: taxRate

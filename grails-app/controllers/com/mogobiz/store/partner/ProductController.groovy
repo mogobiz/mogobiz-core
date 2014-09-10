@@ -149,7 +149,6 @@ class ProductController {
         Product product = new Product()
         product.company = seller.company
         product.state = ProductState.ACTIVE
-        product.creationDate = Calendar.getInstance();
         saveProduct(product, params, seller, EventType.CREATE)
     }
 
