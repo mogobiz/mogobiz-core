@@ -47,12 +47,16 @@ class IbeaconService {
                 beaconInBase.errors.rejectValue("id", "unknown")
                 return beaconInBase
             }
+            else {
+                beaconInBase.delete()
+            }
         }
-
+        beaconInBase = new Ibeacon()
         beaconInBase.properties = cmd.properties
         beaconInBase.company = seller.company
 
         if (beaconInBase.validate()) {
+
             beaconInBase.save()
         }
         return beaconInBase
