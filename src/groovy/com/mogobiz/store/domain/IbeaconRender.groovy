@@ -15,7 +15,7 @@ class IbeaconRender
 {
 
     java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.Ibeacon entity, String lang = 'fr') {
-        return RenderUtil.asMapForJSON(["id", "uuid", "name", "startDate", "endDate", "active"], entity)
+        return RenderUtil.asMapForJSON(["id", "uuid", "name", "minor", "major", "startDate", "endDate", "active"], entity)
     }
 
     def String asString(com.mogobiz.store.domain.Ibeacon entity){return "com.mogobiz.store.domain.Ibeacon : "+entity.id}
