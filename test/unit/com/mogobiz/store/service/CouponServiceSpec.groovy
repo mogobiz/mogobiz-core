@@ -1,7 +1,7 @@
 package com.mogobiz.store.service
 import bootstrap.CommonService
 import com.mogobiz.store.cmd.coupon.CouponCreateUpdateCommand
-import com.mogobiz.store.service.SanitizeUrlService
+import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.vo.CartItemVO
 import com.mogobiz.store.vo.CartVO

@@ -1,10 +1,14 @@
 package com.mogobiz.store.admin
 
+import com.mogobiz.exceptions.CompanyAlreadyExistException
+import com.mogobiz.exceptions.InvalidDomainObjectException
+import com.mogobiz.service.CompanyService
 import com.mogobiz.service.CountryService
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.CompanyProperty
 import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.store.domain.Seller
+import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
 import grails.util.Holders
@@ -31,6 +35,7 @@ class CompanyController {
     def ajaxResponseService
     def authenticationService
     CountryService countryService
+    CompanyService companyService
 
     def initDisplayCompany() {
     }
@@ -144,13 +149,9 @@ class CompanyController {
         }
     }
 
-    private String normalizeName(String companyName) {
-        return Normalizer.normalize(companyName, Normalizer.Form.NFD)
-                .replaceAll("\\s", "-").replaceAll("\\p{IsM}+", "").replaceAll("[^a-zA-Z0-9-]", "");
-    }
 
     def isNameNew() {
-        def normalizedName = normalizeName(params['name'])
+        def normalizedName = IperUtil.normalizeName(params['name'])
         def exist = Company.findByName(normalizedName)
         def map = [:]
         map.put("result", exist ? "error" : "success")
@@ -160,7 +161,7 @@ class CompanyController {
     }
 
     def isCodeNew() {
-        def normalizedCode = normalizeName(params['code'])
+        def normalizedCode = IperUtil.normalizeName(params['code'])
         def exist = Company.findByCode(normalizedCode)
         def map = [:]
         map.put("result", exist ? "error" : "success")
@@ -169,70 +170,29 @@ class CompanyController {
         }
     }
 
-    private void createEsEnvAndCatalog(Company company) {
-        EsEnv env = new EsEnv(
-                name: 'dev',
-                url: Holders.config.elasticsearch.serverURL as String,
-                cronExpr: Holders.config.elasticsearch.export.cron as String,
-                company: company,
-                active: true
-        )
-        env.save(flush: true)
-        Catalog catalog = new Catalog(name: "Default Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: company)
-        catalog.save(flush: true)
-    }
-
     /**
      * create new company
      */
     def save() {
-        def companyVO = [:]
-
-        Company company = new Company(params['company'])
-        if (!company.code)
-            company.code = normalizeName(company.name)
-        company.code = company.code.toLowerCase()
-        Company exist = Company.findByCode(company.code)
-        //		if (!exist) {
-        //			exist = Company.findByWebsite(company.website)
-        //		}
-        if (exist) {
+        try {
+            Company company = new Company(params['company'])
+            Map companyVO = companyService.save(company)
+            withFormat {
+                html {
+                    redirect(action: 'show', params: [format: 'html'])
+                }
+                json {
+                    render ajaxResponseService.prepareResponse(company, companyVO).asMap() as JSON
+                }
+            }
+        }
+        catch (CompanyAlreadyExistException ex) {
             response.sendError 403
             return
         }
-        company.website = company.website ?: "http://" + company.name + grailsApplication.config.rootDomain
-        company.aesPassword = SecureCodec.genKey();
-        if (company.validate()) {
-            if (company.location) {
-                def location = company.location
-                if (location.validate()) {
-                    location.save()
-                    company.save()
-                    createEsEnvAndCatalog(company)
-                } else {
-                    company.errors = location.errors
-                }
-            } else {
-                company.save()
-                createEsEnvAndCatalog(company)
-            }
-            companyVO = company.asMapForJSON()
-        }
-
-        withFormat {
-            html {
-                redirect(action: 'show', params: [format: 'html'])
-            }
-            xml {
-                if (!company.hasErrors()) {
-                    redirect(action: 'show', params: [format: 'xml'])
-                } else {
-                    render company.errors as XML
-                }
-            }
-            json {
-                render ajaxResponseService.prepareResponse(company, companyVO).asMap() as JSON
-            }
+        catch (InvalidDomainObjectException ex) {
+            response.sendError 400
+            return
         }
     }
 

@@ -49,6 +49,9 @@ class AuthController {
 
 	// sign in
 	def signIn = {
+        if (params.data) {
+
+        }
 		// Log the user in the application.
 		def authToken = new UsernamePasswordToken(params.username, params.password)
 		if(params.rememberMe){

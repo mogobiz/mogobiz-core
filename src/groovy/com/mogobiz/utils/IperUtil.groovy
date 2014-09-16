@@ -10,6 +10,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.Normalizer
 import java.text.NumberFormat
 import java.text.ParseException;
 import java.text.SimpleDateFormat
@@ -605,4 +606,9 @@ class IperUtil {
         }
         return c;
     }
+    public static String normalizeName(String companyName) {
+        return Normalizer.normalize(companyName, Normalizer.Form.NFD)
+                .replaceAll("\\s", "-").replaceAll("\\p{IsM}+", "").replaceAll("[^a-zA-Z0-9-]", "");
+    }
+
 }
