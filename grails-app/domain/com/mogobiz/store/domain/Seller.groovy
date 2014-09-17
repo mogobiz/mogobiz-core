@@ -41,6 +41,8 @@ class Seller
      * 
      */
     boolean agent  = false 
+    static hasMany = [ companies:com.mogobiz.store.domain.Company ]
+
     static transients = [ 'sellerValidation', 'sellerRender' ]
 
 
@@ -64,6 +66,8 @@ class Seller
         validator column:"validator",insertable:true,updateable:true,lazy:false,cache:false
         sell column:"sell",insertable:true,updateable:true,lazy:false,cache:false
         agent column:"agent",insertable:true,updateable:true,lazy:false,cache:false
+
+        companies column:"companies_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {

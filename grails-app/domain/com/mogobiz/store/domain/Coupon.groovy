@@ -62,6 +62,14 @@ class Coupon
     /**
      * 
      */
+    java.lang.String description 
+    /**
+     * 
+     */
+    java.lang.Boolean anonymous  = java.lang.Boolean.valueOf(false) 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
     /**
      * 
@@ -97,6 +105,8 @@ class Coupon
         endDate column:"end_date",insertable:true,updateable:true,lazy:false,cache:false
         catalogWise column:"catalog_wise",insertable:true,updateable:true,lazy:false,cache:false
         forSale column:"for_sale",insertable:true,updateable:true,lazy:false,cache:false
+        description column:"description",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        anonymous column:"anonymous",insertable:true,updateable:true,lazy:false,cache:false
 
 
         categories column:"categories_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -123,6 +133,8 @@ class Coupon
         endDate (nullable:true, unique:false)
         catalogWise ( blank:false, nullable:false, unique:false)
         forSale ( blank:false, nullable:false, unique:false)
+        description (nullable:true, unique:false)
+        anonymous ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
         reductionSold (nullable:true)
     }

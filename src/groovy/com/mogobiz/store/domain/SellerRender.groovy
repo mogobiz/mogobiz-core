@@ -37,10 +37,16 @@ class SellerRender
 				'location.postalCode',
 				'location.countryCode',
 				'company',
-				'company.id'
+				'company.id',
+                'company.code'
 			]
 		}
+        List<String> companies = []
 		Map result = super.asMap(included, excluded, entity, lang);
+        entity.companies.each {
+            companies << it.code
+        }
+        result << [companies:companies]
 		translate(result, entity, lang)
 		return result;
 	}

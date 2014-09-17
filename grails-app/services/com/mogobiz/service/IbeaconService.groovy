@@ -25,7 +25,7 @@ class IbeaconService {
             throw new IllegalArgumentException()
         }
 
-        Ibeacon beaconInBase = Ibeacon.findByUuidAndMajorAndMinor(cmd.uuid, cmd.major, cmd.minor)
+        Ibeacon beaconInBase = Ibeacon.findByCompanyAndUuidAndMajorAndMinor(seller.company.id, cmd.uuid, cmd.major, cmd.minor)
         if (beaconInBase != null && (cmd.id == null || cmd.id != beaconInBase.id)) {
             beaconInBase.errors.rejectValue("uuid", "already.exist")
             return beaconInBase
