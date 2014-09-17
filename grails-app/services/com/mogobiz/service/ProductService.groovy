@@ -6,7 +6,9 @@
 package com.mogobiz.service
 
 import com.mogobiz.common.client.BulkResponse
+import com.mogobiz.common.client.Client
 import com.mogobiz.common.client.ClientConfig
+import com.mogobiz.common.rivers.spi.AbstractRiver
 import com.mogobiz.common.rivers.spi.RiverConfig
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.elasticsearch.rivers.ESRivers
@@ -794,7 +796,7 @@ class ProductService
                     languages: languages,
                     defaultLang: 'fr')
             Future<BulkResponse> future = BlockingObservable.from(
-                    river?.upsertCatalogObjects(config, [product], ec)).last()
+                    (river as AbstractRiver<Product, ? extends Client>)?.upsertCatalogObjects(config, [product], ec)).last()
             BulkResponse response = Await.result(future, Duration.create(10, TimeUnit.SECONDS))
             if(response){
                 log.info('product ' + product.id + ' updated to es')
