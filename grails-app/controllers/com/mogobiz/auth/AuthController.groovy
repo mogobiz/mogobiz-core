@@ -6,19 +6,20 @@ package com.mogobiz.auth
 import com.megatome.grails.RecaptchaService
 import com.mogobiz.service.CompanyService
 import com.mogobiz.service.SellerService
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.utils.RSA
+import com.mogobiz.utils.RandomPassword
 import grails.converters.JSON
 import grails.util.Environment
 import grails.util.Holders
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
+import org.apache.shiro.crypto.hash.Sha256Hash
 import org.apache.shiro.web.util.SavedRequest
 import org.apache.shiro.web.util.WebUtils
-
-import com.mogobiz.store.domain.Company
-import org.codehaus.groovy.grails.web.json.JSONObject;
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * @version $Id $
@@ -58,64 +59,78 @@ class AuthController {
     // sign in
     def signIn = {
         if (params.data) {
-            String decodedData = RSA.decrypt(params.data, Environment.currentEnvironment == Environment.PRODUCTION ? new FileInputStream(Holders.config.rsa.key.dir, "private.key") : SCH.servletContext.getResourceAsStream("/WEB-INF/secretkeys/private.key"))
-            JSONObject data = JSON.parse(decodedData)
-            String storename = data.get("storename")
-            String storecode = data.get("storecode")
-            String owneremail = data.get("owneremail")
-            String ownerfirstname = data.get("ownerfirstname")
-            String ownerlastname = data.get("ownerlastname")
-            Company company = Company.findByCode(storecode)
-            if (company == null) {
-                company = new Company(code: storecode, name: storename)
-                companyService.save(company)
-            }
-            Seller seller = Seller.findByEmail(owneremail)
-            if (seller == null) {
-                seller = new Seller(firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, admin: true, sell: true, validator: true, active: true)
-                seller.company = company
-                sellerService.save(seller, false)
-            }
-            seller.save(flush:true)
-
-        }
-        // Log the user in the application.
-        def authToken = new UsernamePasswordToken(params.username, params.password)
-        if (params.rememberMe) {
-            authToken.rememberMe = params.rememberMe
-        }
-
-        try {
-            SecurityUtils.subject.login(authToken)
-            // If a controller redirected to this page, redirect back
-            // to it.
-            def originalParams = session.originalRequestParams
-            if (originalParams) {
-                log.info "Redirecting to controller '${originalParams.controller}', action '${originalParams.action}'."
-
-                // Remove the original parameters from the session.
-                session.removeAttribute('originalRequestParams')
-
-                // Redirect to the target controller and action.
-                redirect(controller: originalParams.controller, action: originalParams.action, params: originalParams)
-            } else if (params.targetUri) {
-                if (params.targetUri.startsWith('http')) {
-                    // redirect to the target url
-                    redirect(url: params.targetUri)
-                } else {
-                    // redirect to the target uri
-                    redirect(uri: params.targetUri)
+            try {
+                String decodedData = RSA.decrypt(params.data, Environment.currentEnvironment == Environment.PRODUCTION ? new FileInputStream(Holders.config.rsa.key.dir, "private.key") : SCH.servletContext.getResourceAsStream("/WEB-INF/secretkeys/private.key"))
+                JSONObject data = JSON.parse(decodedData)
+                String storename = data.get("storename")
+                String storecode = data.get("storecode")
+                String owneremail = data.get("owneremail")
+                String ownerfirstname = data.get("ownerfirstname")
+                String ownerlastname = data.get("ownerlastname")
+                Company company = Company.findByCode(storecode)
+                if (company == null) {
+                    company = new Company(code: storecode, name: storename)
+                    companyService.save(company)
                 }
-            } else {
-                // Redirect to the home page.
+                Seller seller = Seller.findByEmail(owneremail)
+                if (seller == null) {
+                    String clearPassword = RandomPassword.getRandomPassword(10)
+                    String password = new Sha256Hash(clearPassword)
+                    seller = new Seller(password: password, firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, admin: true, sell: true, validator: true, active: true)
+                    seller.company = company
+                    sellerService.save(seller, false)
+                }
+                seller.save(flush: true)
+                UsernamePasswordToken authToken = new UsernamePasswordToken(seller.login, seller.password)
+                // Log the user in the application.
+                SecurityUtils.subject.login(authToken)
                 redirect(uri: '/')
             }
+            catch (Exception ex) {
+                log.info "Authentication failure for data '${params.data}'."
+                flash.message = ex.getMessage()
+                response.sendError 403
+            }
+        } else {
+            // Log the user in the application.
+            UsernamePasswordToken authToken = new UsernamePasswordToken(params.username, params.password)
+            if (params.rememberMe) {
+                authToken.rememberMe = params.rememberMe
+            }
+
+            try {
+                SecurityUtils.subject.login(authToken)
+                // If a controller redirected to this page, redirect back
+                // to it.
+                def originalParams = session.originalRequestParams
+                if (originalParams) {
+                    log.info "Redirecting to controller '${originalParams.controller}', action '${originalParams.action}'."
+
+                    // Remove the original parameters from the session.
+                    session.removeAttribute('originalRequestParams')
+
+                    // Redirect to the target controller and action.
+                    redirect(controller: originalParams.controller, action: originalParams.action, params: originalParams)
+                } else if (params.targetUri) {
+                    if (params.targetUri.startsWith('http')) {
+                        // redirect to the target url
+                        redirect(url: params.targetUri)
+                    } else {
+                        // redirect to the target uri
+                        redirect(uri: params.targetUri)
+                    }
+                } else {
+                    // Redirect to the home page.
+                    redirect(uri: '/')
+                }
+            }
+            catch (AuthenticationException ex) {
+                log.info "Authentication failure for user '${params.username}'."
+                flash.message = ex.getMessage()//"Invalid username and/or password"
+                redirect(action: 'login', params: [username: params.username])
+            }
         }
-        catch (AuthenticationException ex) {
-            log.info "Authentication failure for user '${params.username}'."
-            flash.message = ex.getMessage()//"Invalid username and/or password"
-            redirect(action: 'login', params: [username: params.username])
-        }
+
     }
 
     // sign out
@@ -134,9 +149,9 @@ class AuthController {
     def login = {
         SavedRequest sRequest = WebUtils.getSavedRequest(request)
         if (sRequest) {
-            def uri = sRequest.getRequestURI()
-            def targetUri = sRequest.getRequestURI() - request.contextPath
-            def query = sRequest.getQueryString()
+            String uri = sRequest.getRequestURI()
+            String targetUri = sRequest.getRequestURI() - request.contextPath
+            String query = sRequest.getQueryString()
 
             if (query) {
                 if (!query.startsWith('?')) {

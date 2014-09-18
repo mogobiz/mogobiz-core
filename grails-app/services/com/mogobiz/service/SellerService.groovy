@@ -110,6 +110,9 @@ class SellerService {
             return oldSeller
         } else {
             if (seller.validate()) {
+                if (seller.companies != null && !seller.companies.contains(seller.company)) {
+                    seller.companies.add(seller.company)
+                }
                 //gestion des roles
                 if (seller.validator) {
                     seller.addToRoles(Role.findByName(RoleName.VALIDATOR))
