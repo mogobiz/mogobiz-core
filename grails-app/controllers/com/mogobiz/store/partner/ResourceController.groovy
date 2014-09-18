@@ -3,6 +3,7 @@
  */
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -26,7 +27,7 @@ import com.mogobiz.utils.IperUtil
  */
 class ResourceController {
 	
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 	
 	def authenticationService
 	

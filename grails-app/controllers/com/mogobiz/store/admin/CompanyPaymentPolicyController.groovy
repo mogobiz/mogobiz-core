@@ -1,6 +1,6 @@
 package com.mogobiz.store.admin
 
-
+import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -14,7 +14,7 @@ import com.mogobiz.json.RenderUtil
  */
 class CompanyPaymentPolicyController
 {
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 
 	def show = {
 		def company = params['company']?.id?Company.get(params['company']?.id):null

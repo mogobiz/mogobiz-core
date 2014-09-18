@@ -1,5 +1,6 @@
 package com.mogobiz.store.partner
 import com.mogobiz.ajax.AjaxResponse
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Tag
@@ -12,7 +13,7 @@ class TagController {
 
     def authenticationService
     def tagService
-    def ajaxResponseService
+    AjaxResponseService ajaxResponseService
 
     def list(PagedListCommand cmd) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()

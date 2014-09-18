@@ -3,6 +3,7 @@
  */
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.domain.Shipping;
 import com.mogobiz.store.domain.Product;
 
@@ -15,7 +16,7 @@ import grails.converters.XML
  */
 class ShippingPolicyController {
 
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 
 	def authenticationService
 

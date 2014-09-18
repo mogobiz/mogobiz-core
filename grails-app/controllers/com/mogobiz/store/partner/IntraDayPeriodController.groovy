@@ -3,6 +3,7 @@
  */
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
 import com.mogobiz.store.domain.IntraDayPeriod
@@ -17,7 +18,7 @@ import com.mogobiz.json.RenderUtil
  */
 class IntraDayPeriodController {
 	
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 	
 	def authenticationService
 	

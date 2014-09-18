@@ -1,5 +1,6 @@
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -11,7 +12,7 @@ import com.mogobiz.store.domain.VariationValue
 
 class VariationController {
 	def authenticationService
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 
 	def show = {
 		Category category = params['category']?.id?Category.get(params['category']?.id):null

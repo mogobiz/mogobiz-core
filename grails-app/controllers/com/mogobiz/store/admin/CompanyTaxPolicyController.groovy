@@ -1,5 +1,6 @@
 package com.mogobiz.store.admin
 
+import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -14,7 +15,7 @@ import com.mogobiz.store.domain.TaxRate
  */
 class CompanyTaxPolicyController {
 
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 	def initTaxRateDialogPage() {}
 	def show = {
 		def taxRate = params.id?TaxRate.get(params.id):null

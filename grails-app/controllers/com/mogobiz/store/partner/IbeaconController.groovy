@@ -1,5 +1,6 @@
 package com.mogobiz.store.partner
 import com.mogobiz.ajax.AjaxResponse
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.cmd.IBeaconCommand
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.domain.Ibeacon
@@ -13,7 +14,7 @@ class IbeaconController {
 
     def authenticationService
     def ibeaconService
-    def ajaxResponseService
+    AjaxResponseService ajaxResponseService
 
     def list(PagedListCommand cmd) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()

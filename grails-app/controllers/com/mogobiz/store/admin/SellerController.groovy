@@ -1,5 +1,6 @@
 package com.mogobiz.store.admin
 
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.service.SellerService
 import com.mogobiz.store.domain.Company
@@ -12,7 +13,7 @@ import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha256Hash
 
 class SellerController {
-    def ajaxResponseService
+    AjaxResponseService ajaxResponseService
     AuthenticationService authenticationService
 
     SellerService sellerService

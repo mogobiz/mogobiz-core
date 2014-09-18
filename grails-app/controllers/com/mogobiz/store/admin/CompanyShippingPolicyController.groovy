@@ -1,4 +1,6 @@
 package com.mogobiz.store.admin
+
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.domain.Company
 import com.mogobiz.json.RenderUtil
 import grails.converters.JSON
@@ -10,7 +12,7 @@ import grails.converters.XML
  */
 class CompanyShippingPolicyController {
 
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 
 	def show = {
 		def company = params['company']?.id?Company.get(params['company']?.id):null

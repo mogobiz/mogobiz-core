@@ -1,5 +1,7 @@
 package com.mogobiz.store.admin
 
+import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.exceptions.CompanyAlreadyExistException
 import com.mogobiz.exceptions.InvalidDomainObjectException
 import com.mogobiz.service.CompanyService
@@ -32,8 +34,8 @@ import com.mogobiz.utils.SecureCodec
 class CompanyController {
 
     def grailsApplication
-    def ajaxResponseService
-    def authenticationService
+    AjaxResponseService ajaxResponseService
+    AuthenticationService authenticationService
     CountryService countryService
     CompanyService companyService
 

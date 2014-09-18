@@ -1,5 +1,6 @@
-package com.mogobiz.store.partner;
+package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService;
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -18,7 +19,7 @@ import com.mogobiz.utils.IperUtil;
  *
  */
 public class TicketTypeController {
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 
 	def authenticationService
 

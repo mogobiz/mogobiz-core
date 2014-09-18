@@ -3,6 +3,7 @@
  */
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.BrandProperty
@@ -18,7 +19,7 @@ import grails.converters.XML
  */
 class BrandController {
 
-    def ajaxResponseService
+    AjaxResponseService ajaxResponseService
 
     AuthenticationService authenticationService
 

@@ -1,5 +1,6 @@
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -14,7 +15,7 @@ import com.mogobiz.json.RenderUtil;
  */
 class ProductKoPeriodsController {
 
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 
 	def authenticationService
 

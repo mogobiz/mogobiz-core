@@ -3,6 +3,7 @@
  */
 package com.mogobiz.store.admin
 
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.User
 import com.mogobiz.utils.RandomPassword
@@ -19,7 +20,7 @@ import org.apache.shiro.crypto.hash.Sha256Hash
  *
  */
 class SellerPasswordController {
-    def ajaxResponseService
+    AjaxResponseService ajaxResponseService
     def grailsApplication
 
     MailService mailService

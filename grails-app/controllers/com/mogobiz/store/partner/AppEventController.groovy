@@ -1,5 +1,6 @@
 package com.mogobiz.store.partner
 
+import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.domain.Event
 import com.mogobiz.store.domain.Product
 import java.text.SimpleDateFormat
@@ -12,7 +13,7 @@ import grails.converters.XML
  */
 class AppEventController {
 	
-	def ajaxResponseService
+	AjaxResponseService ajaxResponseService
 	def authenticationService
 
 	SimpleDateFormat sdf = new SimpleDateFormat(IperConstant.DATE_FORMAT)
