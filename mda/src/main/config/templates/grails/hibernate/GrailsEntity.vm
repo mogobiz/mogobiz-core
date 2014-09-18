@@ -266,11 +266,6 @@ $!{indent}$!{indent}autoTimestamp true
 $!{indent}uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 #end
 
-#if($entity.entityName == "Resource")
-    table "XRESOURCE"
-#elseif($entity.entityName == "Catalog")
-    table "XCATALOG"
-#end
 
 #if($entity.hibernateInheritanceClass)
 #if($stringUtils.isNotBlank($entity.hibernateDiscriminatorValue))

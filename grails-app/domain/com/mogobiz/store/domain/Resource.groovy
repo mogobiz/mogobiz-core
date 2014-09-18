@@ -111,15 +111,14 @@ class Resource
 
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
-    table "XRESOURCE"
 
 
         cache usage:'read-write'
 
         tablePerHierarchy true
 
-        discriminator value:'ResourceImpl', column:[name:'xresource',length:255]
-        table 'resource'
+        discriminator value:'ResourceImpl', column:[name:'class',length:255]
+        table 'xresource'
 
         version false
 
