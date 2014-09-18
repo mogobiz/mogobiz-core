@@ -48,6 +48,7 @@ class UserProperty
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
+
         cache usage:'read-write'
 
         tablePerHierarchy false

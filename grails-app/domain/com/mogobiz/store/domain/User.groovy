@@ -80,7 +80,11 @@ class User
     /**
      * 
      */
-    java.util.Date birthdate     /**
+    java.util.Date birthdate 
+    /**
+     * 
+     */
+    boolean autosign  = false     /**
      * 
      */
     com.mogobiz.geolocation.domain.Location location
@@ -100,6 +104,7 @@ class User
         autoTimestamp true
 
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
+
 
 
         cache usage:'read-write'
@@ -124,6 +129,7 @@ class User
         tokenSecret column:"token_secret",insertable:true,updateable:true,lazy:false,cache:false
         externalId column:"external_id",insertable:true,updateable:true,lazy:false,cache:false
         birthdate column:"birthdate",insertable:true,updateable:true,lazy:false,cache:false
+        autosign column:"autosign",insertable:true,updateable:true,lazy:false,cache:false
 
 
         location column:"location_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -149,6 +155,7 @@ class User
         tokenSecret (nullable:true, unique:false)
         externalId (nullable:true, unique:false)
         birthdate (nullable:true, unique:false)
+        autosign ( blank:false, nullable:false, unique:false)
         location (nullable:true)
         company (nullable:true)
     }

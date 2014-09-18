@@ -59,7 +59,7 @@ $!{indent}$primaryKeyTypeName ${primaryKey.name}
 #end
 ## TODO FIX EMBEDDEDVALUE ISSUE
 #if($attribute.containsEmbeddedObject)
-#### L'attribut est une entité imbriquée
+#### L'attribut est une entitï¿½ imbriquï¿½e
 #### EmbeddedValueStereotype
 $!{indent}/**
 $attribute.getDocumentation("$!{indent} * ")
@@ -70,7 +70,7 @@ $!{indent}$fullyQualifiedPropertyType $attribute.name
 ##render the embedded type
 #else
 #if($typeSafeEnumsEnabled == false)
-## Enumeration non typée <TODO NOT YET SUPPORTED/>
+## Enumeration non typï¿½e <TODO NOT YET SUPPORTED/>
 #else
 #if($attribute.name != 'id')
 #if(!$attribute.identifier)
@@ -93,11 +93,11 @@ $!{indent}$fullyQualifiedPropertyType $attribute.name #if($attribute.defaultValu
 #if($otherEnd.navigable && !$otherEnd.transient)
 ## La relation $otherEnd.name est navigable et non transient
 #if($sourceEnd.one2One)
-## La muyltiplicité de $sourceEnd.name est one2One
+## La muyltiplicitï¿½ de $sourceEnd.name est one2One
 #if($sourceEnd.one2OnePrimary || (!$sourceEnd.navigable && !$entity.foreignHibernateGeneratorClass))
-## Association one2One sur une clé primaire sourceEnd.one2OnePrimary = $sourceEnd.one2OnePrimary
+## Association one2One sur une clï¿½ primaire sourceEnd.one2OnePrimary = $sourceEnd.one2OnePrimary
 ## ou 
-## L entité $sourceEnd.name n est pas navigable et l entité $entity.entityName na pas de generateur de classe hibernate
+## L entitï¿½ $sourceEnd.name n est pas navigable et l entitï¿½ $entity.entityName na pas de generateur de classe hibernate
 $!{indent}/**
 $otherEnd.getDocumentation("$!{indent} * ")
 $!{indent} */
@@ -266,6 +266,12 @@ $!{indent}$!{indent}autoTimestamp true
 $!{indent}uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 #end
 
+#if($entity.entityName == "Resource")
+    table "XRESOURCE"
+#elseif($entity.entityName == "Catalog")
+    table "XCATALOG"
+#end
+
 #if($entity.hibernateInheritanceClass)
 #if($stringUtils.isNotBlank($entity.hibernateDiscriminatorValue))
 #set($mappingDiscriminatorValue = "$!{entity.hibernateDiscriminatorValue}")
@@ -364,7 +370,7 @@ $!{indent}$!{indent}version $optimisticLocking
 ## 
 #if(!$entity.hibernateEmbeddedValueMetaType)
 #if(!$entity.compositeIdentifier )
-## Identifiant de l entité est non composite
+## Identifiant de l entitï¿½ est non composite
 #set($identifier = $entity.identifiers.iterator().next())
 ##
 ## Custom identity
@@ -512,9 +518,9 @@ $!{indent}$!{indent}$mappingAssociationName #if($mappingAssociationConfigColumn!
 #end
 #if($sourceEnd.one2One)
 #if($sourceEnd.one2OnePrimary || (!$sourceEnd.navigable && !$entity.foreignHibernateGeneratorClass))
-## Association one2One sur une clé primaire sourceEnd.one2OnePrimary = $sourceEnd.one2OnePrimary
+## Association one2One sur une clï¿½ primaire sourceEnd.one2OnePrimary = $sourceEnd.one2OnePrimary
 ## ou 
-## L entité $sourceEnd.name n est pas navigable et l entité $entity.entityName na pas de generateur de classe hibernate
+## L entitï¿½ $sourceEnd.name n est pas navigable et l entitï¿½ $entity.entityName na pas de generateur de classe hibernate
 #if($otherEnd.type.foreignHibernateGeneratorClass)
 ## generateur de classe hibernate pour le type de $otherEnd.name
 #set($mappingAssociationName = "$!{otherEnd.name}")
@@ -678,7 +684,7 @@ $!{indent}$!{indent}$mappingAssociationName #if($mappingAssociationConfigColumn!
 #set($mappingAssociationConfigIndexColumnName  = "$!{otherEnd.collectionIndexName}")
 #end
 #if($otherEnd.map)
-## création de l index pour une map
+## crï¿½ation de l index pour une map
 #set($mappingAssociationConfigIndexColumnName  = "$!{otherEnd.collectionIndexName}")
 #set($mappingAssociationConfigIndexColumnType  = "$!{otherEnd.collectionIndexType}")
 #end

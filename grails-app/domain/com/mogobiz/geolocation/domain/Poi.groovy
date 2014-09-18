@@ -88,6 +88,7 @@ class Poi
 
 
 
+
         cache usage:'read-write'
 
         discriminator value:'POI'

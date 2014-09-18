@@ -68,6 +68,7 @@ class BOCart
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
+
         cache usage:'read-write'
 
         tablePerHierarchy false
@@ -79,7 +80,7 @@ class BOCart
         id name:'id',column:'id',generator:'native'
         transactionUuid column:"transaction_uuid",insertable:true,updateable:true,lazy:false,cache:false
         buyer column:"buyer",insertable:true,updateable:true,lazy:false,cache:false
-        date column:"date",insertable:true,updateable:true,lazy:false,cache:false
+        date column:"xdate",insertable:true,updateable:true,lazy:false,cache:false
         price column:"price",insertable:true,updateable:true,lazy:false,cache:false
         status column:"status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
         currencyCode column:"currency_code",insertable:true,updateable:true,lazy:false,cache:false

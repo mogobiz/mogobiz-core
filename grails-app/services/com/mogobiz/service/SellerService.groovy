@@ -62,6 +62,7 @@ class SellerService {
             seller.addToCompanies(company)
         }
         seller.company = company
+        seller.autosign = true
         seller.save(flush: true)
 
         UsernamePasswordToken authToken = new UsernamePasswordToken(seller.login, seller.password)

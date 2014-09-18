@@ -31,6 +31,7 @@ class ShippingCarriers implements java.io.Serializable
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
+
         cache true
 
         version false

@@ -63,6 +63,8 @@ class Catalog
 
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
+    table "XCATALOG"
+
 
         cache usage:'read-write'
 

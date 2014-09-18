@@ -44,6 +44,7 @@ class Consumption
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
+
         cache usage:'read-write'
 
         tablePerHierarchy false
@@ -53,7 +54,7 @@ class Consumption
         version false
 
         id name:'id',column:'id',generator:'native'
-        date column:"date",insertable:true,updateable:true,lazy:false,cache:false
+        date column:"xdate",insertable:true,updateable:true,lazy:false,cache:false
 
 
         bOTicketType column:"b_o_ticket_type_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'

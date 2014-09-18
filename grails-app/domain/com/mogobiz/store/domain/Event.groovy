@@ -62,6 +62,7 @@ class Event
     uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
+
         cache usage:'read-write'
 
         tablePerHierarchy false
@@ -72,7 +73,7 @@ class Event
 
         id name:'id',column:'id',generator:'native'
         xtype column:"xtype",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
-        date column:"date",insertable:true,updateable:true,lazy:false,cache:false
+        date column:"xdate",insertable:true,updateable:true,lazy:false,cache:false
         description column:"description",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
