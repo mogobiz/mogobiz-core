@@ -1,20 +1,26 @@
 package com.mogobiz.service
 
 import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Permission
-import com.mogobiz.store.domain.Role
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.Seller
-import com.mogobiz.store.domain.UserPermission
+import com.mogobiz.store.domain.*
+import com.mogobiz.utils.RSA
+import com.mogobiz.utils.RandomPassword
+import grails.converters.JSON
+import grails.util.Environment
+import grails.util.Holders
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authc.UsernamePasswordToken
+import org.apache.shiro.crypto.hash.Sha256Hash
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 class SellerService {
+    static transactional = true
+
     def grailsApplication
     def emailConfirmationService
     AuthenticationService authenticationService
+    CompanyService companyService
 
-    static transactional = true
 
     def setActiveCompany(Seller seller, Company company) {
         seller.companies.remove(seller.company)
@@ -24,21 +30,63 @@ class SellerService {
         seller.save(flush: true)
     }
 
+
+    def autoSignIn(String paramData) throws Exception {
+//        String decodedData = RSA.decrypt(paramData, Environment.currentEnvironment == Environment.PRODUCTION ? new FileInputStream(Holders.config.rsa.key.dir, "private.key") : ServletContextHolder.servletContext.getResourceAsStream("/WEB-INF/secretkeys/private.key"))
+//        JSONObject data = JSON.parse(decodedData)
+//        String storename = data.get("storename")
+//        String storecode = data.get("storecode")
+//        String owneremail = data.get("owneremail")
+//        String ownerfirstname = data.get("ownerfirstname")
+//        String ownerlastname = data.get("ownerlastname")
+        String storename =" coucou"
+        String storecode = "coucou"
+        String owneremail ="hayssam@saleh.fr"
+        String ownerfirstname = "hayssam"
+        String ownerlastname = "saleh"
+
+        Company company = Company.findByCode(storecode)
+        if (company == null) {
+            company = new Company(code: storecode, name: storename)
+            companyService.save(company)
+        }
+        Seller seller = Seller.findByEmail(owneremail)
+        if (seller == null) {
+            String clearPassword = RandomPassword.getRandomPassword(10)
+            String password = new Sha256Hash(clearPassword)
+            seller = new Seller(password: password, firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, login:owneremail, admin: true, sell: true, validator: true, active: true)
+            seller.company = company
+            this.save(seller, false)
+        }
+        if (!seller.companies?.contains(company)) {
+            seller.addToCompanies(company)
+        }
+        seller.company = company
+        seller.save(flush: true)
+
+        UsernamePasswordToken authToken = new UsernamePasswordToken(seller.login, seller.password)
+        // Log the user in the application.
+        SecurityUtils.subject.login(authToken)
+    }
+
     def addCompany(Seller seller, Company company) {
-        if (!seller.companies.contains(company))
-            seller.companies.add(company)
+        if (authenticationService.canAdminAllStores()) {
+            if (!seller.companies?.contains(company))
+                seller.addToCompanies(company)
+        }
     }
 
     def removeCompany(Seller seller, Company company) {
-        seller.companies.remove(company)
-        seller.save(flush: true)
+        if (authenticationService.canAdminAllStores()) {
+            seller.removeFromCompanies(company)
+            seller.save(flush: true)
+        }
     }
 
     def Seller update(Seller seller, def params) {
         def user = authenticationService.retrieveAuthenticatedUser()
         def isitme = seller.id == user.id
         def isSeller = isitme && SecurityUtils.getSubject().hasRole(RoleName.PARTNER.name())
-        def sellerVO
         // FIXME (bug ihm)
         def oldPassword = seller.password
         def wasAdmin = seller.admin
@@ -105,13 +153,13 @@ class SellerService {
         Seller oldSeller = Seller.findByEmail(seller.email)
         if (oldSeller != null) {
             Company company = Company.get(seller.company.id)
-            if (!oldSeller.companies.contains(company))
-                oldSeller.companies.add(company)
+            if (!oldSeller.companies?.contains(company))
+                oldSeller.addToCompanies(company)
             return oldSeller
         } else {
             if (seller.validate()) {
-                if (seller.companies != null && !seller.companies.contains(seller.company)) {
-                    seller.companies.add(seller.company)
+                if (!seller.companies?.contains(seller.company)) {
+                    seller.addToCompanies(seller.company)
                 }
                 //gestion des roles
                 if (seller.validator) {

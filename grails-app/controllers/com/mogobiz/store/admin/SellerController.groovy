@@ -18,6 +18,22 @@ class SellerController {
 
     SellerService sellerService
 
+    def addCompany() {
+        long sellerId = params.long("seller.id")
+        String companyCode = params["company.code"]
+        Company company = Company.findByCode(companyCode)
+        Seller seller = Seller.get(sellerId)
+        sellerService.addCompany(seller, company)
+    }
+
+    def removeCompany() {
+        String sellerId = params["seller.id"]
+        String companyCode = params["company.code"]
+        Company company = Company.findByCode(companyCode)
+        Seller seller = Seller.get(sellerId)
+        sellerService.removeCompany(seller, company)
+    }
+
     def setActiveCompany(String code) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
