@@ -91,7 +91,7 @@ class AuthenticationService {
 		def authorized = store && canAdminStore(store.id)
 		if(store && !authorized){
 			def seller = retrieveAuthenticatedSeller()
-			authorized = store == seller?.company
+			authorized = seller.companies?.contains(store)
 		}
 		return authorized
 	}
