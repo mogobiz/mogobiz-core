@@ -44,7 +44,7 @@ class Role
 
         tablePerHierarchy false
 
-        table 'role'
+        table 'xrole'
 
         version false
 
@@ -59,16 +59,6 @@ class Role
         name ( blank:false, nullable:false, unique:true)
     }
 
-    static com.mogobiz.store.domain.Role findByName(final com.mogobiz.store.domain.RoleName name)
-    {
-        return Role.findByName("from com.mogobiz.store.domain.Role as role where role.name = :name", name);
-    }
-
-    static com.mogobiz.store.domain.Role findByName(final java.lang.String queryString, final com.mogobiz.store.domain.RoleName name)
-    {
-        def ret = Role.executeQuery(queryString, [name:name]).iterator()
-        return ret.hasNext()?ret.next():null
-    }
 
     String toString(){return roleRender?.asString(this)}
 
