@@ -7,6 +7,7 @@ import java.sql.Types;
  */
 public class OracleDialect extends org.hibernate.dialect.Oracle10gDialect {
     public OracleDialect() {
+        super();
         registerColumnType( Types.VARBINARY, 2000, "raw($l)" );
         registerColumnType( Types.VARBINARY, "blob" );
         registerColumnType( Types.LONGVARCHAR, "clob" );

@@ -32,10 +32,6 @@ class Token
     /**
      * 
      */
-    java.util.Date creationDate 
-    /**
-     * 
-     */
     java.lang.String value 
     /**
      * 
@@ -79,7 +75,6 @@ class Token
 
         id name:'id',column:'id',generator:'native'
         redirectURI column:"redirect_u_r_i",insertable:true,updateable:true,lazy:false,cache:false
-        creationDate column:"creation_date",insertable:true,updateable:true,lazy:false,cache:false
         value column:"value",insertable:true,updateable:true,lazy:false,cache:false
         expiresIn column:"expires_in",insertable:true,updateable:true,lazy:false,cache:false
         scope column:"scope",insertable:true,updateable:true,lazy:false,cache:false
@@ -94,7 +89,6 @@ class Token
     uuid (nullable:false, unique:false)
 
         redirectURI ( blank:false, nullable:false, unique:false)
-        creationDate ( blank:false, nullable:false, unique:false)
         value ( blank:false, nullable:false, unique:false)
         expiresIn ( blank:false, nullable:false, unique:false)
         scope (nullable:true, unique:false)

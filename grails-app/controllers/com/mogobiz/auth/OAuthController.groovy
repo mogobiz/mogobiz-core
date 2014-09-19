@@ -117,7 +117,6 @@ class OAuthController {
 				user : user,
 				scope : scope,
 				state : state,
-				creationDate : new Date(),
 				// The authorization code MUST expire
 				// shortly after it is issued to mitigate the risk of leaks.  A
 				// maximum authorization code lifetime of 10 minutes is
@@ -243,7 +242,6 @@ class OAuthController {
 					value : accessToken,
 					clientId : clientId,
 					user : user,
-					creationDate : new Date(),
 					expiresIn : 0,
                     redirectURI : redirectURI)
 				token.validate()

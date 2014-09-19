@@ -188,7 +188,7 @@ class ProductService
 				le('price', Long.valueOf(criteria["priceMax"]))
 			}
 			if (criteria["creationDateMin"]) {
-				ge('creationDate', criteria["creationDateMin"])
+				ge('dateCreated', criteria["creationDateMin"])
 			}
 			order(criteria["orderBy"] ?: "startDate", criteria["orderDirection"] ?: "desc")
 		}
@@ -257,7 +257,7 @@ class ProductService
 				le('price', criteria["priceMax"])
 			}
 			if (criteria["creationDateMin"]) {
-				ge('creationDate', criteria["creationDateMin"])
+				ge('dateCreated', criteria["creationDateMin"])
 			}
 			order(criteria["orderBy"] ?: "startDate", criteria["orderDirection"] ?: "desc")
 		}

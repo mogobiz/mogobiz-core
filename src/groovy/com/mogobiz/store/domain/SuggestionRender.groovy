@@ -35,7 +35,7 @@ class SuggestionRender
 				'product.text',
 				'product.picture',
 				'product.video',
-				'product.creationDate',
+				'product.dateCreated',
 				'product.modificationDate',
 				'product.startDate',
 				'product.stopDate',

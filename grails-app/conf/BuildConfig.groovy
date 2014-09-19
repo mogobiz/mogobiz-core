@@ -46,7 +46,7 @@ grails.project.dependency.resolution = {
         compile group:"org.twitter4j", name:"twitter4j-stream", version:"2.2.5"
         runtime 'mysql:mysql-connector-java:5.1.30'
         runtime "postgresql:postgresql:9.1-901.jdbc4"
-//        runtime "com.oracle:ojdbc6:11.2.0.1.0"
+        //runtime "com.oracle:ojdbc6:11.2.0.1.0"
 
         compile 'org.scala-lang:scala-library:2.11.2'
 

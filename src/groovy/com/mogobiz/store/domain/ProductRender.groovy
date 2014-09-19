@@ -36,7 +36,6 @@ class ProductRender
                 'keywords',
 				'picture',
 				'video',
-				'creationDate',
 				'modificationDate',
 				'startDate',
 				'stopDate',

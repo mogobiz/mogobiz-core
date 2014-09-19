@@ -278,7 +278,6 @@ public class CommonService {
 				startFeatureDate: getDateDebutMois(),
 				stopFeatureDate: getDateFinMois(),
 				calendarType: calendarType,
-				creationDate: Calendar.getInstance(),
 				sanitizedName: sanitizeUrlService.sanitizeWithDashes(name),
 				company: company,
 				brand: brand,

@@ -116,7 +116,7 @@ class AuthenticationService {
     boolean hasExpired(Token token){
         boolean ret = false
         if(token.expiresIn > 0){
-            ret = (token.creationDate.time + token.expiresIn) < System.currentTimeMillis()
+            ret = (token.dateCreated.time + token.expiresIn) < System.currentTimeMillis()
         }
         return ret
     }
