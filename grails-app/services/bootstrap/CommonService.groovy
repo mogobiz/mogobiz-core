@@ -465,7 +465,7 @@ public class CommonService {
         return rule
     }
 
-    public Coupon createCoupon(Company company, List<ReductionRule> rules, String code, String name, Long numberOfUses = null, List<Category> categories = null, List<Product> products = null, List<TicketType> ticketTypes = null) {
+    public Coupon createCoupon(Company company, List<ReductionRule> rules, String code, String name, Long numberOfUses = null, List<Category> categories = null, List<Product> products = null, List<TicketType> ticketTypes = null, String description = null, boolean anonymous=false) {
         Coupon coupon = Coupon.findByCode(code)
         if (coupon == null) {
             coupon = new Coupon()
@@ -481,6 +481,12 @@ public class CommonService {
             rules?.each { ReductionRule rule ->
                 saveEntity(rule)
             }
+            coupon.description = description
+            coupon.startDate = Calendar.getInstance()
+            def endDate = Calendar.getInstance()
+            endDate.add(Calendar.DAY_OF_YEAR, 7)
+            coupon.endDate = endDate
+            coupon.anonymous = anonymous
             saveEntity(coupon)
         }
         return coupon

@@ -156,5 +156,7 @@ class JahiaCommerceService {
         produitPull.ibeacon = ibeacon
         commonService.saveEntity(produitPull)
 
+        // Promotion
+        commonService.createCoupon(company, [regle10Pourcent], "Promotion", "-10%", 0L, [categoryHabillage], null, null, "Promotion exceptionnelle de -10% sur tout l'habillement", true)
     }
 }
