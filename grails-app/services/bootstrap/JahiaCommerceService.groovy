@@ -158,5 +158,6 @@ class JahiaCommerceService {
 
         // Promotion
         commonService.createCoupon(company, [regle10Pourcent], "Promotion", "-10%", 0L, [categoryHabillage], null, null, "Promotion exceptionnelle de -10% sur tout l'habillement", true)
+        commonService.createCoupon(company, [regle3achete1Offer], "Promo1pour3", "Pour 3 tshirt achetés, 1 offert", null, null, [produitTShirt],null,"Pour 3 pour 1 sur tout les tshirts",true)
     }
 }
