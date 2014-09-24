@@ -85,7 +85,7 @@ class RenderUtil {
 	 * @return  map for json renderer
 	 */
 	public static Map asMapForJSON(object) {
-		return asMapForJSON(null, [], [], object, false)
+		return asMapForJSON(null, [], [], object, false, true)
 	}
 	
 	/**
@@ -96,7 +96,7 @@ class RenderUtil {
 	 * @return  map for json renderer
 	 */
 	public static Map asMapForJSON(included, object) {
-		return asMapForJSON(null, included, [], object, false)
+		return asMapForJSON(null, included, [], object, false, true)
 	}
 
     /**
@@ -107,7 +107,7 @@ class RenderUtil {
      * @return  map for json renderer
      */
     public static Map asIsoMapForJSON(included, object) {
-        return asMapForJSON(null, included, [], object, true)
+        return asMapForJSON(null, included, [], object, true, false)
     }
 
     /**
@@ -120,7 +120,7 @@ class RenderUtil {
      * @param iso whether or not to use ISO format for date
 	 * @return  map for json renderer
 	 */
-	public static Map asMapForJSON(property, included, excluded, object, boolean iso = false) {
+	public static Map asMapForJSON(property, included, excluded, object, boolean iso = false, boolean nullable = true) {
 		def map = null;
 		if (object != null)
 		{
@@ -146,8 +146,13 @@ class RenderUtil {
 									valueList.add (asMapForJSON(currentProperty, included, excluded, val))
 								}
 								map.put(key,valueList)
-							}else if(value== null || value instanceof java.lang.Enum || isPrimitiveType(value.class)) {
-								map.put(key, value)
+							}else if(value == null || value instanceof java.lang.Enum || isPrimitiveType(value.class)) {
+                                if(value == null && !nullable && String.class.equals(propertyUtilsBean.getPropertyDescriptor(object, key).propertyType)){
+                                    map.put(key, "")
+                                }
+                                else{
+                                    map.put(key, value)
+                                }
 							}else if(value!= null && value.class.isArray()) {
 								def valueList  = new ArrayList()
 								value.each { val ->
