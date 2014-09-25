@@ -4,6 +4,7 @@ import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.RSA
 import com.mogobiz.utils.RandomPassword
+import com.mogobiz.utils.SymmetricCrypt
 import grails.converters.JSON
 import grails.util.Environment
 import grails.util.Holders
@@ -33,17 +34,19 @@ class SellerService {
 
     def autoSignIn(String paramData) throws Exception {
 //        String decodedData = RSA.decrypt(paramData, Environment.currentEnvironment == Environment.PRODUCTION ? new FileInputStream(Holders.config.rsa.key.dir, "private.key") : ServletContextHolder.servletContext.getResourceAsStream("/WEB-INF/secretkeys/private.key"))
-//        JSONObject data = JSON.parse(decodedData)
-//        String storename = data.get("storename")
-//        String storecode = data.get("storecode")
-//        String owneremail = data.get("owneremail")
-//        String ownerfirstname = data.get("ownerfirstname")
-//        String ownerlastname = data.get("ownerlastname")
-        String storename =" coucou"
-        String storecode = "coucou"
-        String owneremail ="hayssam@saleh.fr"
-        String ownerfirstname = "hayssam"
-        String ownerlastname = "saleh"
+//        String decodedData = RSA.decrypt(paramData, new FileInputStream("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys/private.key"))
+        String decodedData = SymmetricCrypt.decrypt(paramData, Holders.config.application.secret, "AES")
+        JSONObject data = JSON.parse(decodedData)
+        String storename = data.get("storename")
+        String storecode = data.get("storecode")
+        String owneremail = data.get("owneremail")
+        String ownerfirstname = data.get("ownerfirstname")
+        String ownerlastname = data.get("ownerlastname")
+//        String storename =" coucou"
+//        String storecode = "coucou"
+//        String owneremail ="hayssam@saleh.fr"
+//        String ownerfirstname = "hayssam"
+//        String ownerlastname = "saleh"
 
         Company company = Company.findByCode(storecode)
         if (company == null) {

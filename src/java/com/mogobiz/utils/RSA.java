@@ -63,17 +63,17 @@ public class RSA {
 		}
 	}
 
-	public static byte[] encrypt(byte[] data, InputStream publicKey) throws Exception {
+    static String rsa = "RSA/NONE/PKCS1PADDING";
+    public static byte[] encrypt(byte[] data, InputStream publicKey) throws Exception {
 		Key pubKey = readKeyFromFile(publicKey, true);
-		Cipher cipher = Cipher.getInstance("RSA");
+		Cipher cipher = Cipher.getInstance(rsa);
 		cipher.init(Cipher.ENCRYPT_MODE, pubKey);
 		byte[] cipherData = cipher.doFinal(data);
 		return cipherData;
 	}
-
 	public static String encrypt(String data, InputStream publicKey) throws Exception{
 		Key pubKey = readKeyFromFile(publicKey, true);
-		Cipher cipher = Cipher.getInstance("RSA");
+		Cipher cipher = Cipher.getInstance(rsa);
 		cipher.init(Cipher.ENCRYPT_MODE, pubKey);
 		byte[] cipherData = cipher.doFinal(data.getBytes());
 		return Base64.encodeBytes(cipherData, 0, cipherData.length, Base64.URL_SAFE);
@@ -81,7 +81,7 @@ public class RSA {
 
 	public static byte[] decrypt(byte[] cipherData, InputStream privateKey) throws Exception {
 		Key prvKey = readKeyFromFile(privateKey, false);
-		Cipher cipher = Cipher.getInstance("RSA");
+		Cipher cipher = Cipher.getInstance(rsa);
 		cipher.init(Cipher.DECRYPT_MODE, prvKey);
 		byte[] data = cipher.doFinal(cipherData);
 		return data;
@@ -89,30 +89,34 @@ public class RSA {
 	
 	public static String decrypt(String cipherData, InputStream privateKey) throws Exception {
 		Key prvKey = readKeyFromFile(privateKey, false);
-		Cipher cipher = Cipher.getInstance("RSA");
+		Cipher cipher = Cipher.getInstance(rsa);
 		cipher.init(Cipher.DECRYPT_MODE, prvKey);
+        System.out.println(cipher.getProvider().getInfo());
 		byte[] data = cipher.doFinal(Base64.decode(cipherData, Base64.URL_SAFE));
 		return new String(data);
 	}
 	public static void main(String[] args) throws Exception {
 		RSA.genKeyPair(new File("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys"));
-//		String dataEncoded64 = RSA.encrypt("hayssam@saleh.fr;customer_email;1234567890123456;AZERAZERAZERAZERAZERAZER", new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/public.key"));
+		String dataEncoded64 = RSA.encrypt("{\"storeName\":\"eCommerce\",\"storeCode\":\"ecommerce\",\"owneremail\":\"root@mogobiz.com\",\"ownerfirstname\":\"root\",\"ownerlastname\":\"root\"}", new FileInputStream("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys/public.key"));
+
 //		System.out.println(dataEncoded64);
 //		System.out.println("^^^^^^^^^^^^");
 //		String data = RSA.decrypt("D3cHhsyst5__sz1Nh75Xk45EGYKFIn94EJb3xH585b0zsmZYjkDlXHo-UhVgkGqpw-aMldc5TDYbv0V54Tvmwbh9zBluhzkN9YN0ZAMaZ38DAKlVpee8bY-HQeB2Kgm9wxvDa_62XddvMIDM8ef4DrqWWhXCoO6lj-NiAha_oSzxTb42uAunBFM4Msl8pe0ctDUtyU5sIjTO4gjvjwQeJVKpRPtuGj4TpNANJaFGNbyiEgU-8ue6iD2oTdTTHwy4XOIlxDShgPkuKrzkjYMoHAr9SSCwV_HaxPJj9zL2PKu_GsV9D9isukI1F1jjdL9jt9-HF8PQGHMg2CfHka_oMA==", new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/private.key"));
 //		System.out.println(dataEncoded64+"/"+data);
 //		byte[] data2 = RSA.encrypt("1245673241657342671437432714632".getBytes(), new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/public.key"));
-//		byte[]  data3 = RSA.decrypt(data2, new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/private.key"));
+//		byte[]  data3 = RSA.decrypt("UfGPs5RXSnl74T6s6jUvBmlwt7I_hx4A6VrtxXgb3_6n1So2vM-9xnnGv7D1aAu_G1wp0LbaTYmLU3GduygE9TjzKuWbBG1QEqYQIu-igbWIX9JiR1yNk4MrK996bL_t9g8p46HSzBnN9QjhgtmXh7t_3wqUquAuOtLARxQj2DZETqh_hnk0UUbUhBerphnO0VamySNAu3jo3DOgBPidiC9AS8wk8iBHx8XzXaKNHJ4on-zlm_5GlY0zHSSTG2fEc-Fk7Zw-DEtk8MWMhrIKg-fjy257iCoR4YFFJWpxO1sRZQ5ooHimD4u_dJ85fTLrQogClaXU7oUg3vk1RIOFCg==", new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/private.key"));
 //		System.out.println(new String(data3));
 //
 //
 //
-//		dataEncoded64 = RSA.encrypt("demande;1379067702831;039142286;yoann.baudy@ebiznext.com", new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/public.key"));
-//		System.out.println("******");
-//		System.out.println(dataEncoded64);
-//		data = RSA.decrypt("g_U1K1bLqGRuz1v66Al7pcCa_TgwO48kdhh7hAcBGrOFCKw-08f-00okShMoBrvAo26zEFl2sDicr_f_AqRZ7LtM7ngzCpYU7Z-HRk7o75-IunVvtuo4hyY_bN3Q-wdnRPgsO_0-L6_q9-INL5CLcbwQ0pbP2NS4gcJrQ-Gn18vyvLWJVHNHffbiVW3mkzsJngAe8IMSsXhvWaMg0tR9PDnR_C78720HlGS5BMgabUTIsx5orGoUNBEjYVVMWwZtrdhTphm1XRgQExN8YrYqieoCuTdjUlQvqA80jjM0df73qOke163f1W1Jpzbvk4FuUW8a8DXVtJ0MdbUladhj2A==", new FileInputStream("/Users/hayssams/git/mogopay-core/mogopay/web-app/WEB-INF/secretkeys/private.key"));
-//		System.out.println(dataEncoded64+"/"+data);
-//		System.out.println(data);
+        dataEncoded64 = RSA.encrypt("{\"storeName\":\"eCommerce\",\"storeCode\":\"ecommerce\",\"owneremail\":\"root@mogobiz.com\",\"ownerfirstname\":\"root\",\"ownerlastname\":\"root\"}", new FileInputStream("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys/public.key"));
+		System.out.println("******");
+		System.out.println(dataEncoded64);
+        String data = RSA.decrypt(dataEncoded64, new FileInputStream("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys/private.key"));
+        System.out.println(dataEncoded64+"/"+data);
+        data = RSA.decrypt("S-GPor96y9ALQUd8145NDxxM2n8pwG61x87B5NLuviYue3mdFYk4iYEiUUvsZ5Y70sXFyEOuKfzOUQRDnYsK0AG3_SbzysJswNxTZ3j9KOvKCV3JCaIdYkA71gZBlA5Un9pY-PhzjpgNdU0csSwgQf9Z16fWPMzUYx6rkM6KVGuT5SEjU0eRk_YZucmdgC6xQdUgJTA6FKG4bAS7cbN_F9pCq5_83-ilnxC0Ng0sU_4kh5UAhUm3Fw5tjLCbSkarG-rWIg9QPZvWosaGP39bmXLA6WUixN9MWtu9OrCN-4aFyga2W1kaJGxyfY88YOetiBKdCEpRuHcq8BEO8U_gGQ==", new FileInputStream("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys/private.key"));
+		System.out.println(dataEncoded64+"/"+data);
+		System.out.println(data);
 
 	}
 }
