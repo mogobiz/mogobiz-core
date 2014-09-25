@@ -44,7 +44,7 @@ class ShippingRule
     /**
      * 
      */
-    com.mogobiz.store.domain.Product product 
+    com.mogobiz.store.domain.Company company 
 
     static transients = [ 'shippingRuleValidation', 'shippingRuleRender' ]
 
@@ -72,7 +72,7 @@ class ShippingRule
         price column:"price",insertable:true,updateable:true,lazy:false,cache:false
 
 
-        product column:"product_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+        company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -82,7 +82,7 @@ class ShippingRule
         minAmount ( blank:false, nullable:false, unique:false)
         maxAmount ( blank:false, nullable:false, unique:false)
         price ( blank:false, nullable:false, unique:false)
-        product (nullable:true)
+        company (nullable:true)
     }
 
 
