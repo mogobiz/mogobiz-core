@@ -492,6 +492,18 @@ public class CommonService {
         return coupon
     }
 
+    public ShippingRule createShippingRule(Company company, String countryCode, long minAmount, long maxAmount, String price ){
+        ShippingRule shippingRule = new ShippingRule(
+                company : company,
+                countryCode: countryCode,
+                minAmount: minAmount,
+                maxAmount: maxAmount,
+                price: price
+        )
+        saveEntity(shippingRule)
+        shippingRule
+    }
+
 	private void saveEntity(def entite)
 	{
 		String msg = "";
