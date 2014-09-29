@@ -24,6 +24,8 @@ class SellerService {
 
 
     def setActiveCompany(Seller seller, Company company) {
+        if (!seller.companies?.contains(company) && seller.company != company)
+            throw new Exception("Security breach")
         seller.companies.remove(seller.company)
         seller.company = company
         seller.companies.remove(company)
@@ -57,7 +59,7 @@ class SellerService {
         if (seller == null) {
             String clearPassword = RandomPassword.getRandomPassword(10)
             String password = new Sha256Hash(clearPassword)
-            seller = new Seller(password: password, firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, login:owneremail, admin: true, sell: true, validator: true, active: true)
+            seller = new Seller(password: password, firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, login: owneremail, admin: true, sell: true, validator: true, active: true)
             seller.company = company
             this.save(seller, false)
         }
