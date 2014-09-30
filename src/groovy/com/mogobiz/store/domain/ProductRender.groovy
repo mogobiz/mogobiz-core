@@ -26,6 +26,7 @@ class ProductRender
 				'id',
 				'dateCreated',
 				'lastUpdated',
+                'availabilityDate',
 				'name',
 				'code',
 				'externalCode',

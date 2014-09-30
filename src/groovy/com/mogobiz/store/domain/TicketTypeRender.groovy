@@ -24,6 +24,7 @@ class TicketTypeRender
 				'xprivate',
 				'startDate',
 				'stopDate',
+                'availabilityDate',
 				'product',
 				'product.id',
 				'sku',

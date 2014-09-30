@@ -102,6 +102,7 @@ public class TicketTypeController {
 				ticketType.description = params['ticketType']?.description;
 				ticketType.startDate = RenderUtil.translateDateTimeToCalendar(params['ticketType']?.startDate, IperConstant.DATE_FORMAT)
 				ticketType.stopDate =  RenderUtil.translateDateTimeToCalendar(params['ticketType']?.stopDate, IperConstant.DATE_FORMAT)
+                ticketType.availabilityDate = RenderUtil.translateDateTimeToCalendar(params['ticketType']?.availabilityDate, IperConstant.DATE_FORMAT)
 				Long quantity = params['ticketType']?.stock ? new Long(params['ticketType']?.stock) : 0
 				def stock = new Stock()
 				stock.stock = quantity && quantity > 0?quantity: 0
@@ -163,6 +164,7 @@ public class TicketTypeController {
 				ticketType.description = params['ticketType']?.description;
 				ticketType.startDate = RenderUtil.translateDateTimeToCalendar(params['ticketType']?.startDate, IperConstant.DATE_FORMAT)
 				ticketType.stopDate = RenderUtil.translateDateTimeToCalendar(params['ticketType']?.stopDate, IperConstant.DATE_FORMAT)
+                ticketType.availabilityDate = RenderUtil.translateDateTimeToCalendar(params['ticketType']?.availabilityDate, IperConstant.DATE_FORMAT)
 				Long quantity = params['ticketType']?.stock ? new Long(params['ticketType']?.stock) : -1
 				def stock = new Stock()
 				stock.stock = quantity && quantity >= 0 ? quantity : null
