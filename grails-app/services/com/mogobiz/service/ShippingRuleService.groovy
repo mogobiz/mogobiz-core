@@ -29,7 +29,7 @@ class ShippingRuleService {
             throw new IllegalArgumentException()
         }
 
-        ShippingRule shippingRule = ShippingRule.findByCompanyAndCountryCode(seller.company.id, cmd.countryCode)
+        ShippingRule shippingRule = ShippingRule.findByCompanyAndCountryCode(seller.company, cmd.countryCode)
         if (shippingRule != null && (cmd.id == null || cmd.id != shippingRule.id)) {
             shippingRule.errors.rejectValue("countryCode", "already.exist")
             return shippingRule
