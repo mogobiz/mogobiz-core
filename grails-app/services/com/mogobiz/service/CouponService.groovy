@@ -220,7 +220,7 @@ class CouponService {
         coupon.endDate = params.endDate
 
         // link with categories
-        params.categories?.each { groovy.lang.Category c ->
+        params.categories?.each { Category c ->
             coupon.addToCategories(c)
         }
 
