@@ -196,9 +196,10 @@ class CouponService {
         coupon.ticketTypes?.clear()
 
         if (coupon.rules?.size() > 0) {
-            ReductionRule.deleteAll(coupon.rules)
+            coupon.rules.each {
+                coupon.removeFromRules(it)
+            }
         }
-        coupon.rules?.clear()
         return createOrUpdate(coupon, params)
     }
 
