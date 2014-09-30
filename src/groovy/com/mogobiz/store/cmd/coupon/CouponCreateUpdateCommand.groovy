@@ -14,6 +14,7 @@ class CouponCreateUpdateCommand {
     String code
     Boolean active
     Boolean catalogWise
+    Boolean anonymous
     Long numberOfUses
     Calendar startDate
     Calendar endDate

@@ -214,6 +214,7 @@ class CouponService {
         coupon.name = params.name
         coupon.code = params.code ? params.code : generateCode()
         coupon.active = params.active ? params.active : true
+        coupon.anonymous = params.anonymous ? params.anonymous : false
         coupon.catalogWise = params.catalogWise ? params.catalogWise : false
         coupon.numberOfUses = params.numberOfUses
         coupon.startDate = params.startDate
