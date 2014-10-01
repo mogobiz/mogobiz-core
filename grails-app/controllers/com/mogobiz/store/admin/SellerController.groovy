@@ -71,9 +71,7 @@ class SellerController {
                 }
 
                 withFormat {
-                    html company: seller
-                    xml { render seller as XML }
-                    json { render seller as JSON }
+                    json { render seller.asMapForJSON() as JSON }
                 }
             } else {
                 response.sendError 404

@@ -121,7 +121,7 @@ class RenderUtil {
 	 * @return  map for json renderer
 	 */
 	public static Map asMapForJSON(property, included, excluded, object, boolean iso = false, boolean nullable = true) {
-		def map = null;
+		Map map = null;
 		if (object != null)
 		{
 			map = new HashMap()
