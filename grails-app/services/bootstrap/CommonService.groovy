@@ -1,7 +1,6 @@
 package bootstrap
 import com.mogobiz.store.domain.*
 import com.mogobiz.service.SanitizeUrlService
-import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.store.vo.RegisteredCartItemVO
 import com.mogobiz.utils.DateUtilitaire
 import com.mogobiz.utils.IperUtil
@@ -20,9 +19,9 @@ public class CommonService {
 	def init() {
 		// création des roles
 		Role admin = createRole(RoleName.ADMINISTRATOR)
-		Role client = createRole(RoleName.CLIENT)
-		Role partner = createRole(RoleName.PARTNER)
-		Role validator = createRole(RoleName.VALIDATOR)
+		createRole(RoleName.CLIENT)
+		createRole(RoleName.PARTNER)
+		createRole(RoleName.VALIDATOR)
 
 		// permissions
 		Permission permission = Permission.findByTypeAndPossibleActions('org.apache.shiro.authz.permission.WildcardPermission', '*');
@@ -42,126 +41,59 @@ public class CommonService {
 			saveEntity(adminCompanyRolePermission)
 		}
 
-		// création de l'adresse de la compagnie		
-		Location adresseMogobiz = Location.findByPostalCodeAndCity("92800", "Puteaux")
-		if (adresseMogobiz == null)
-		{
-			adresseMogobiz = new Location(road1: "4 Place de la Défense", postalCode: "92800", city: "Puteaux", countryCode: 'FR');
-			saveEntity(adresseMogobiz)
-		}
-
-		// création des compagnies
-		Company mogobiz = Company.findByCode("mogobiz")
-		if (mogobiz == null) {
-			mogobiz = new Company(code: "mogobiz", name: "Mogobiz", location: adresseMogobiz, website: "http://www.ebiznext.com", aesPassword:"5c3f3da15cae1bf2bc736b95bda10c78", email:"contact@mogobiz.com")
-            GoogleEnv googleEnv = new GoogleEnv(
-                    merchant_id: '100653663',
-                    merchant_url: Holders.config.grails.serverURL,
-                    client_id: 'mogobiz@gmail.com',
-                    client_secret: 'e-z12B24',
-                    cronExpr: '0 * * * * ?',
-                    running: false,
-                    dry_run: true,
-                    version: 2,
-                    active:false
-            )
-            saveEntity(googleEnv)
-            mogobiz.googleEnv = googleEnv
-			saveEntity(mogobiz)
-			
-			Catalog catalog = new Catalog(name:"Default Catalog", uuid:UUID.randomUUID().toString(), social:false, activationDate:new Date(), company:mogobiz)
-			saveEntity(catalog)
-								
-			// création des TaxRate
-            LocalTaxRate frTaxRate = new LocalTaxRate(rate: 19.6, active: true, countryCode: "FR");
-            saveEntity(frTaxRate)
-            LocalTaxRate usaAlTaxRate = new LocalTaxRate(rate: 9.0, active: true, countryCode: "USA", stateCode: "USA.AL");
-            saveEntity(usaAlTaxRate)
-
-			TaxRate taxRate = new TaxRate(name: "TaxRate", company: mogobiz);
-            taxRate.addToLocalTaxRates(frTaxRate);
-            taxRate.addToLocalTaxRates(usaAlTaxRate);
-			saveEntity(taxRate)
-
-            EsEnv env = new EsEnv(
-                    name:'dev',
-                    url:Holders.config.elasticsearch.serverURL as String,
-                    cronExpr: Holders.config.elasticsearch.export.cron as String,
-                    company: mogobiz,
-                    active: true
-            )
-            saveEntity(env)
-		}
-		Catalog mogobizCatalog = Catalog.findByNameAndCompany("Default Catalog", mogobiz);
-		
-		// création de l'admin
-		User userAdmin = User.findByLogin("admin@iper2010.com")
-		if(userAdmin == null) {
-			userAdmin = new User(login:"admin@iper2010.com", email:"admin@iper2010.com", password:new Sha256Hash('changeit').toHex(), active:true)
-			userAdmin.addToRoles(admin)
-			saveEntity(userAdmin)
-		}
-        Seller seller = Seller.findByLogin("partner@iper2010.com")
-
-		// création des sellers
-		if(seller == null) {
-			seller = new Seller(login:"partner@iper2010.com", email:"partner@iper2010.com", password:new Sha256Hash('changeit').toHex(),
-			firstName: 'rector', lastName: 'Dir', active: true, company: mogobiz, location: adresseMogobiz, admin:true)
-			seller.addToRoles(partner)
-			saveEntity(seller)
-		}
-
-		UserPermission userPermission = UserPermission.createCriteria().get{
-			eq('permission.id', permission?.id)
-			eq('user.id', seller.id)
-			eq('target', 'company:'+seller.company.id+':admin')
-			eq('actions', '*')
-		}
-		if (seller.admin) {
-			if(!userPermission) {
-				userPermission = new UserPermission(permission:permission, user:seller, target:'company:'+seller.company.id+':admin',actions:'*')
-				saveEntity(userPermission)
-			}
-		}
-		else if(userPermission) { userPermission.delete() }
-
-		// création du valideur
-		Seller userValidator = Seller.findByLogin("validator@iper2010.com")
-		if (userValidator == null)
-		{
-			userValidator = new Seller(login:"validator@iper2010.com", email:"validator@iper2010.com", password:new Sha256Hash('changeit').toHex(),
-				firstName:'Valid', lastName:'ator', active:true, company: mogobiz, location: adresseMogobiz, admin:true)
-			userValidator.addToRoles(validator)
-			saveEntity(userValidator)
-		}
-
-		// création des categories
-		createCategory("Habillement", null, mogobiz, mogobizCatalog, 1, "vetements homme femme enfant");
-        Category parent = createCategory("Hightech", null, mogobiz, mogobizCatalog, 2);
-		createCategory("Télévisions", parent, mogobiz, mogobizCatalog, 1, "TV télé télévision HD");
-		createCategory("Cinéma", null, mogobiz, mogobizCatalog, 3);
+        // création de l'admin
+        User userAdmin = User.findByLogin(Holders.config.superadmin.login)
+        if(userAdmin == null) {
+            userAdmin = new User(login:Holders.config.superadmin.login, email:Holders.config.superadmin.email, password:new Sha256Hash(Holders.config.superadmin.password).toHex(), active:true)
+            userAdmin.addToRoles(admin)
+            saveEntity(userAdmin)
+        }
 
         // création des variations google
-        GoogleVariationType gender = new GoogleVariationType(xtype: 'gender')
-        saveEntity(gender)
+        GoogleVariationType gender = GoogleVariationType.findByXtype('gender')
+        if(gender == null){
+            gender = new GoogleVariationType(xtype: 'gender')
+            saveEntity(gender)
+        }
         ['male', 'female', 'unisex'].each {value ->
-            GoogleVariationValue val = new GoogleVariationValue(value:value, type: gender)
-            saveEntity(val)
+            GoogleVariationValue val = GoogleVariationValue.findByValueAndType(value, gender)
+            if(val == null){
+                val = new GoogleVariationValue(value:value, type: gender)
+                saveEntity(val)
+            }
         }
-        GoogleVariationType age_group = new GoogleVariationType(xtype: 'age group')
-        saveEntity(age_group)
+        GoogleVariationType age_group = GoogleVariationType.findByXtype('age group')
+        if(age_group == null){
+            age_group = new GoogleVariationType(xtype: 'age group')
+            saveEntity(age_group)
+        }
         ['adults', 'kids'].each {value ->
-            GoogleVariationValue val = new GoogleVariationValue(value:value, type: age_group)
-            saveEntity(val)
+            GoogleVariationValue val = GoogleVariationValue.findByValueAndType(value, age_group)
+            if(val == null){
+                val = new GoogleVariationValue(value:value, type: age_group)
+                saveEntity(val)
+            }
         }
-        GoogleVariationType color = new GoogleVariationType(xtype: 'color')
-        saveEntity(color)
-        GoogleVariationType size = new GoogleVariationType(xtype: 'size')
-        saveEntity(size)
-        GoogleVariationType material = new GoogleVariationType(xtype: 'material')
-        saveEntity(material)
-        GoogleVariationType pattern = new GoogleVariationType(xtype: 'pattern')
-        saveEntity(pattern)
+        GoogleVariationType color = GoogleVariationType.findByXtype('color')
+        if(color == null){
+            color = new GoogleVariationType(xtype: 'color')
+            saveEntity(color)
+        }
+        GoogleVariationType size = GoogleVariationType.findByXtype('size')
+        if(size == null){
+            size = new GoogleVariationType(xtype: 'size')
+            saveEntity(size)
+        }
+        GoogleVariationType material = GoogleVariationType.findByXtype('material')
+        if(material == null){
+            material = new GoogleVariationType(xtype: 'material')
+            saveEntity(material)
+        }
+        GoogleVariationType pattern = GoogleVariationType.findByXtype('pattern')
+        if(pattern == null){
+            pattern = new GoogleVariationType(xtype: 'pattern')
+            saveEntity(pattern)
+        }
 	}
 
 	public Feature createFeature(String name, String value, Product product, int position)
@@ -348,17 +280,20 @@ public class CommonService {
 	}
 
     public BOCart createBOCart(Company company, String transactionUUID) {
-        BOCart boCart = new BOCart(
-                transactionUuid : transactionUUID,
-                buyer: "yoann.baudy@ebiznext.com",
-                date : Calendar.getInstance(),
-                price : 10000,
-                status : TransactionStatus.PENDING,
-                currencyCode : "EUR",
-                currencyRate : 0.01,
-                company: company
-        )
-        saveEntity(boCart);
+        BOCart boCart = BOCart.findByTransactionUuid(transactionUUID)
+        if(boCart == null){
+            boCart = new BOCart(
+                    transactionUuid : transactionUUID,
+                    buyer: "yoann.baudy@ebiznext.com",
+                    date : Calendar.getInstance(),
+                    price : 10000,
+                    status : TransactionStatus.PENDING,
+                    currencyCode : "EUR",
+                    currencyRate : 0.01,
+                    company: company
+            )
+            saveEntity(boCart);
+        }
         return boCart;
     }
 
@@ -427,7 +362,7 @@ public class CommonService {
 	 * @param roleName
 	 * @return
 	 */
-	private Role createRole(RoleName roleName) {
+	public Role createRole(RoleName roleName) {
 		Role role = Role.findByName(roleName)
 		if (role == null) {
 			role = new Role(name:roleName)
@@ -504,7 +439,7 @@ public class CommonService {
         shippingRule
     }
 
-	private void saveEntity(def entite)
+	public void saveEntity(def entite)
 	{
 		String msg = "";
 		if (entite.validate())
