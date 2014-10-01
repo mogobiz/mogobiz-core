@@ -2,16 +2,13 @@ package com.mogobiz.service
 
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.*
-import com.mogobiz.utils.RSA
 import com.mogobiz.utils.RandomPassword
 import com.mogobiz.utils.SymmetricCrypt
 import grails.converters.JSON
-import grails.util.Environment
 import grails.util.Holders
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.crypto.hash.Sha256Hash
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 class SellerService {
@@ -74,8 +71,10 @@ class SellerService {
 
     def addCompany(Seller seller, Company company) {
         if (authenticationService.canAdminAllStores()) {
-            if (!seller.companies?.contains(company))
+            if (!seller.companies?.contains(company)) {
                 seller.addToCompanies(company)
+                seller.save(flush: true)
+            }
         }
     }
 
