@@ -24,12 +24,9 @@ class SellerService {
 
 
     def setActiveCompany(Seller seller, Company company) {
-        if (!seller.companies?.contains(company) && seller.company != company)
+        if (!seller.companies?.contains(company) || seller.company == company)
             throw new Exception("Security breach")
-        seller.companies.remove(seller.company)
         seller.company = company
-        seller.companies.remove(company)
-        seller.companies.add(company)
         seller.save(flush: true)
     }
 

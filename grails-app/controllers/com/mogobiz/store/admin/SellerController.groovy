@@ -34,13 +34,14 @@ class SellerController {
         sellerService.removeCompany(seller, company)
     }
 
-    def setActiveCompany(String code) {
+    def setActiveCompany() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
             response.sendError 401
             return
         }
-        Company company = Company.findByCode(code)
+        String companyCode = params["company.code"]
+        Company company = Company.findByCode(companyCode)
         if (company) {
             sellerService.setActiveCompany(seller, company)
             withFormat {
