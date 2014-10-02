@@ -19,6 +19,11 @@ class SellerController {
     SellerService sellerService
 
     def addCompany() {
+        // to fix potential security hole
+        if (!SecurityUtils.getSubject().isPermitted('company:' + seller.company?.id + ':admin')) {
+            redirect(controller: 'auth', action: 'unauthorized')
+        }
+
         long sellerId = params.long("seller.id")
         String companyCode = params["company.code"]
         Company company = Company.findByCode(companyCode)
@@ -27,6 +32,11 @@ class SellerController {
     }
 
     def removeCompany() {
+        // to fix potential security hole
+        if (!SecurityUtils.getSubject().isPermitted('company:' + seller.company?.id + ':admin')) {
+            redirect(controller: 'auth', action: 'unauthorized')
+        }
+
         String sellerId = params["seller.id"]
         String companyCode = params["company.code"]
         Company company = Company.findByCode(companyCode)
@@ -64,11 +74,6 @@ class SellerController {
         if (id != null) {
             Seller seller = Seller.get(id)
             if (seller) {
-
-                // to fix potential security hole
-                if (!SecurityUtils.getSubject().isPermitted('company:' + seller.company?.id + ':admin')) {
-                    redirect(controller: 'auth', action: 'unauthorized')
-                }
 
                 withFormat {
                     json { render seller.asMapForJSON() as JSON }
