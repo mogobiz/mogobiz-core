@@ -1,22 +1,33 @@
 package bootstrap
 
+import com.mogobiz.geolocation.domain.Location
+import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.BOCart
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Company
+import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.store.domain.Feature
+import com.mogobiz.store.domain.GoogleEnv
 import com.mogobiz.store.domain.Ibeacon
+import com.mogobiz.store.domain.LocalTaxRate
+import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.ProductType
 import com.mogobiz.store.domain.ReductionRule
 import com.mogobiz.store.domain.ReductionRuleType
+import com.mogobiz.store.domain.RoleName
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Shipping
 import com.mogobiz.store.domain.Tag
 import com.mogobiz.store.domain.TaxRate
 import com.mogobiz.store.domain.TicketType
+import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.store.vo.RegisteredCartItemVO
+import grails.util.Holders
+import org.apache.shiro.crypto.hash.Sha256Hash
 
 class JahiaCommerceService {
 
@@ -24,6 +35,99 @@ class JahiaCommerceService {
     def destroy() {}
 
     void init() {
+
+        // création de l'adresse de la compagnie
+        Location adresseMogobiz = Location.findByPostalCodeAndCity("92800", "Puteaux")
+        if (adresseMogobiz == null)
+        {
+            adresseMogobiz = new Location(road1: "4 Place de la Défense", postalCode: "92800", city: "Puteaux", countryCode: 'FR');
+            commonService.saveEntity(adresseMogobiz)
+        }
+
+        // création des compagnies
+        Company mogobiz = Company.findByCode("mogobiz")
+        if (mogobiz == null) {
+            mogobiz = new Company(code: "mogobiz", name: "Mogobiz", location: adresseMogobiz, website: "http://www.ebiznext.com", aesPassword:"5c3f3da15cae1bf2bc736b95bda10c78", email:"contact@mogobiz.com")
+            GoogleEnv googleEnv = new GoogleEnv(
+                    merchant_id: '100653663',
+                    merchant_url: Holders.config.grails.serverURL,
+                    client_id: 'mogobiz@gmail.com',
+                    client_secret: 'e-z12B24',
+                    cronExpr: '0 * * * * ?',
+                    running: false,
+                    dry_run: true,
+                    version: 2,
+                    active:false
+            )
+            commonService.saveEntity(googleEnv)
+            mogobiz.googleEnv = googleEnv
+            commonService.saveEntity(mogobiz)
+
+            Catalog catalog = new Catalog(name:"Default Catalog", uuid:UUID.randomUUID().toString(), social:false, activationDate:new Date(), company:mogobiz)
+            commonService.saveEntity(catalog)
+
+            // création des TaxRate
+            LocalTaxRate frTaxRate = new LocalTaxRate(rate: 19.6, active: true, countryCode: "FR");
+            commonService.saveEntity(frTaxRate)
+            LocalTaxRate usaAlTaxRate = new LocalTaxRate(rate: 9.0, active: true, countryCode: "USA", stateCode: "USA.AL");
+            commonService.saveEntity(usaAlTaxRate)
+
+            TaxRate taxRate = new TaxRate(name: "TaxRate", company: mogobiz);
+            taxRate.addToLocalTaxRates(frTaxRate);
+            taxRate.addToLocalTaxRates(usaAlTaxRate);
+            commonService.saveEntity(taxRate)
+
+            EsEnv env = new EsEnv(
+                    name:'dev',
+                    url:Holders.config.elasticsearch.serverURL as String,
+                    cronExpr: Holders.config.elasticsearch.export.cron as String,
+                    company: mogobiz,
+                    active: true
+            )
+            commonService.saveEntity(env)
+        }
+        Catalog mogobizCatalog = Catalog.findByNameAndCompany("Default Catalog", mogobiz);
+
+        // création des sellers
+        Seller seller = Seller.findByLogin("partner@iper2010.com")
+        if(seller == null) {
+            seller = new Seller(login:"partner@iper2010.com", email:"partner@iper2010.com", password:new Sha256Hash('changeit').toHex(),
+                    firstName: 'rector', lastName: 'Dir', active: true, company: mogobiz, location: adresseMogobiz, admin:true)
+            seller.addToRoles(commonService.createRole(RoleName.PARTNER))
+            commonService.saveEntity(seller)
+        }
+
+        Permission permission = Permission.findByTypeAndPossibleActions('org.apache.shiro.authz.permission.WildcardPermission', '*');
+        UserPermission userPermission = UserPermission.createCriteria().get{
+            eq('permission.id', permission?.id)
+            eq('user.id', seller.id)
+            eq('target', 'company:'+seller.company.id+':admin')
+            eq('actions', '*')
+        }
+        if (seller.admin) {
+            if(!userPermission) {
+                userPermission = new UserPermission(permission:permission, user:seller, target:'company:'+seller.company.id+':admin',actions:'*')
+                commonService.saveEntity(userPermission)
+            }
+        }
+        else if(userPermission) { userPermission.delete() }
+
+        // création du valideur
+        Seller userValidator = Seller.findByLogin("validator@iper2010.com")
+        if (userValidator == null)
+        {
+            userValidator = new Seller(login:"validator@iper2010.com", email:"validator@iper2010.com", password:new Sha256Hash('changeit').toHex(),
+                    firstName:'Valid', lastName:'ator', active:true, company: mogobiz, location: adresseMogobiz, admin:true)
+            userValidator.addToRoles(commonService.createRole(RoleName.VALIDATOR))
+            commonService.saveEntity(userValidator)
+        }
+
+        // création des categories
+        commonService.createCategory("Habillement", null, mogobiz, mogobizCatalog, 1, "vetements homme femme enfant");
+        Category parent = commonService.createCategory("Hightech", null, mogobiz, mogobizCatalog, 2);
+        commonService.createCategory("Télévisions", parent, mogobiz, mogobizCatalog, 1, "TV télé télévision HD");
+        commonService.createCategory("Cinéma", null, mogobiz, mogobizCatalog, 3);
+
         // Récupération des éléménts nécessaires pour créer les autres entitées
         Company company = Company.findByCode("mogobiz");
         TaxRate taxRate = TaxRate.findByNameAndCompany("TaxRate", company);
@@ -151,10 +255,13 @@ class JahiaCommerceService {
         commonService.createCoupon(company, [regle10Pourcent], "TEST2", "Sold tout à 10%", null, [categoryTV])
 
         // IBeacon
-        Ibeacon ibeacon = new Ibeacon(uuid: UUID.randomUUID(), name:"Ibeacon", startDate: commonService.getDateDebutMois(), endDate: commonService.getDateFinMois(), active: true, company: company)
-        commonService.saveEntity(ibeacon)
-        produitPull.ibeacon = ibeacon
-        commonService.saveEntity(produitPull)
+        Ibeacon ibeacon = produitPull.ibeacon
+        if(ibeacon == null){
+            ibeacon = new Ibeacon(uuid: UUID.randomUUID(), name:"Ibeacon", startDate: commonService.getDateDebutMois(), endDate: commonService.getDateFinMois(), active: true, company: company)
+            commonService.saveEntity(ibeacon)
+            produitPull.ibeacon = ibeacon
+            commonService.saveEntity(produitPull)
+        }
 
         // Promotion
         commonService.createCoupon(company, [regle10Pourcent], "Promotion", "-10%", 0L, [categoryHabillage], null, null, "Promotion exceptionnelle de -10% sur tout l'habillement", true)
