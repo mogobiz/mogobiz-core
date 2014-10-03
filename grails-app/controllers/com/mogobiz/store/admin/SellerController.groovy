@@ -69,7 +69,7 @@ class SellerController {
 
     def show() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
-        if (seller == null) {
+        if (seller == null && ! authenticationService.canAdminAllStores()) {
             response.sendError 401
             return
         }
