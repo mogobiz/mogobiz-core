@@ -117,7 +117,7 @@ class SellerService {
             if (seller.sell || isSeller) {
                 seller.addToRoles(Role.findByName(RoleName.PARTNER))
             }
-            seller.companies.add(seller.company)
+            seller.addToCompanies(seller.company)
             seller.save()
 
             def permission = Permission.findByTypeAndPossibleActions(

@@ -189,10 +189,12 @@ class CompanyController {
             }
         }
         catch (CompanyAlreadyExistException ex) {
+            ex.printStackTrace()
             response.sendError 403
             return
         }
         catch (InvalidDomainObjectException ex) {
+            ex.printStackTrace()
             response.sendError 400
             return
         }
