@@ -28,8 +28,10 @@ class SellerController {
         Company company = Company.findByCode(companyCode)
         Seller paramSeller = Seller.get(sellerId)
         sellerService.addCompany(paramSeller, company)
+        def map=[:]
+        map.put("success", true)
         withFormat {
-            json { render true as JSON }
+            json { render map as JSON }
         }
     }
 
@@ -43,8 +45,10 @@ class SellerController {
         Company company = Company.findByCode(companyCode)
         Seller seller = Seller.get(sellerId)
         sellerService.removeCompany(seller, company)
+        def map=[:]
+        map.put("success", true)
         withFormat {
-            json { render true as JSON }
+            json { render map as JSON }
         }
     }
 
@@ -58,8 +62,10 @@ class SellerController {
         Company company = Company.findByCode(companyCode)
         if (company) {
             sellerService.setActiveCompany(seller, company)
+            def map=[:]
+            map.put("success", true)
             withFormat {
-                json { render true as JSON }
+                json { render map as JSON }
             }
         } else {
             response.sendError 404
