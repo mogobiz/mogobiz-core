@@ -4,25 +4,19 @@ import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.exceptions.CompanyAlreadyExistException
 import com.mogobiz.exceptions.InvalidDomainObjectException
+import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.service.CompanyService
 import com.mogobiz.service.CountryService
-import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.CompanyProperty
-import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.store.domain.Seller
+import com.mogobiz.store.exception.CountryException
 import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
-import grails.util.Holders
 import org.apache.shiro.SecurityUtils
 
-import java.text.Normalizer
 import javax.servlet.http.HttpServletResponse
-
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.exception.CountryException;
-import com.mogobiz.geolocation.domain.Location
-import com.mogobiz.utils.SecureCodec
 
 /**
  * Controller utilisé pour gérer les entreprises
@@ -68,8 +62,20 @@ class CompanyController {
 
     def show() {
         def id = params.id
-        if (id != null) {
-            def company = Company.get(id)
+        if (params.id) {
+            def company = Company.get(params.id)
+            if (company) {
+                def companyVO = company.asMapForJSON()
+                withFormat {
+                    html companyVO: companyVO
+                    xml { render companyVO as XML }
+                    json { render companyVO as JSON }
+                }
+            } else {
+                response.sendError 404
+            }
+        } else if (params.code) {
+            def company = Company.findByCode(params.code)
             if (company) {
                 def companyVO = company.asMapForJSON()
                 withFormat {
