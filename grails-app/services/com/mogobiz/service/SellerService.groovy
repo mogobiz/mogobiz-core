@@ -80,7 +80,10 @@ class SellerService {
 
     def removeCompany(Seller seller, Company company) {
         if (authenticationService.canAdminAllStores()) {
+            boolean cleanup = company == seller.company
             seller.removeFromCompanies(company)
+            if (cleanup)
+                seller.company = seller.companies.getAt(0)
             seller.save(flush: true)
         }
     }
