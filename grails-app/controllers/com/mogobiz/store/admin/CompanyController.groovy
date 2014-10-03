@@ -177,8 +177,8 @@ class CompanyController {
      */
     def save() {
         try {
-            Company company = new Company(params['company'])
-            Map companyVO = companyService.save(company)
+            Company company = companyService.save(new Company(params['company']))
+            Map companyVO = company.asMapForJSON()
             withFormat {
                 html {
                     redirect(action: 'show', params: [format: 'html'])
