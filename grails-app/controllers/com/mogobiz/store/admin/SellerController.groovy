@@ -28,6 +28,9 @@ class SellerController {
         Company company = Company.findByCode(companyCode)
         Seller paramSeller = Seller.get(sellerId)
         sellerService.addCompany(paramSeller, company)
+        withFormat {
+            json { render true as JSON }
+        }
     }
 
     def removeCompany() {
@@ -40,6 +43,9 @@ class SellerController {
         Company company = Company.findByCode(companyCode)
         Seller seller = Seller.get(sellerId)
         sellerService.removeCompany(seller, company)
+        withFormat {
+            json { render true as JSON }
+        }
     }
 
     def setActiveCompany() {
