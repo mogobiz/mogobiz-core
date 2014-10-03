@@ -19,13 +19,7 @@ class SellerController {
     SellerService sellerService
 
     def addCompany() {
-        def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
-        if (seller == null) {
-            response.sendError 401
-            return
-        }
-        // to fix potential security hole
-        if (!SecurityUtils.getSubject().isPermitted('company:' + seller.company?.id + ':admin')) {
+        if (!authenticationService.canAdminAllStores()) {
             redirect(controller: 'auth', action: 'unauthorized')
         }
 
@@ -37,8 +31,7 @@ class SellerController {
     }
 
     def removeCompany() {
-        // to fix potential security hole
-        if (!SecurityUtils.getSubject().isPermitted('company:' + seller.company?.id + ':admin')) {
+        if (!authenticationService.canAdminAllStores()) {
             redirect(controller: 'auth', action: 'unauthorized')
         }
 
