@@ -102,8 +102,8 @@ class SellerController {
 
                 def crit = Seller.createCriteria()
                 def sellerList = crit.list {
-                    if (companyId) {
-                        eq('company.id', Long.parseLong(companyId))
+                    companies {
+                        eq('id', Long.parseLong(companyId))
                     }
                     order("login", "asc")
                 }

@@ -94,6 +94,7 @@ class JahiaCommerceService {
             seller = new Seller(login:"partner@iper2010.com", email:"partner@iper2010.com", password:new Sha256Hash('changeit').toHex(),
                     firstName: 'rector', lastName: 'Dir', active: true, company: mogobiz, location: adresseMogobiz, admin:true)
             seller.addToRoles(commonService.createRole(RoleName.PARTNER))
+            seller.addToCompanies(mogobiz)
             commonService.saveEntity(seller)
         }
 
@@ -119,6 +120,7 @@ class JahiaCommerceService {
             userValidator = new Seller(login:"validator@iper2010.com", email:"validator@iper2010.com", password:new Sha256Hash('changeit').toHex(),
                     firstName:'Valid', lastName:'ator', active:true, company: mogobiz, location: adresseMogobiz, admin:true)
             userValidator.addToRoles(commonService.createRole(RoleName.VALIDATOR))
+            userValidator.addToCompanies(mogobiz)
             commonService.saveEntity(userValidator)
         }
 
