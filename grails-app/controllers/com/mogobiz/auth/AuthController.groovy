@@ -53,7 +53,18 @@ class AuthController {
         if (params.data) {
             try {
                 sellerService.autoSignIn(params.data)
-                redirect(uri: '/')
+                if (params.targetUri) {
+                    if (params.targetUri.startsWith('http')) {
+                        // redirect to the target url
+                        redirect(url: params.targetUri)
+                    } else {
+                        // redirect to the target uri
+                        redirect(uri: params.targetUri)
+                    }
+                }
+                else {
+                    redirect(uri: '/')
+                }
             }
             catch (Exception ex) {
                 ex.printStackTrace()
