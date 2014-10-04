@@ -72,8 +72,15 @@ class BOCartItem
      * </p>
      */
     int quantity  = 1 
+
     /**
-     * 
+     * champ pour stocker l'id du ticketType référence
+     * pas de foreign, juste à titre indicatif pour la MAJ des nbSales
+     */
+    long ticketTypeFk
+
+    /**
+     *
      */
     com.mogobiz.store.domain.BOCart bOCart 
 
@@ -109,6 +116,7 @@ class BOCartItem
         startDate column:"start_date",insertable:true,updateable:true,lazy:false,cache:false
         endDate column:"end_date",insertable:true,updateable:true,lazy:false,cache:false
         quantity column:"quantity",insertable:true,updateable:true,lazy:false,cache:false
+        ticketTypeFk column:"ticket_type_fk",insertable:true,updateable:true,lazy:false,cache:false
 
 
         bOCart column:"b_o_cart_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -129,6 +137,7 @@ class BOCartItem
         startDate (nullable:true, unique:false)
         endDate (nullable:true, unique:false)
         quantity ( blank:false, nullable:false, unique:false)
+        ticketTypeFk (blank:false, nullable:false, unique:false)
         bOCart ( blank:false, nullable:false)
     }
 
