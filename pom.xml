@@ -1,932 +1,810 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.mogobiz</groupId>
-  <artifactId>mogobiz-core</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-  
-  <name>IPER2010 project</name>
-  <description>IPER2010 project</description>
-
-  <properties>  
-    <grails.version>2.3.5</grails.version>
-    <grails-bootstrap.version>${grails.version}</grails-bootstrap.version>
-    <grails-gorm.version>${grails.version}</grails-gorm.version>
-    <grails-test.version>${grails.version}</grails-test.version>
-
-    <grails-maven-plugin.version>1.3.4</grails-maven-plugin.version>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     
-    <jstl.version>1.2</jstl.version>
-    <hibernate-ehcache.version>3.3.1.GA</hibernate-ehcache.version>
-    <javassist.version>3.11.0.GA</javassist.version>
-    <ehcache-core.version>1.7.1</ehcache-core.version>
-    <hsqldb.version>1.8.0.10</hsqldb.version>
-    <postgresql.version>8.4-701.jdbc4</postgresql.version>
-    <slf4j-log4j12.version>1.5.8</slf4j-log4j12.version>
-    <aspectjweaver.version>1.6.8</aspectjweaver.version>
-    <aspectjrt.version>1.6.8</aspectjrt.version>
+    <groupId>com.mogobiz</groupId>
+    <artifactId>mogobiz-core</artifactId>
+    <packaging>grails-binary-plugin</packaging>
+    <version>1.0-SNAPSHOT</version>
 
-	<compiler.source>1.6</compiler.source>
-	<compiler.target>${compiler.source}</compiler.target>
+    <name>mogobiz-core</name>
+    <description>mogobiz core grails plugin</description>
 
-	<!-- application properties -->
-	<application.id>iper2010</application.id>
-	<application.name>${application.id}</application.name>
-	<application.package>${project.groupId}</application.package>
+    <properties>
+        <grails.version>2.3.9</grails.version>
+        <h2.version>1.3.170</h2.version>
 
-	<!-- andromda properties -->
-	<andromda.version>3.2</andromda.version>
-	<andromda.grails.version>3.2</andromda.grails.version>
-	<grails.output.dir>${project.basedir}/grails-app</grails.output.dir>
-	<model.path>${project.basedir}/mda/src/main/uml</model.path>
-	<model.id>${application.id}</model.id>
-	<model.uri>file:${model.path}/${model.id}.uml2</model.uri>
-	<!--
-		A comma seperated list of cartridge names (i.e. namespaces) that should be processed by AndroMDA. If this is not defined, then ANY discovered cartridges will be processed. This is useful when you want to restrict the cartridges that will process the model, in order to speed up the development cycle. 
-		You can also prefix the list of cartridges using the tilde '~' character, that way the cartridges that are *not* listed will be processed (negation). 
-	-->
-	<filter>java, grails</filter>
-	<!--
-		Specifies whether or not models loaded by AndroMDA will be validated. By default models WILL be validated, however sometimes its nice to turn off validation for performance reasons (i.e. you have very large model(s) being processed).
-	-->
-	<validation>true</validation>
-	<!--
-		Specifies whether or not models modifications loaded by AndroMDA should be checked prior to generation.
-	-->
-	<modification>false</modification>
-	<conf.dir>${project.basedir}/mda/src/main/config</conf.dir>
-	<!-- hibernate configuration -->
-	<!-- default strategy to use when using inhertiance -->
-	<hibernate.inheritance.strategy>subclass</hibernate.inheritance.strategy>
-	<hibernate.db.showSql>true</hibernate.db.showSql>
-	<!-- hibernate eager loading -->
-	<eagerLoading>false</eagerLoading>
-	<!-- hibernate generator class to use for identifiers -->
-	<hibernate.generatorClass>native</hibernate.generatorClass>
-	<hibernate.show.sql>false</hibernate.show.sql>
-	<jdbc.host>localhost</jdbc.host>
-	<jdbc.url>${jdbc.default.url}</jdbc.url>
-	<jdbc.username>${application.id}</jdbc.username>
-	<jdbc.password>${application.id}</jdbc.password>
-	<!--
-		Change exception sorder class name for appropriate database
-		For MySQL use: org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter
-		For Hypersonic use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-		For Oracle9i use: org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter
-		For DB2 use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-		For Informix use: org.jboss.resource.adapter.jdbc.vendor.InformixExceptionSorter
-		For MSSQL use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-		For Pointbase use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-		For Postgres use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-		For Sybase use: org.jboss.resource.adapter.jdbc.vendor.SybaseExceptionSorter
-		For SapDB use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-		For Progress use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-	-->
-	<jdbc.exception.sorter>
-		org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
-	</jdbc.exception.sorter>
-	<!-- jndi -->
-	<dataSource.name>jdbc/${application.id}</dataSource.name>
-	<dataSource>java:${dataSource.name}</dataSource>
+        <mysql.version>5.1.30</mysql.version>
+        <postgresql.version>9.1-901.jdbc4</postgresql.version>
+        <oracle.version>11.2.0.3.0</oracle.version>
 
-  </properties>
+        <!-- application properties -->
+        <application.id>iper2010</application.id>
+        <application.name>${application.id}</application.name>
+        <application.package>${project.groupId}</application.package>
 
-  <dependencies>
-	<dependency>
-		<groupId>org.codehaus.castor</groupId>
-		<artifactId>castor-core</artifactId>
-   		<version>1.3.2</version>
-   		<exclusions>
-   			<exclusion>
-   				<groupId>cglib</groupId>
-				<artifactId>cglib-full</artifactId>
-   			</exclusion>
-   		</exclusions>   		
-	</dependency>
-	<dependency>
-		<groupId>org.codehaus.castor</groupId>
-		<artifactId>castor-xml</artifactId>
-   		<version>1.3.2</version>
-	</dependency>
-    <dependency>
-      <groupId>org.grails</groupId>
-      <artifactId>grails-bootstrap</artifactId>
-      <version>${grails-bootstrap.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>${jstl.version}</version>
-    </dependency>
+        <!-- andromda properties -->
+        <andromda.version>3.2</andromda.version>
+        <andromda.grails.version>3.2</andromda.grails.version>
+        <grails.output.dir>${project.basedir}/grails-app</grails.output.dir>
+        <model.path>${project.basedir}/mda/src/main/uml</model.path>
+        <model.id>${application.id}</model.id>
+        <model.uri>file:${model.path}/${model.id}.uml2</model.uri>
+        <!--
+            A comma seperated list of cartridge names (i.e. namespaces) that should be processed by AndroMDA. If this is not defined, then ANY discovered cartridges will be processed. This is useful when you want to restrict the cartridges that will process the model, in order to speed up the development cycle.
+            You can also prefix the list of cartridges using the tilde '~' character, that way the cartridges that are *not* listed will be processed (negation).
+        -->
+        <filter>java, grails</filter>
+        <!--
+            Specifies whether or not models loaded by AndroMDA will be validated. By default models WILL be validated, however sometimes its nice to turn off validation for performance reasons (i.e. you have very large model(s) being processed).
+        -->
+        <validation>true</validation>
+        <!--
+            Specifies whether or not models modifications loaded by AndroMDA should be checked prior to generation.
+        -->
+        <modification>false</modification>
+        <conf.dir>${project.basedir}/mda/src/main/config</conf.dir>
+        <!-- hibernate configuration -->
+        <!-- default strategy to use when using inhertiance -->
+        <hibernate.inheritance.strategy>subclass</hibernate.inheritance.strategy>
+        <hibernate.db.showSql>true</hibernate.db.showSql>
+        <!-- hibernate eager loading -->
+        <eagerLoading>false</eagerLoading>
+        <!-- hibernate generator class to use for identifiers -->
+        <hibernate.generatorClass>native</hibernate.generatorClass>
+        <hibernate.show.sql>false</hibernate.show.sql>
+        <jdbc.host>localhost</jdbc.host>
+        <jdbc.url>${jdbc.default.url}</jdbc.url>
+        <jdbc.username>${application.id}</jdbc.username>
+        <jdbc.password>${application.id}</jdbc.password>
+        <!--
+            Change exception sorder class name for appropriate database
+            For MySQL use: org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter
+            For Hypersonic use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+            For Oracle9i use: org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter
+            For DB2 use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+            For Informix use: org.jboss.resource.adapter.jdbc.vendor.InformixExceptionSorter
+            For MSSQL use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+            For Pointbase use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+            For Postgres use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+            For Sybase use: org.jboss.resource.adapter.jdbc.vendor.SybaseExceptionSorter
+            For SapDB use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+            For Progress use: org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+        -->
+        <jdbc.exception.sorter>
+            org.jboss.resource.adapter.jdbc.vendor.DummyExceptionSorter
+        </jdbc.exception.sorter>
+        <!-- jndi -->
+        <dataSource.name>jdbc/${application.id}</dataSource.name>
+        <dataSource>java:${dataSource.name}</dataSource>
+    </properties>
 
-    <!-- jcf dependencies -->
-    <dependency>
-      <groupId>org.apache.struts</groupId>
-      <artifactId>struts-core</artifactId>
-      <version>1.3.10</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.struts</groupId>
-      <artifactId>struts-taglib</artifactId>
-      <version>1.3.10</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.struts</groupId>
-      <artifactId>struts-tiles</artifactId>
-      <version>1.3.10</version>
-      <scope>runtime</scope>
-    </dependency>
-	
-	<dependency>
-    <groupId>commons-beanutils</groupId>
-    <artifactId>commons-beanutils</artifactId>
-    <version>1.8.3</version>
-	</dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>0.7-groovy-2.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- nekohtml -->
+            <dependency>
+                <groupId>net.sourceforge.nekohtml</groupId>
+                <artifactId>nekohtml</artifactId>
+                <version>1.9.15</version>
+                <type>jar</type>
+                <scope>compile</scope>
+            </dependency>
 
-    <!-- Grails defaults to Ehache for the second-level Hibernate cache. -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-ehcache</artifactId>
-      <version>${hibernate-ehcache.version}</version>
-        <exclusions>
-          <!-- See http://www.slf4j.org/faq.html#IllegalAccessError -->
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-          </exclusion>
-          
-          <!-- We are pulling in ehcache-core below -->
-          <exclusion>
-            <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-          </exclusion>
-        </exclusions>
-    </dependency>
-    
-    <!-- Use javassist as the bytecode manipulation provider for Hibernate -->
-    <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>${javassist.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>${ehcache-core.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>jms</artifactId>
-        </exclusion>
+            <dependency>
+                <groupId>xerces</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>2.8.1</version>
+                <scope>runtime</scope>
+                <exclusions>
+                <!-- this transitive dependency is replaced by xml-apis/xml-apis/1.3.03 dependency below -->
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-async</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-rest</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-services</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-i18n</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-databinding</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-filters</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-gsp</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-log4j</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-servlets</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-url-mappings</artifactId>
+            <version>${grails.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-resources</artifactId>
+            <version>${grails.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-test</artifactId>
+            <version>${grails.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.grails</groupId>
+            <artifactId>grails-plugin-testing</artifactId>
+            <version>${grails.version}</version>
+            <scope>test</scope>
+        </dependency>
         
-        <exclusion>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.0.1</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.11</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>net.sourceforge.nekohtml</groupId>
+    <artifactId>nekohtml</artifactId>
+    <type>jar</type>
+    <scope>compile</scope>
+</dependency>
+
+        <dependency>
+            <groupId>com.restfb</groupId>
+            <artifactId>restfb</artifactId>
+            <version>1.6.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mogobiz.rivers</groupId>
+            <artifactId>mogobiz-elasticsearch</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- begin from grails-app/BuildConfig.groovy //-->
+        <dependency>
+            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
+            <artifactId>http-builder</artifactId>
+            <version>0.5.2</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sourceforge.nekohtml</groupId>
+                    <artifactId>nekohtml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.2.3</version>
+            <scope>compile</scope>
+        </dependency>
         
-        <!-- We have JCL-over-SLF4J instead. -->
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
-    <!-- For ease of development and testing, we include the HSQLDB database. -->
-    <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>${hsqldb.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${postgresql.version}</version>
-    </dependency>
-    
-    <!-- Use Log4J for logging. This artifact also pulls in the Log4J JAR. -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j-log4j12.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    
-    <!-- Needed in the case of AOP usage -->
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjweaver</artifactId>
-      <version>${aspectjweaver.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-      <version>${aspectjrt.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.2.3</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-async</artifactId>
+            <version>2.2.5</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-core</artifactId>
+            <version>2.2.5</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-media-support</artifactId>
+            <version>2.2.5</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>2.2.5</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.11.2</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.common</artifactId>
+            <version>0.31</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+            <version>0.31</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
+            <version>0.31</version>
+            <scope>compile</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>2.3.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-stream-experimental_2.11</artifactId>
+            <version>0.4</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.netflix.rxjava</groupId>
+            <artifactId>rxjava-groovy</artifactId>
+            <version>0.16.1</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>cache</artifactId>
+            <version>1.1.3</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>facebook-graph</artifactId>
+            <version>0.14</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>platform-core</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>google-data</artifactId>
+            <version>0.1.3</version>
+            <scope>compile</scope>
+            
+            <type>zip</type>
+            
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>email-confirmation</artifactId>
+            <version>2.0.8</version>
+            <scope>compile</scope>
+            
+            <type>zip</type>
+            
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>shiro</artifactId>
+            <version>1.2.1</version>
+            <scope>compile</scope>
+            <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>shiro-quartz</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.0.5</version>
+            <scope>compile</scope>
+            
+            <type>zip</type>
+            
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>quartz</artifactId>
+            <version>1.0.1</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>recaptcha</artifactId>
+            <version>0.6.8</version>
+            <scope>compile</scope>
+            
+            <type>zip</type>
+            
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>cache-headers</artifactId>
+            <version>1.1.6</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>cached-resources</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>cookie</artifactId>
+            <version>0.51</version>
+            <scope>compile</scope>
+            
+            <type>zip</type>
+            
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>rest</artifactId>
+            <version>0.8</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.6.10.15</version>
+            <scope>runtime</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>database-migration</artifactId>
+            <version>1.4.0</version>
+            <scope>runtime</scope>
+            <type>zip</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>resources</artifactId>
+            <version>1.2.8</version>
+            <scope>runtime</scope>
+            <type>zip</type>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>spock</artifactId>
+            <version>0.7</version>
+            <scope>test</scope>
+            <type>zip</type>
+        </dependency>
+        //-->
+        
+        <!-- end from grails-app/BuildConfig.groovy //-->
 
-	<!-- andromda dependencies -->
-	<dependency>
-		<groupId>org.andromda.profiles.uml2</groupId>
-		<artifactId>andromda-profile</artifactId>
-		<version>${andromda.version}</version>
-		<type>xml.zip</type>
-	</dependency>
-	<dependency>
-		<groupId>org.andromda.cartridges</groupId>
-		<artifactId>andromda-grails-cartridge</artifactId>
-		<version>${andromda.grails.version}</version>
-		<exclusions>
-          <exclusion>
-              <groupId>xml-apis</groupId>
-              <artifactId>xml-apis</artifactId>
-          </exclusion>
-		</exclusions>
-	</dependency>
-	<dependency>
-		<groupId>org.andromda.cartridges</groupId>
-		<artifactId>andromda-java-cartridge</artifactId>
-		<version>${andromda.version}</version>
-		<exclusions>
-          <exclusion>
-              <groupId>xml-apis</groupId>
-              <artifactId>xml-apis</artifactId>
-          </exclusion>
-		</exclusions>
-	</dependency>
-  </dependencies>
-  
-  <repositories>
-    <!-- Required to get hold of JTA -->
-    <repository>
-      <id>grails.org</id>
-      <name>grails.org</name>
-      <url>http://repo1.maven.org/maven2</url>
-    </repository>
-    <!-- repository>
-      <id>jboss.org</id>
-      <name>jboss.org</name>
-      <url>http://repository.jboss.com/maven2/</url>
-    </repository -->
-    
-    <repository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <layout>default</layout>
-    </repository>
-    
-    <repository>
-      <id>Codehaus Snapshots</id>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
-  
-  <pluginRepositories>
-    <pluginRepository>
-      <id>Codehaus Snapshots</id>
-      <url>http://snapshots.repository.codehaus.org</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-  
-  <build>
-  	<resources>
-  		<resource>
-  			<directory>src/config</directory>
-  			<filtering>true</filtering>
-  			<includes>
-  				<include>META-INF/*.xml</include>
-  			</includes>
-  			<targetPath>${basedir}/web-app</targetPath>
-  		</resource>
-  		<resource>
-  			<directory>src/config/jboss</directory>
-  			<filtering>true</filtering>
-  			<includes>
-  				<include>*.xml</include>
-  			</includes>
-  			<targetPath>${basedir}/target</targetPath>
-  		</resource>
-  	</resources>
-   	<plugins>
-		<!-- andromda -->
-		<plugin>
-			<groupId>org.andromda.maven.plugins</groupId>
-			<artifactId>andromda-maven-plugin</artifactId>
-			<version>${andromda.version}</version>
-		</plugin>
-		<plugin>
-			<groupId>org.andromda.maven.plugins</groupId>
-			<artifactId>andromdapp-maven-plugin</artifactId>
-			<version>${andromda.version}</version>
-			<!-- jdbc configuration -->
-			<configuration>
-				<jdbcConnectionUrl>${jdbc.url}</jdbcConnectionUrl>
-				<jdbcDriver>${jdbc.driver}</jdbcDriver>
-				<jdbcDriverJar>${jdbc.driver.jar}</jdbcDriverJar>
-				<jdbcUsername>${jdbc.username}</jdbcUsername>
-				<jdbcPassword>${jdbc.password}</jdbcPassword>
-			</configuration>
-		</plugin>
-		<plugin>
-			<artifactId>maven-antrun-plugin</artifactId>
-			<executions>
-				<!-- execution>
-					<id>export2emf</id>
-					<phase>initialize</phase>
-					<goals>
-						<goal>run</goal>
-					</goals>
-					<configuration>
-						<tasks>
-							<exec
-								executable="${env.MD_HOME}/plugins/com.nomagic.magicdraw.emfuml2export/exportEMFXMI"
-								failonerror="true">
-								<arg value="project_file=${model.path}/${model.id}.xml" />
-								<arg value="destination_dir=${model.path}" />
-								<arg value="check_time=true" />
-							</exec>
-						</tasks>
-					</configuration>
-				</execution>
-				<execution>
-					<id>clean-uml2</id>
-					<phase>clean</phase>
-					<goals>
-						<goal>run</goal>
-					</goals>
-					<configuration>
-						<tasks>
-							<delete failonerror="false">
-								<fileset dir="${project.basedir}/mda/src/main/uml">
-									<include name="*.uml2" />
-								</fileset>
-							</delete>
-						</tasks>
-					</configuration>
-				</execution -->
-				<execution>
-					<id>copy-tomcat-resources</id>
-					<phase>process-resources</phase>
-					<goals>
-						<goal>run</goal>
-					</goals>
-					<configuration>
-						<tasks>
-							<copy todir="${project.basedir}/web-app" overwrite="true" filtering="true">
-								<fileset dir="${project.basedir}/src/config" includes="META-INF/*.xml" />
-								<filterset>
-									<filter token="application.id" value="${application.id}"/>
-									<filter token="dataSource.name" value="${dataSource.name}"/>
-									<filter token="jdbc.driver" value="${jdbc.driver}"/>
-									<filter token="jdbc.username" value="${jdbc.username}"/>
-									<filter token="jdbc.password" value="${jdbc.password}"/>
-									<filter token="jdbc.url" value="${jdbc.url}"/>
-								</filterset>
-							</copy>
-						</tasks>
-					</configuration>
-				</execution>
-				<!-- 
-				<execution>
-					<id>copy-jboss-resources</id>
-					<phase>process-resources</phase>
-					<goals>
-						<goal>run</goal>
-					</goals>
-					<configuration>
-						<tasks>
-							<copy todir="${project.basedir}/web-app/WEB-INF" overwrite="true" filtering="true">
-								<fileset dir="${project.basedir}/src/config/jboss" includes="*.xml" />
-								<filterset>
-									<filter token="application.id" value="${application.id}"/>
-									<filter token="dataSource.name" value="${dataSource.name}"/>
-									<filter token="jdbc.driver" value="${jdbc.driver}"/>
-									<filter token="jdbc.username" value="${jdbc.username}"/>
-									<filter token="jdbc.password" value="${jdbc.password}"/>
-									<filter token="jdbc.url" value="${jdbc.url}"/>
-								</filterset>
-							</copy>
-						</tasks>
-					</configuration>
-				</execution>
-				 -->
-			</executions>
-		</plugin>
-        <!-- maven-install-plugin -->
-        <plugin>
-            <artifactId>maven-install-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-                <updateReleaseInfo>true</updateReleaseInfo>
-            </configuration>
-        </plugin>
+    </dependencies>
 
-		<plugin>
-			<groupId>org.grails</groupId>
-			<artifactId>grails-maven-plugin</artifactId>
-			<version>${grails-maven-plugin.version}</version>
-			<extensions>true</extensions>
-			<executions>
-				<execution>
-					<goals>
-						<goal>init</goal>
-						<goal>maven-clean</goal>
-						<goal>validate</goal>
-						<goal>config-directories</goal>
-						<goal>maven-compile</goal>
-						<!-- <goal>maven-test</goal> -->
-						<goal>maven-war</goal>
-						<!-- <goal>maven-functional-test</goal> -->
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
+    <build>
+        <pluginManagement/>
 
-		<plugin>
-			<artifactId>maven-compiler-plugin</artifactId>
-			<configuration>
-				<source>${compiler.source}</source>
-				<target>${compiler.target}</target>
-				<meminitial>256m</meminitial>
-				<maxmem>1024m</maxmem>
-			</configuration>
-		</plugin>
-	
-		<plugin>
-			<artifactId>maven-antrun-plugin</artifactId>
-			<version>1.2</version>
-			<dependencies>
-				<dependency>
-					<groupId>ant-contrib</groupId>
-					<artifactId>ant-contrib</artifactId>
-					<version>1.0b3</version>
-					<scope>runtime</scope>
-				</dependency>
-			</dependencies>
-		</plugin>
+        <plugins>
+            <!-- Disables the Maven surefire plugin for Grails applications, as we have our own test runner -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>surefire-it</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>plugins</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
 
-		<!-- maven-release-plugin -->
-		<plugin>
-			<artifactId>maven-release-plugin</artifactId>
-			<version>2.0-beta-9</version>
-			<configuration>
-				<autoVersionSubmodules>true</autoVersionSubmodules>
-				<preparationGoals>verify</preparationGoals>
-				<!-- <releaseProfiles>andromda-generate,potgresql</releaseProfiles> -->
-				<tagBase>${svn.base.url}/${svn.project.path}/tags</tagBase>
-				<tag>${iper2010.revision}-${BUILD_NUMBER}</tag>
-				<username>${svn.username}</username>
-				<password>${svn.password}</password>
-			</configuration>
-		</plugin>
+            <plugin>
+                <groupId>org.grails</groupId>
+                <artifactId>grails-maven-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <fork>true</fork>
+                    <grailsVersion>${grails.version}</grailsVersion>
+                </configuration>
+                <extensions>true</extensions>
+            </plugin>
 
-		<!-- maven-scm-plugin -->
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-scm-plugin</artifactId>
-			<version>1.3</version>
-			<configuration>
-			  <tag>http://www.cmmicenter.com:80/svn/all/IPER2010/SNAPSHOT/tags/${application.id}-${release.version}</tag>
-			</configuration>
-		</plugin>
-   	</plugins>
-    
-  </build>
-  
-  <profiles>
-		<profile>
-			<id>tools</id>
-			<activation>
-				<property>
-					<name>java.vendor</name>
-					<value>Sun Microsystems Inc.</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.sun</groupId>
-					<artifactId>tools</artifactId>
-					<version>${java.version}</version>
-					<scope>system</scope>
-					<systemPath>${java.home}/../lib/tools.jar</systemPath>
-				</dependency>
-			</dependencies>
-		</profile>
+        </plugins>
+    </build>
 
-		<!-- begin jdbc profiles -->
-		<profile>
-			<id>hsqldb</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>hsqldb</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>hsqldb</jdbc>
-				<!--
-					Change this to generate to the correct MDA database mappings,
-					For MySql use: MySQL
-					For Hypersonic use: HypersonicSql
-					For Oracle9i use: Oracle9i
-					For DB2 use: DB2
-					For Informix use: InformixDB
-					For MSSQL use: MSSQL
-					For Pointbase use: PointBase
-					For Postgres use: PostgreSQL
-					For Sybase use: Sybase
-					For SapDB use: SapDB
-					For Derby use: Derby
-				-->
-				<sql.mappings>HypersonicSql</sql.mappings>
-				<!--
-					Change this for the appropriate database
-					For MySql use: org.hibernate.dialect.MySQLDialect
-					For MySql InnoDB use: org.hibernate.dialect.MySQLInnoDBDialect
-					For MySql MyISAM use: org.hibernate.dialect.MySQLMyISAMDialect
-					For Hypersonic use: org.hibernate.dialect.HSQLDialect
-					For Oracle any version use: org.hibernate.dialect.OracleDialect
-					For Oracle9i/10g use: org.hibernate.dialect.Oracle9Dialect
-					For DB2 use: org.hibernate.dialect.DB2Dialect
-					For Informix use: org.hibernate.dialect.InformixDialect
-					For MSSQL use: org.hibernate.dialect.SQLServerDialect
-					For Pointbase use: org.hibernate.dialect.PointbaseDialect
-					For Postgres use: org.hibernate.dialect.PostgreSQLDialect
-					For Sybase use: org.hibernate.dialect.SybaseDialect
-					For Sybase Anywhere use: org.hibernate.dialect.SybaseAnywhereDialect
-					For SapDB use: org.hibernate.dialect.SAPDBDialect
-					For Progress use: org.hibernate.dialect.ProgressDialect
-					For Derby use: org.hibernate.dialect.DerbyDialect
-				-->
-				<hibernate.dialect>
-					org.hibernate.dialect.HSQLDialect
-				</hibernate.dialect>
-				<!--
-					Change driver for appropriate database
-					For MySQL use: com.mysql.jdbc.Driver
-					For Hypersonic use: org.hsqldb.jdbcDriver
-					For Oracle9i use: oracle.jdbc.driver.OracleDriver
-					For DB2 use: COM.ibm.db2.jdbc.app.DB2Driver
-					For Informix use: com.informix.jdbc.IfxDriver
-					For MSSQL use: com.microsoft.jdbc.sqlserver.SQLServerDriver
-					For Pointbase use: com.pointbase.jdbc.jdbcUniversalDriver
-					For Postgres use: org.postgresql.Driver
-					For Sybase use: com.sybase.jdbc2.jdbc.SybDataSource
-					For SapDB use: com.sap.dbtech.jdbc.DriverSapDB
-					For Progress use: com.progress.sql.jdbc.JdbcProgressDriver
-					For Derby use: org.apache.derby.jdbc.EmbeddedDriver
-				-->
-				<jdbc.driver>org.hsqldb.jdbcDriver</jdbc.driver>
-				<jdbc.groupId>hsqldb</jdbc.groupId>
-				<jdbc.artifactId>hsqldb</jdbc.artifactId>
-				<jdbc.version>1.8.0.1</jdbc.version>
-				<!--
-					Change connection url for appropriate database
-					For MySQL use: jdbc:mysql://localhost:3306/codechic
-					For Hypersonic use: jdbc:hsqldb:hsql://127.0.0.1:1701
-					For Oracle9i use: jdbc:oracle:thin:@localhost:1521:yoursid
-					For DB2 use: jdbc:db2:codechic
-					For Informix use: jdbc:informix-sqli://localhost:1557/codechic:INFORMIXSERVER=myserver
-					For MSSQL use: jdbc:microsoft:sqlserver://localhost:1433;DatabaseName=codechic
-					For Pointbase use: jdbc:pointbase:server://@pointbase.server@:@pointbase.port/pointbase.codechic@,new
-					For Postgres use: jdbc:postgresql://localhost/codechic
-					For Sybase use: jdbc:sybase:Tds:localhost:5000/codechic?JCONNECT_VERSION=6
-					For SapDB use: jdbc:sapdb://127.0.0.1/codechic
-					For Progress use: jdbc:JdbcProgress:T:localhost:3305:codechic
-				-->
-				<jdbc.default.url>
-					jdbc:hsqldb:mem:hsqlDB
-				</jdbc.default.url>
-				<jdbc.username>sa</jdbc.username>
-				<jdbc.password></jdbc.password>
-			</properties>
-		</profile>
-		<profile>
-			<id>mysql</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>mysql</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>mysql</jdbc>
-				<sql.mappings>MySQL</sql.mappings>
-				<!--
-					For MySql InnoDB use: org.hibernate.dialect.MySQLInnoDBDialect
-					For MySql MyISAM use: org.hibernate.dialect.MySQLMyISAMDialect
-				-->
-				<hibernate.dialect>
-					org.hibernate.dialect.MySQLInnoDBDialect
-				</hibernate.dialect>
-				<jdbc.groupId>mysql</jdbc.groupId>
-				<jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
-				<jdbc.version>5.1.30</jdbc.version>
-				<jdbc.driver> com.mysql.jdbc.Driver</jdbc.driver>
-				<jdbc.default.url>
-					jdbc:mysql://${jdbc.host}:3306/${application.id}
-				</jdbc.default.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>oracle</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-				<property>
-					<name>jdbc</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>oracle</jdbc>
-				<sql.mappings>Oracle9i</sql.mappings>
-				<!--
-					For Oracle9i/10g use: org.hibernate.dialect.Oracle9Dialect
-				-->
-				<hibernate.dialect>
-					org.hibernate.dialect.OracleDialect
-				</hibernate.dialect>
-				<jdbc.groupId>oracle</jdbc.groupId>
-				<jdbc.artifactId>ojdbc14</jdbc.artifactId>
-				<jdbc.version>10.2.0.2</jdbc.version>
-				<jdbc.driver>
-					oracle.jdbc.driver.OracleDriver
-				</jdbc.driver>
-				<jdbc.default.url>
-					jdbc:oracle:thin:@127.0.0.1:1521:${application.id}
-				</jdbc.default.url>
-				<jdbc.exception.sorter>
-					org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter
-				</jdbc.exception.sorter>
-			</properties>
-		</profile>
-		<profile>
-			<id>oracle9i</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>oracle9i</value>
-				</property>
-			</activation>
-			<properties>
-				<sql.mappings>Oracle9i</sql.mappings>
-				<hibernate.dialect>
-					org.hibernate.dialect.Oracle9iDialect
-				</hibernate.dialect>
-				<jdbc.groupId>oracle</jdbc.groupId>
-				<jdbc.artifactId>ojdbc14</jdbc.artifactId>
-				<jdbc.version>10.2.0.2</jdbc.version>
-				<jdbc.driver>
-					oracle.jdbc.driver.OracleDriver
-				</jdbc.driver>
-				<jdbc.url>
-					jdbc:oracle:thin:@127.0.0.1:1521:${application.id}
-				</jdbc.url>
-				<jdbc.username>${application.id}</jdbc.username>
-				<jdbc.password>${application.id}</jdbc.password>
-				<jdbc.exception.sorter>
-					org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter
-				</jdbc.exception.sorter>
-			</properties>
-		</profile>
-		<profile>
-			<id>derby-embedded</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>derby-embedded</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>derby-embedded</jdbc>
-				<sql.mappings>Derby</sql.mappings>
-				<hibernate.dialect>
-					org.hibernate.dialect.DerbyDialect
-				</hibernate.dialect>
-				<jdbc.groupId>org.apache.derby</jdbc.groupId>
-				<jdbc.artifactId>derby</jdbc.artifactId>
-				<jdbc.version>10.2.2.0</jdbc.version>
-				<jdbc.driver>
-					org.apache.derby.jdbc.EmbeddedDriver
-				</jdbc.driver>
-				<!--jdbc.default.url>jdbc:derby:${application.id};create=true</jdbc.default.url-->
-				<jdbc.default.url>
-					jdbc:derby:${db.outputDir}/${application.id};create=true
-				</jdbc.default.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>derby-network</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>derby-network</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>derby-network</jdbc>
-				<sql.mappings>Derby</sql.mappings>
-				<hibernate.dialect>
-					org.hibernate.dialect.DerbyDialect
-				</hibernate.dialect>
-				<jdbc.groupId>org.apache.derby</jdbc.groupId>
-				<jdbc.artifactId>derbyclient</jdbc.artifactId>
-				<jdbc.version>10.2.2.0</jdbc.version>
-				<jdbc.driver>
-					org.apache.derby.jdbc.ClientDriver
-				</jdbc.driver>
-				<jdbc.default.url>
-					jdbc:derby://${jdbc.host}:1527/${application.id};create=true
-				</jdbc.default.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>postgresql</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>postgresql</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>postgresql</jdbc>
-				<sql.mappings>PostgreSQL</sql.mappings>
-				<hibernate.dialect>
-					org.hibernate.dialect.IperSQLDialect
-				</hibernate.dialect>
-				<jdbc.groupId>postgresql</jdbc.groupId>
-				<jdbc.artifactId>postgresql</jdbc.artifactId>
-				<jdbc.version>${postgresql.version}</jdbc.version>
-				<jdbc.driver>org.postgresql.Driver</jdbc.driver>
-				<jdbc.default.url>
-					jdbc:postgresql://${jdbc.host}/${application.id}
-				</jdbc.default.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>sybase</id>
-			<activation>
-				<property>
-					<name>jdbc</name>
-					<value>sybase</value>
-				</property>
-			</activation>
-			<properties>
-				<jdbc>sybase</jdbc>
-				<sql.mappings>Sybase</sql.mappings>
-				<!--
-					For Sybase Anywhere use: org.hibernate.dialect.SybaseAnywhereDialect
-				-->
-				<hibernate.dialect>
-					org.hibernate.dialect.SybaseDialect
-				</hibernate.dialect>
-				<jdbc.groupId>sybase</jdbc.groupId>
-				<jdbc.artifactId>jconnect</jdbc.artifactId>
-				<jdbc.version>5.5</jdbc.version>
-				<jdbc.driver>
-					com.sybase.jdbc2.jdbc.SybDataSource
-				</jdbc.driver>
-				<jdbc.default.url>
-					jdbc:sybase:Tds:${jdbc.host}:5000/${application.id}?JCONNECT_VERSION=6
-				</jdbc.default.url>
-				<jdbc.exception.sorter>
-					org.jboss.resource.adapter.jdbc.vendor.SybaseExceptionSorter
-				</jdbc.exception.sorter>
-			</properties>
-		</profile>
-		<!-- end jdbc profiles -->
+    <repositories>
+        <repository>
+            <id>grails</id>
+            <name>grails</name>
+            <url>http://repo.grails.org/grails/core</url>
+        </repository>
+        <repository>
+            <id>grails-plugins</id>
+            <name>grails-plugins</name>
+            <url>http://repo.grails.org/grails/plugins</url>
+        </repository>
+        <!--
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </repository>
+        //-->
+    </repositories>
 
-		<profile>
-			<id>andromda-generate</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.andromda.maven.plugins</groupId>
-						<artifactId>andromda-maven-plugin</artifactId>
-						<version>${andromda.version}</version>
-						<executions>
-							<execution>
-		                        <phase>process-resources</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<configurationUri>${pom.basedir}/mda/src/main/config/andromda.xml</configurationUri>
-									<lastModifiedCheck>true</lastModifiedCheck>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>tomcat</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>deploy</id>
-								<phase>install</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<delete dir="${env.CATALINA_HOME}/webapps/${application.id}" failonerror="false" />
-										<copy file="target/${pom.artifactId}-${pom.version}.war"
-											tofile="${env.CATALINA_HOME}/webapps/${application.id}.war"
-											overwrite="true" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-			<properties>
-				<dataSource>java:/comp/env/${dataSource.name}</dataSource>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>jboss</id>
-			<properties>
-				<dataSource>java:${dataSource.name}</dataSource>
-			</properties>
-		</profile>
-
+    <profiles>
         <profile>
-            <id>smartguide</id>
+            <id>tools</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>java.vendor</name>
+                    <value>Sun Microsystems Inc.</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>${java.version}</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- begin jdbc profiles -->
+        <profile>
+            <id>mysql</id>
+            <activation>
+                <property>
+                    <name>jdbc</name>
+                    <value>mysql</value>
+                </property>
             </activation>
             <properties>
-			    <jdbc.host>194.79.150.229</jdbc.host>
-			    <jdbc.username>iper2010</jdbc.username>
-			    <jdbc.password>e-z12B24</jdbc.password>
+                <jdbc>mysql</jdbc>
+                <sql.mappings>MySQL</sql.mappings>
+                <!--
+                    For MySql InnoDB use: org.hibernate.dialect.MySQLInnoDBDialect
+                    For MySql MyISAM use: org.hibernate.dialect.MySQLMyISAMDialect
+                -->
+                <hibernate.dialect>
+                    org.hibernate.dialect.MySQLInnoDBDialect
+                </hibernate.dialect>
+                <jdbc.groupId>mysql</jdbc.groupId>
+                <jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
+                <jdbc.version>${mysql.version}</jdbc.version>
+                <jdbc.driver> com.mysql.jdbc.Driver</jdbc.driver>
                 <jdbc.default.url>
-                    jdbc:postgresql://${jdbc.host}/iper2010
+                    jdbc:mysql://${jdbc.host}:3306/${application.id}
                 </jdbc.default.url>
             </properties>
         </profile>
         <profile>
-            <id>localhost</id>
+            <id>oracle9i</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>jdbc</name>
+                    <value>oracle9i</value>
+                </property>
             </activation>
             <properties>
-			    <jdbc.host>localhost</jdbc.host>
-			    <jdbc.username>iper2010</jdbc.username>
-			    <jdbc.password>iper2010</jdbc.password>
-                <jdbc.default.url>
-                    jdbc:postgresql://${jdbc.host}/iper2010
-                </jdbc.default.url>
+                <sql.mappings>Oracle9i</sql.mappings>
+                <hibernate.dialect>
+                    org.hibernate.dialect.Oracle9iDialect
+                </hibernate.dialect>
+                <jdbc.groupId>oracle</jdbc.groupId>
+                <jdbc.artifactId>ojdbc6_g</jdbc.artifactId>
+                <jdbc.version>${oracle.version}</jdbc.version>
+                <jdbc.driver>
+                    oracle.jdbc.driver.OracleDriver
+                </jdbc.driver>
+                <jdbc.url>
+                    jdbc:oracle:thin:@127.0.0.1:1521:${application.id}
+                </jdbc.url>
+                <jdbc.username>${application.id}</jdbc.username>
+                <jdbc.password>${application.id}</jdbc.password>
+                <jdbc.exception.sorter>
+                    org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter
+                </jdbc.exception.sorter>
             </properties>
         </profile>
         <profile>
-            <id>passnguide-test</id>
+            <id>oracle10g</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>jdbc</name>
+                    <value>oracle10g</value>
+                </property>
             </activation>
             <properties>
-                <jdbc.host>194.79.150.229</jdbc.host>
-                <jdbc.username>passnguide-test</jdbc.username>
-                <jdbc.password>passnguide-test</jdbc.password>
+                <sql.mappings>Oracle9i<!-- FIXME //--></sql.mappings>
+                <hibernate.dialect>
+                    org.hibernate.dialect.Oracle10gDialect
+                </hibernate.dialect>
+                <jdbc.groupId>oracle</jdbc.groupId>
+                <jdbc.artifactId>ojdbc6_g</jdbc.artifactId>
+                <jdbc.version>${oracle.version}</jdbc.version>
+                <jdbc.driver>
+                    oracle.jdbc.driver.OracleDriver
+                </jdbc.driver>
+                <jdbc.url>
+                    jdbc:oracle:thin:@127.0.0.1:1521:${application.id}
+                </jdbc.url>
+                <jdbc.username>${application.id}</jdbc.username>
+                <jdbc.password>${application.id}</jdbc.password>
+                <jdbc.exception.sorter>
+                    org.jboss.resource.adapter.jdbc.vendor.OracleExceptionSorter
+                </jdbc.exception.sorter>
+            </properties>
+        </profile>
+        <profile>
+            <id>postgresql</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>jdbc</name>
+                    <value>postgresql</value>
+                </property>
+            </activation>
+            <properties>
+                <jdbc>postgresql</jdbc>
+                <sql.mappings>PostgreSQL</sql.mappings>
+                <hibernate.dialect>
+                    org.hibernate.dialect.IperSQLDialect
+                </hibernate.dialect>
+                <jdbc.groupId>postgresql</jdbc.groupId>
+                <jdbc.artifactId>postgresql</jdbc.artifactId>
+                <jdbc.version>${postgresql.version}</jdbc.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
                 <jdbc.default.url>
-                    jdbc:postgresql://${jdbc.host}/passnguide-test
+                    jdbc:postgresql://${jdbc.host}/${application.id}
                 </jdbc.default.url>
             </properties>
         </profile>
-  </profiles>
-    
+        <!-- end jdbc profiles -->
+
+        <profile>
+            <id>andromda-generate</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.andromda.maven.plugins</groupId>
+                        <artifactId>andromda-maven-plugin</artifactId>
+                        <version>${andromda.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <configurationUri>${pom.basedir}/mda/src/main/config/andromda.xml</configurationUri>
+                                    <lastModifiedCheck>true</lastModifiedCheck>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <!-- andromda dependencies -->
+                <dependency>
+                    <groupId>org.andromda.profiles.uml2</groupId>
+                    <artifactId>andromda-profile</artifactId>
+                    <version>${andromda.version}</version>
+                    <type>xml.zip</type>
+                </dependency>
+                <dependency>
+                    <groupId>org.andromda.cartridges</groupId>
+                    <artifactId>andromda-grails-cartridge</artifactId>
+                    <version>${andromda.grails.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.andromda.cartridges</groupId>
+                    <artifactId>andromda-java-cartridge</artifactId>
+                    <version>${andromda.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>xml-apis</groupId>
+                            <artifactId>xml-apis</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

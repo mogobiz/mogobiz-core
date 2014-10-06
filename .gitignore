@@ -1,0 +1,4 @@
+*.uml2
+plugins/*
+target/*
+*.log

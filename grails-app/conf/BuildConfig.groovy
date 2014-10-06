@@ -60,6 +60,8 @@ grails.project.dependency.resolution = {
         compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.resourceserver:0.31'
         runtime 'org.codehaus.jettison:jettison:1.2'
 
+        compile 'com.restfb:restfb:1.6.7'
+        compile 'com.google.zxing:core:1.7'
     }
 
     plugins {
