@@ -7,7 +7,9 @@ class MogobizCoreGrailsPlugin {
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
         "grails-app/views/error.gsp",
-        "**/*.groovy",
+        "src/groovy/**/*.groovy",
+        "scripts/*.groovy",
+        "*.groovy",
         "**/*.java",
         "**/iper2010.xml",
         "**/*.mdzip"

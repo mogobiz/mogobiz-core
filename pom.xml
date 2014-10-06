@@ -83,6 +83,7 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- spock-core //-->
             <dependency>
                 <groupId>org.spockframework</groupId>
                 <artifactId>spock-core</artifactId>
@@ -94,7 +95,8 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- nekohtml -->
+
+            <!-- nekohtml //-->
             <dependency>
                 <groupId>net.sourceforge.nekohtml</groupId>
                 <artifactId>nekohtml</artifactId>
@@ -220,23 +222,6 @@
     <scope>compile</scope>
 </dependency>
 
-        <dependency>
-            <groupId>com.restfb</groupId>
-            <artifactId>restfb</artifactId>
-            <version>1.6.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mogobiz.rivers</groupId>
-            <artifactId>mogobiz-elasticsearch</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- begin from grails-app/BuildConfig.groovy //-->
         <dependency>
             <groupId>org.codehaus.groovy.modules.http-builder</groupId>
@@ -324,7 +309,26 @@
             <version>0.31</version>
             <scope>compile</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>com.restfb</groupId>
+            <artifactId>restfb</artifactId>
+            <version>1.6.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mogobiz.rivers</groupId>
+            <artifactId>mogobiz-elasticsearch</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -441,9 +445,7 @@
             <artifactId>mail</artifactId>
             <version>1.0.5</version>
             <scope>compile</scope>
-            
             <type>zip</type>
-            
         </dependency>
         
         <dependency>
@@ -459,9 +461,7 @@
             <artifactId>recaptcha</artifactId>
             <version>0.6.8</version>
             <scope>compile</scope>
-            
             <type>zip</type>
-            
         </dependency>
         
         <dependency>
@@ -485,9 +485,7 @@
             <artifactId>cookie</artifactId>
             <version>0.51</version>
             <scope>compile</scope>
-            
             <type>zip</type>
-            
         </dependency>
         
         <dependency>
@@ -529,6 +527,7 @@
             <scope>runtime</scope>
             <type>zip</type>
         </dependency>
+
         <!--
         <dependency>
             <groupId>org.grails.plugins</groupId>
@@ -610,14 +609,6 @@
             <name>grails-plugins</name>
             <url>http://repo.grails.org/grails/plugins</url>
         </repository>
-        <!--
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
-        </repository>
-        //-->
     </repositories>
 
     <profiles>
