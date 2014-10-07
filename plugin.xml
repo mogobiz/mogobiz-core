@@ -5,7 +5,6 @@
 </description>
   <documentation>http://grails.org/plugin/mogobiz-core</documentation>
   <type>MogobizCoreGrailsPlugin</type>
-  <packaging>binary</packaging>
   <resources>
     <resource>com.mogobiz.auth.AuthController</resource>
     <resource>com.mogobiz.auth.ExternalAuthController</resource>

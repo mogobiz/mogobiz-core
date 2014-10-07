@@ -1,5 +1,5 @@
 class MogobizCoreGrailsPlugin {
-    def packaging = "binary"
+    //def packaging = "binary"
     // the plugin version
     def version = "1.0-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
@@ -7,10 +7,11 @@ class MogobizCoreGrailsPlugin {
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
         "grails-app/views/error.gsp",
-        "src/groovy/**/*.groovy",
-        "scripts/*.groovy",
-        "*.groovy",
-        "**/*.java",
+//        "src/groovy/**/*.groovy",
+//        "scripts/*.groovy",
+//        "*.groovy",
+//        "**/*.groovy",
+//        "**/*.java",
         "**/iper2010.xml",
         "**/*.mdzip"
     ]
