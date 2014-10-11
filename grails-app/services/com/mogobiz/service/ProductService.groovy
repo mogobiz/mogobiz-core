@@ -157,6 +157,7 @@ class ProductService
 		
 		PagedResultList pagedListe = Product.createCriteria().list (max: maxItemsPerPage, offset: pageOffset * maxItemsPerPage) {
 			company { eq('id', companyId) }
+            eq('deleted', false)
 			eq('state', ProductState.ACTIVE)
 			le('startDate',today)
 			ge('stopDate',today)
@@ -226,6 +227,7 @@ class ProductService
 		
 		PagedResultList pagedListe = Product.createCriteria().list (max: maxItemsPerPage, offset: pageOffset * maxItemsPerPage) {
 			company { eq('id', companyId) }
+            eq('deleted', false)
 			eq('state', ProductState.ACTIVE)
 			le('startFeatureDate',today)
 			ge('stopFeatureDate',today)

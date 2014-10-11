@@ -106,6 +106,7 @@ class ProductController {
             def productslist = products.list(max: pageSize,
                     offset: offset) {
                 eq('company', company)
+                eq('deleted', false)
                 if (params['product']?.state) {
                     eq('state', ProductState.valueOf(params['product']?.state))
                 }

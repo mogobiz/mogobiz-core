@@ -17,10 +17,6 @@ class CatalogController {
 
     def show = {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
-        Long idCompany = -1L
-        if(seller) {
-            idCompany = seller.company.id
-        }
         Long id = params['catalog']?.id?.toLong()
         if(id != null){
             def catalog = Catalog.get(id)
@@ -36,7 +32,7 @@ class CatalogController {
             }
         }
         else {
-            List<Catalog> catalogs = Catalog.findAllByCompany(seller.company)
+            List<Catalog> catalogs = Catalog.findAllByCompanyAndDeleted(seller.company, false)
             withFormat {
                 html catalogs:catalogs
                 xml { render catalogs as XML }

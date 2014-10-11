@@ -32,6 +32,7 @@ class CategoryController {
             }
         } else if (par != null) {
             List<Category> categories = Category.withCriteria {
+                eq('deleted', false)
                 company {
                     eq('id', seller.company.id)
                 }
@@ -45,6 +46,7 @@ class CategoryController {
             }
         } else if (catalogId) {
             List<Category> categories = Category.withCriteria {
+                eq('deleted', false)
                 company {
                     eq('id', seller.company.id)
                 }
@@ -60,6 +62,7 @@ class CategoryController {
             }
         } else {
             List<Category> categories = Category.withCriteria {
+                eq('deleted', false)
                 company {
                     eq('id', seller.company.id)
                 }
