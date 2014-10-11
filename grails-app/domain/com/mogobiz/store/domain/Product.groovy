@@ -122,6 +122,10 @@ class Product
     /**
      * 
      */
+    boolean deleted  = false 
+    /**
+     * 
+     */
     com.mogobiz.geolocation.domain.Poi poi 
 
     /**
@@ -206,6 +210,7 @@ class Product
         stopDate column:"stop_date",insertable:true,updateable:true,lazy:false,cache:false
         keywords column:"keywords",insertable:true,updateable:true,lazy:false,cache:false
         availabilityDate column:"availability_date",insertable:true,updateable:true,lazy:false,cache:false
+        deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
 
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -255,6 +260,7 @@ class Product
         stopDate (nullable:true, unique:false)
         keywords (nullable:true, unique:false)
         availabilityDate (nullable:true, unique:false)
+        deleted ( blank:false, nullable:false, unique:false)
         poi (nullable:true)
         category ( blank:false, nullable:false)
         brand (nullable:true)

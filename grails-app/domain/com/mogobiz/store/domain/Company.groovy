@@ -136,7 +136,11 @@ class Company
     /**
      * 
      */
-    java.lang.String defaultLanguage  = "fr"     /**
+    java.lang.String defaultLanguage  = "fr" 
+    /**
+     * 
+     */
+    boolean deleted  = false     /**
      * 
      */
     com.mogobiz.geolocation.domain.Location shipFrom
@@ -198,6 +202,7 @@ class Company
         gakey column:"gakey",insertable:true,updateable:true,lazy:false,cache:false
         mapProvider column:"map_provider",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
         defaultLanguage column:"default_language",insertable:true,updateable:true,lazy:false,cache:false
+        deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
 
 
         shipFrom column:"ship_from_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -235,6 +240,7 @@ class Company
         gakey (nullable:true, unique:false)
         mapProvider (nullable:true, unique:false)
         defaultLanguage ( blank:false, nullable:false, unique:false)
+        deleted ( blank:false, nullable:false, unique:false)
         shipFrom (nullable:true)
         location (nullable:true)
         googleContent (nullable:true)

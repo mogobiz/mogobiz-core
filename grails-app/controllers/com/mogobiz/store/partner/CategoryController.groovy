@@ -1,5 +1,6 @@
 package com.mogobiz.store.partner
 
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Ibeacon
 import grails.converters.JSON
 import grails.converters.XML
@@ -215,13 +216,13 @@ class CategoryController {
 	}
 
 	def delete = {
-		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
+		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
 			return
 		}
-		def company = seller.company
-		def category = params['category']?.id ? Category.get(params['category']?.id):null
+        Company company = seller.company
+        Category category = params['category']?.id ? Category.get(params['category']?.id):null
 		if(category && category.company == company){
 			def products = Product.executeQuery('FROM Product p JOIN p.category c WHERE c=:category', [category:category])
 			def variations = Variation.executeQuery('FROM Variation v JOIN v.category c WHERE c=:category', [category:category])
