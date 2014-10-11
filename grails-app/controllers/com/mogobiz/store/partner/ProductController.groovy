@@ -352,5 +352,21 @@ class ProductController {
             response.sendError 404
         }
     }
+    def markDeleted(long id) {
+        def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
+        if (seller == null) {
+            response.sendError 401
+            return
+        }
+        Product product = Product.get(id)
+        if (product && product.company == seller.company) {
+            product.setDeleted(true)
+            product.save(flush:true)
+            render ([success:true] as Map) as JSON
+            return
+        } else {
+            response.sendError 404
+        }
+    }
 
 }

@@ -52,6 +52,10 @@ class Catalog
     /**
      * 
      */
+    boolean deleted  = false 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'catalogValidation', 'catalogRender' ]
@@ -80,6 +84,7 @@ class Catalog
         description column:"description",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         social column:"social",insertable:true,updateable:true,lazy:false,cache:false
         channels column:"channels",insertable:true,updateable:true,lazy:false,cache:false
+        deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -94,6 +99,7 @@ class Catalog
         description (nullable:true, unique:false)
         social ( blank:false, nullable:false, unique:false)
         channels (nullable:true, unique:false)
+        deleted ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
     }
 

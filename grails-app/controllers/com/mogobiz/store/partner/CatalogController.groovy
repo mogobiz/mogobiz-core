@@ -124,5 +124,24 @@ class CatalogController {
             json { render [:] as JSON }
         }
     }
-
+    def markDeleted = {
+        Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
+        Long id = params['catalog']?.id?.toLong()
+        if (id != null) {
+            Catalog catalog = Catalog.get(id)
+            if (catalog && catalog.company == seller.company) {
+                catalog.setDeleted(true)
+                catalog.save(flush: true)
+                withFormat {
+                    html category: catalog
+                    xml { render catalog as XML }
+                    json { render catalog as JSON }
+                }
+            } else {
+                response.sendError 404
+            }
+        } else {
+            response.sendError 403
+        }
+    }
 }
