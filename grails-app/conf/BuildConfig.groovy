@@ -62,6 +62,9 @@ grails.project.dependency.resolution = {
 
         compile 'com.restfb:restfb:1.6.7'
         compile 'com.google.zxing:core:1.7'
+
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
     }
 
     plugins {

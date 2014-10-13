@@ -2,3 +2,4 @@
 plugins/*
 target/*
 *.log
+*.iml
