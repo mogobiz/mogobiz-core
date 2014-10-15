@@ -267,7 +267,7 @@ class UploadController {
         }
         def d = new File(dir)
         d.mkdirs()
-        resource.url = dir + resource.id + extension
+        resource.url = dir + resource.id //+ extension
         file.transferTo(new File(resource.url))
         if (resource.xtype == ResourceType.PICTURE) {
             resource.smallPicture = ImageUtil.getFile(new File(resource.url), ImageSize.SMALL, true)
