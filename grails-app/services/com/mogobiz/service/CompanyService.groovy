@@ -78,6 +78,7 @@ class CompanyService
             return company.asMapForJSON()
         }
         else {
+            company.errors.allErrors.each { println it }
             throw new InvalidDomainObjectException("Company")
         }
     }

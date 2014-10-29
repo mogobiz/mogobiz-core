@@ -159,7 +159,7 @@ class SellerController {
         seller.password = new Sha256Hash(clearPassword)
         seller.login = seller.email
         seller.active = false
-        sellerService.save(seller, true)
+        sellerService.save(seller, clearPassword, true)
         Map sellerVO = seller.asMapForJSON()
 
         withFormat {

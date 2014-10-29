@@ -53,9 +53,9 @@ class FeatureService {
 			order('position', "asc")
 		}
 		if (includeParents) {
-			Set<Long> cats = []
 
 			Product product = Product.get(productId)
+			Set<Long> cats = [product.category.id]
 			cats.addAll(getCategories(product.category.id))
 			List<Feature>  parentFeatures = getFeatures(cats)
 			features.addAll(0, parentFeatures)

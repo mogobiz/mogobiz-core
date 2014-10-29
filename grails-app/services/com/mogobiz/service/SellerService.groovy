@@ -154,7 +154,7 @@ class SellerService {
     }
 
 
-    def Seller save(Seller seller, Boolean sendConfirmation) {
+    def Seller save(Seller seller, String clearPassword, Boolean sendConfirmation) {
         Seller oldSeller = Seller.findByEmail(seller.email)
         if (oldSeller != null) {
             Company company = Company.get(seller.company.id)
