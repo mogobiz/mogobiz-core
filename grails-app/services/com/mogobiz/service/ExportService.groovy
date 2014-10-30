@@ -2,7 +2,12 @@ package com.mogobiz.service
 
 import com.mogobiz.store.domain.*
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.DataValidationConstraint
 import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.util.CellRangeAddressList
+import org.apache.poi.xssf.usermodel.XSSFDataValidation
+import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
@@ -15,7 +20,7 @@ class ExportService {
     final List<String> catHeaders = ["id", "uuid", "external-code", "path", "name", "description", "keywords", "hide", "seo", "google", "deleted"]
     final List<String> featHeaders = ["category-id", "category-path", "product-id", "product-path", "id", "uuid", "external-code", "domain", "name", "value", "hide"]
     final List<String> varHeaders = ["category-id", "category-path", "id", "uuid", "external-code", "google", "hide"]
-    final List<String> varValHeaders = ["category-id", "category-path", "variation-id", "id", "uuid", "external-code", "variation-name", "value", "google", "hide"]
+    final List<String> varValHeaders = ["category-id", "category-path", "variation-id", "variation-name", "id", "uuid", "external-code", "value", "google", "hide"]
     final List<String> prdHeaders = ["category-id", "category-path", "id", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords"]
     final List<String> skuHeaders = ["category-id", "category-path", "product-id", "product-path", "id", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-value-1", "variation-value-21", "variation-value-3"]
 
@@ -23,28 +28,33 @@ class ExportService {
         [it.id, it.uuid, it.externalCode, categoryService.path(it), it.name, it.description, it.keywords, it.hide, it.sanitizedName, it.googleCategory, it.deleted]
     }
 
-    List<String> toArray(Feature it) {
-        [it.category?.id, it.category ? categoryService.path(it.category) : null, it.product?.id, it.product?.name, it.id, it.uuid, it.externalCode, it.domain, it.name, it.value, it.hide]
+    List<String> toArrayForCat(Feature it, int rowNum) {
+        ["category!A" + rowNum, "category!D" + rowNum, null, null, it.id, it.uuid, it.externalCode, it.domain, it.name, it.value, it.hide]
     }
 
-    List<String> toArray(Variation it) {
-        [it.categoryId, categoryService.path(it.category), it.id, it.uuid, it.externalCode, it.name, it.googleVariationType, it.hide]
+    List<String> toArrayForPrd(Feature it, int rowNum) {
+        ["product!A" + rowNum, "product!B" + rowNum, "product!C" + rowNum, "product!G" + rowNum, it.id, it.uuid, it.externalCode, it.domain, it.name, it.value, it.hide]
     }
 
-    List<String> toArray(VariationValue it) {
-        [it.variation.categoryId, categoryService.path(it.variation.category), it.variationId, it.id, it.uuid, it.externalCode, it.variation.name, it.value, it.googleVariationValue]
+    List<String> toArray(Variation it, int rowNum) {
+        ["category!A" + rowNum, "category!D" + rowNum, it.id, it.uuid, it.externalCode, it.name, it.googleVariationType, it.hide]
     }
 
-    List<String> toArray(Product it) {
-        [it.categoryId, categoryService.path(it.category), it.id, it.uuid, it.externalCode, it.code, it.name, it.xtype, it.price, it.state, it.description, it.nbSales, it.stockDisplay, it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : null, it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : null, it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : null, it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : null, it.sanitizedName, it.tags.collect {
+    List<String> toArray(VariationValue it, int rowNum) {
+        ["category!A" + rowNum, "category!D" + rowNum, "product!A" + rowNum, "product!B" + rowNum, "product!C" + rowNum, "product!G" + rowNum, it.id, it.uuid, it.externalCode, it.value, it.googleVariationValue]
+    }
+
+    List<String> toArray(Product it, rowNum) {
+        ["category!A" + rowNum, "category!D" + rowNum, it.id, it.uuid, it.externalCode, it.code, it.name, it.xtype, it.price, it.state, it.description, it.nbSales, it.stockDisplay, it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : null, it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : null, it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : null, it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : null, it.sanitizedName, it.tags.collect {
             it.name
         }.join(","), it.keywords, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : null]
     }
 
-    List<String> toArray(TicketType it) {
-        [it.product.categoryId, categoryService.path(it.product.category), it.product.id, it.product.name, it.id, it.uuid, it.externalCode, it.sku, it.name, it.price, it.minOrder, it.maxOrder, it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : null, it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : null, it.xprivate, it.stock?.stock, it.stock?.stockUnlimited, it.stock?.stockOutSelling, it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : null, it.gtin, it.mpn, it.variation1?.value, it.variation2?.value, it.variation3?.value]
+    List<String> toArray(TicketType it, int rowNum) {
+        ["category!A" + rowNum, "category!D" + rowNum, "product!A" + rowNum, "product!B" + rowNum, "product!C" + rowNum, it.id, it.uuid, it.externalCode, it.sku, it.name, it.price, it.minOrder, it.maxOrder, it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : null, it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : null, it.xprivate, it.stock?.stock, it.stock?.stockUnlimited, it.stock?.stockOutSelling, it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : null, it.gtin, it.mpn, it.variation1?.value, it.variation2?.value, it.variation3?.value]
     }
 
+    CellStyle unlockedCellStyle
 
     File export(long catalogId, Category parent = null, boolean deleted = false) {
         int catRownum = 0
@@ -56,7 +66,24 @@ class ExportService {
         int skuRownum = 0
 
         XSSFWorkbook workbook = new XSSFWorkbook();
+        unlockedCellStyle = workbook.createCellStyle();
+        unlockedCellStyle.setLocked(false);
+
+
         XSSFSheet catSheet = workbook.createSheet("category");
+        catSheet.protectSheet("")
+        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(catSheet);
+        DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
+        CellRangeAddressList addressList = new CellRangeAddressList(0, 65000, 7, 7);
+        XSSFDataValidation dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
+        dataValidation.setShowErrorBox(true);
+        catSheet.addValidationData(dataValidation)
+
+        addressList = new CellRangeAddressList(0, 65000, 10, 10);
+        dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
+        dataValidation.setShowErrorBox(true);
+        catSheet.addValidationData(dataValidation)
+
         Row catRow = catSheet.createRow(catRownum++)
         int catCellnum = 0
         catHeaders.each {
@@ -65,6 +92,14 @@ class ExportService {
         }
 
         XSSFSheet catFeatSheet = workbook.createSheet("cat-feature");
+        catFeatSheet.protectSheet("")
+        dvHelper = new XSSFDataValidationHelper(catFeatSheet);
+        dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
+        addressList = new CellRangeAddressList(0, 65000, 10, 10);
+        dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
+        dataValidation.setShowErrorBox(true);
+        catFeatSheet.addValidationData(dataValidation)
+
         Row catFeatRow = catFeatSheet.createRow(catfeatRownum++)
         int catFeatCellnum = 0
         featHeaders.each {
@@ -73,6 +108,7 @@ class ExportService {
         }
 
         XSSFSheet varSheet = workbook.createSheet("variation");
+        varSheet.protectSheet("")
         Row varRow = varSheet.createRow(varRownum++)
         int varCellnum = 0
         varHeaders.each {
@@ -81,6 +117,7 @@ class ExportService {
         }
 
         XSSFSheet varValSheet = workbook.createSheet("variation-value");
+        varValSheet.protectSheet("")
         int varValCellnum = 0
         Row varValRow = varValSheet.createRow(varValRownum++)
         varValHeaders.each {
@@ -89,6 +126,7 @@ class ExportService {
         }
 
         XSSFSheet prdSheet = workbook.createSheet("product");
+        prdSheet.protectSheet("")
         Row prdRow = prdSheet.createRow(prdRownum++)
         int prdCellnum = 0
         prdHeaders.each {
@@ -97,6 +135,7 @@ class ExportService {
         }
 
         XSSFSheet prdFeatSheet = workbook.createSheet("product-feature");
+        prdFeatSheet.protectSheet("")
         Row prdFeatRow = prdFeatSheet.createRow(prdFeatRownum++)
         int prdFeatCellnum = 0
         featHeaders.each {
@@ -105,6 +144,7 @@ class ExportService {
         }
 
         XSSFSheet skuSheet = workbook.createSheet("sku");
+        skuSheet.protectSheet("")
         Row skuRow = skuSheet.createRow(skuRownum++)
         int skuCellnum = 0
         skuHeaders.each {
@@ -113,7 +153,7 @@ class ExportService {
         }
 
         categories(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum])
-        File outFile = File.createTempFile("mogobiz-"+ (new SimpleDateFormat("yyyy-MM-dd").format(new Date())), "xlsx")
+        File outFile = File.createTempFile("mogobiz-" + (new SimpleDateFormat("yyyy-MM-dd").format(new Date())), "xlsx")
         //Write the workbook in file system
         FileOutputStream out = new FileOutputStream(outFile);
         workbook.write(out);
@@ -145,16 +185,27 @@ class ExportService {
             Row catRow = catSheet.createRow(catRownum++)
             toArray(it).each {
                 Cell catCell = catRow.createCell(catCellnum++)
-                catCell.setCellValue(it)
+                if (catCellnum <= 4) {
+                    catCell.setCellValue(it)
+                } else {
+                    catCell.setCellValue(it)
+                    catCell.setCellStyle(unlockedCellStyle)
+                }
             }
 
             List<Feature> features = featureService.getCategoryFeatures(it.id, false)
             features.each {
                 int catFeatCellnum = 0
                 Row catFeatRow = catFeatSheet.createRow(catfeatRownum++)
-                toArray(it).each {
+                toArrayForCat(it, catRownum).each {
                     Cell catFeatCell = catFeatRow.createCell(catFeatCellnum++)
-                    catFeatCell.setCellValue(it)
+                    if (catFeatCellnum <= 4) {
+                        catFeatCell.setCellFormula(it)
+                    } else {
+                        catFeatCell.setCellValue(it)
+                        catFeatCell.setCellStyle(unlockedCellStyle)
+
+                    }
                 }
             }
 
@@ -162,17 +213,27 @@ class ExportService {
             variations.each {
                 int varCellnum = 0
                 Row varRow = varSheet.createRow(varRownum++)
-                toArray(it).each {
+                toArray(it, varRownum).each {
                     Cell varCell = varRow.createCell(varCellnum++)
-                    varCell.setCellValue(it)
+                    if (varCellnum <= 2)
+                        varCell.setCellFormula(it)
+                    else {
+                        varCell.setCellValue(it)
+                        varCell.setCellStyle(unlockedCellStyle)
+                    }
                 }
                 List<VariationValue> values = VariationValue.findAllByVariation(it)
                 values.each {
                     int varValCellnum = 0
                     Row varValRow = varValSheet.createRow(varValRownum++)
-                    toArray(it).each {
+                    toArray(it, varValRownum).each {
                         Cell varValCell = varValRow.createCell(varValCellnum++)
-                        varValCell.setCellValue(it)
+                        if (varValCellnum <= 4)
+                            varValCell.setCellFormula(it)
+                        else {
+                            varValCell.setCellValue(it)
+                            varValCell.setCellStyle(unlockedCellStyle)
+                        }
                     }
                 }
             }
@@ -181,18 +242,29 @@ class ExportService {
             products.each {
                 int prdCellnum = 0
                 Row prdRow = prdSheet.createRow(prdRownum++)
-                toArray(it).each {
+                toArray(it, prdRownum).each {
                     Cell prdCell = prdRow.createCell(prdCellnum++)
-                    prdCell.setCellValue(it.toString())
+                    if (prdCellnum <= 2)
+                        prdCell.setCellFormula(it)
+                    else {
+                        prdCell.setCellValue(it.toString())
+                        prdCell.setCellStyle(unlockedCellStyle)
+                    }
                 }
 
                 List<Feature> pfeatures = featureService.getProductFeatures(it.id, false)
                 pfeatures.each {
                     int prdFeatCellnum = 0
                     Row prdFeatRow = prdFeatSheet.createRow(prdFeatRownum++)
-                    toArray(it).each {
+                    toArrayForPrd(it, prdFeatRownum).each {
                         Cell prdFeatCell = prdFeatRow.createCell(prdFeatCellnum++)
                         prdFeatCell.setCellValue(it)
+                        if (prdFeatCellnum <= 4)
+                            prdFeatCell.setCellFormula(it)
+                        else {
+                            prdFeatCell.setCellValue(it)
+                            prdFeatCell.setCellStyle(unlockedCellStyle)
+                        }
                     }
                 }
 
@@ -200,9 +272,14 @@ class ExportService {
                 ticketTypes.each {
                     int skuCellnum = 0
                     Row skuRow = skuSheet.createRow(skuRownum++)
-                    toArray(it).each {
+                    toArray(it, skuRownum).each {
                         Cell skuCell = skuRow.createCell(skuCellnum++)
-                        skuCell.setCellValue(it)
+                        if (skuCellnum <= 4)
+                            skuCell.setCellFormula(it)
+                        else {
+                            skuCell.setCellValue(it)
+                            skuCell.setCellStyle(unlockedCellStyle)
+                        }
                     }
                 }
             }
@@ -218,3 +295,4 @@ class ExportService {
     }
 
 }
+
