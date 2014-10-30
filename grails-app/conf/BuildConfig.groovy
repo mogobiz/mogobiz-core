@@ -62,6 +62,7 @@ grails.project.dependency.resolution = {
 
         compile 'com.restfb:restfb:1.6.7'
         compile 'com.google.zxing:core:1.7'
+        compile 'org.apache.poi:poi-ooxml:3.10.1'
 
         provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
         provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
@@ -98,6 +99,5 @@ grails.project.dependency.resolution = {
         compile ":cookie:0.51"
         compile ":rest:0.8"
         compile ":joda-time:1.4"
-        test ':spock:0.7'
     }
 }

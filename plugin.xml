@@ -156,6 +156,7 @@
     <resource>com.mogobiz.service.CountryService</resource>
     <resource>com.mogobiz.service.CouponService</resource>
     <resource>com.mogobiz.service.EmailConfirmationNotificationService</resource>
+    <resource>com.mogobiz.service.ExportService</resource>
     <resource>com.mogobiz.service.FeatureService</resource>
     <resource>com.mogobiz.service.IbeaconService</resource>
     <resource>com.mogobiz.service.ProductJahiaService</resource>

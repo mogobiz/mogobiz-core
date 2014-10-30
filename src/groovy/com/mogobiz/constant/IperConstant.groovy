@@ -60,5 +60,5 @@ interface IperConstant {
 	static final Integer NUMBER_EVENTS_PER_PAGE = 50
 	static final Integer NUMBER_SALES_PER_PAGE = 50
 	
-	static String GET_QRCODE_URL = Holders.config.grails.serverURL.toString() + '/event/getQRCode?content='
+	static String GET_QRCODE_URL =  '/event/getQRCode?content='
 }

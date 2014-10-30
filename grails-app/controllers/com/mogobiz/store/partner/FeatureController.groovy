@@ -1,5 +1,7 @@
 package com.mogobiz.store.partner
 
+import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.service.FeatureService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -15,8 +17,8 @@ import com.mogobiz.store.domain.Product
  *
  */
 class FeatureController {
-	def authenticationService
-	def featureService
+	AuthenticationService authenticationService
+	FeatureService featureService
 
 	def show() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()

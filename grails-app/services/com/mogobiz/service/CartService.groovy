@@ -16,6 +16,7 @@ import com.mogobiz.store.vo.ShippingVO
 import com.mogobiz.utils.*
 import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.plugin.mail.MailService
+import grails.util.Holders
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 
@@ -789,7 +790,7 @@ class CartService implements IperConstant {
                                 price    : ligne.price,
                                 type     : ligne.type,
                                 shortCode: ligne.shortCode,
-                                qrcodeUrl: IperConstant.GET_QRCODE_URL + ligne.qrcode])
+                                qrcodeUrl: Holders.config.grails.serverURL.toString() + IperConstant.GET_QRCODE_URL + ligne.qrcode])
             }
         }
     }
