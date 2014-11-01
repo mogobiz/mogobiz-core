@@ -97,6 +97,7 @@ class SuggestionsController {
 		}
 		Product.createCriteria().list {
 			eq('company', company)
+			eq('deleted', false)
 			//eq('state', ProductState.ACTIVE )
 			order("name", "asc")
 		}.each { product ->
