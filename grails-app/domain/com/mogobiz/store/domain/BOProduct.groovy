@@ -84,7 +84,7 @@ class BOProduct
         acquittement ( blank:false, nullable:false, unique:false)
         principal ( blank:false, nullable:false, unique:false)
         price ( blank:false, nullable:false, unique:false)
-        product ( blank:false, nullable:false)
+        product (nullable:true)
     }
 
     static com.mogobiz.store.domain.BOProduct findByOffreNonConsome(final long idBuyer, final java.lang.String codeOffre, final long idCompany, final java.util.Calendar dateConsomation)

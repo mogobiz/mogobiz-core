@@ -1,5 +1,7 @@
 package com.mogobiz.store.partner
 
+import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.elasticsearch.client.ESClient
 import grails.converters.JSON
@@ -11,7 +13,7 @@ import com.mogobiz.store.domain.Seller
 
 class CatalogController {
 
-    def authenticationService
+    AuthenticationService authenticationService
 
     static client = ESClient.instance
 
@@ -48,16 +50,18 @@ class CatalogController {
             return
         }
         def name = params['catalog']?.name
+        Company company = seller.company
         if(name){
             def catalog = Catalog.withCriteria {
                 eq('name', name)
+                eq('deleted', false)
                 company {
-                    eq('id', seller.company.id)
+                    eq('id', company.id)
                 }
             }
             if(!catalog){
                 catalog = new Catalog(params['catalog'])
-                catalog.company = seller.company
+                catalog.company = company
                 catalog.uuid = UUID.randomUUID().toString()
                 if(catalog.validate()){
                     catalog.save(flush:true)
