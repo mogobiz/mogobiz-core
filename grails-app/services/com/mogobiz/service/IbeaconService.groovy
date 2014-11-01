@@ -31,10 +31,7 @@ class IbeaconService {
             return beaconInBase
         }
 
-        if (cmd.id == null) {
-            beaconInBase = new Ibeacon()
-        }
-        else {
+        if (cmd.id != null) {
             beaconInBase = Ibeacon.get(cmd.id)
 
             if (beaconInBase == null) {
