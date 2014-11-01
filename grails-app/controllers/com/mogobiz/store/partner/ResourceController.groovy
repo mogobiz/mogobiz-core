@@ -278,12 +278,7 @@ class ResourceController {
 			}else{
 				resource.save()
 			}
-			
-			def event =IperUtil.saveEvent(request.seller,resource, eventType)
-			if(!event.hasErrors()) {
-				resource.creation=event
-			}
-			
+
 			resourceVO =  resource.asMapForJSON()
 		}
 		withFormat {

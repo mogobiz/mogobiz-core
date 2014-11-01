@@ -178,30 +178,6 @@ class IperUtil {
         return poi
     }
 
-    /**
-     * cr�er l'evenement apres creer or modifier un Twitable
-     * @param seller the seller
-     * @param twitable the twitable object
-     * @param eventType the event type
-     * @return the created event
-     */
-    public static Event saveEvent(User user, Object twitable, eventType) {
-        def event = new Event()
-        if (twitable instanceof Resource) {
-            event.resource = twitable
-        } else if (twitable instanceof Product) {
-            event.product = twitable
-        }
-        event.date = Calendar.getInstance()
-        event.user = user
-        event.xtype = eventType
-        event.date = Calendar.getInstance()
-        if (event.validate()) {
-            event.save(flush: true)
-        }
-        return event
-    }
-
     public static long computeDiscount(String regle, long prixDeBase) {
         long nouveauPrix = prixDeBase;
         if (!StringUtils.isEmpty(regle)) {

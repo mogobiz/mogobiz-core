@@ -746,12 +746,6 @@ class ProductService
 			if(!entity.hasErrors()){
 				entity.save(flush: true)
 			}
-
-			def event = IperUtil.saveEvent(seller, entity, eventType)
-			if(!event.hasErrors() && EventType.CREATE.equals(eventType)) {
-				entity.creation = event
-				entity.save(flush: true)
-			}
 		}
 
 		if(!entity.hasErrors()){
