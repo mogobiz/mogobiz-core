@@ -19,7 +19,7 @@ class ExportService {
 
     final List<String> catHeaders = ["id", "uuid", "external-code", "path", "name", "description", "keywords", "hide", "seo", "google", "deleted"]
     final List<String> featHeaders = ["category-id", "category-path", "product-id", "product-path", "id", "uuid", "external-code", "domain", "name", "value", "hide"]
-    final List<String> varHeaders = ["category-id", "category-path", "id", "uuid", "external-code", "google", "hide"]
+    final List<String> varHeaders = ["category-id", "category-path", "id", "uuid", "external-code", "name", "google", "hide"]
     final List<String> varValHeaders = ["category-id", "category-path", "variation-id", "variation-name", "id", "uuid", "external-code", "value", "google", "hide"]
     final List<String> prdHeaders = ["category-id", "category-path", "id", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords"]
     final List<String> skuHeaders = ["category-id", "category-path", "product-id", "product-path", "id", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-value-1", "variation-value-21", "variation-value-3"]
@@ -56,6 +56,19 @@ class ExportService {
 
     CellStyle unlockedCellStyle
 
+
+    private def boolValidateCell(XSSFSheet sheet, List<Integer> cellNums) {
+        sheet.protectSheet("")
+        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
+        DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
+        cellNums.each {
+            CellRangeAddressList addressList = new CellRangeAddressList(0, 65000, it, it);
+            XSSFDataValidation dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
+            dataValidation.setShowErrorBox(true);
+            sheet.addValidationData(dataValidation)
+        }
+
+    }
     File export(long catalogId, Category parent = null, boolean deleted = false) {
         int catRownum = 0
         int catfeatRownum = 0
@@ -72,17 +85,8 @@ class ExportService {
 
         XSSFSheet catSheet = workbook.createSheet("category");
         catSheet.protectSheet("")
-        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(catSheet);
-        DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
-        CellRangeAddressList addressList = new CellRangeAddressList(0, 65000, 7, 7);
-        XSSFDataValidation dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
-        dataValidation.setShowErrorBox(true);
-        catSheet.addValidationData(dataValidation)
+        boolValidateCell(catSheet, [7, 10])
 
-        addressList = new CellRangeAddressList(0, 65000, 10, 10);
-        dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
-        dataValidation.setShowErrorBox(true);
-        catSheet.addValidationData(dataValidation)
 
         Row catRow = catSheet.createRow(catRownum++)
         int catCellnum = 0
@@ -93,12 +97,7 @@ class ExportService {
 
         XSSFSheet catFeatSheet = workbook.createSheet("cat-feature");
         catFeatSheet.protectSheet("")
-        dvHelper = new XSSFDataValidationHelper(catFeatSheet);
-        dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
-        addressList = new CellRangeAddressList(0, 65000, 10, 10);
-        dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
-        dataValidation.setShowErrorBox(true);
-        catFeatSheet.addValidationData(dataValidation)
+        boolValidateCell(catFeatSheet, [10])
 
         Row catFeatRow = catFeatSheet.createRow(catfeatRownum++)
         int catFeatCellnum = 0
@@ -109,6 +108,7 @@ class ExportService {
 
         XSSFSheet varSheet = workbook.createSheet("variation");
         varSheet.protectSheet("")
+        boolValidateCell(varSheet, [7])
         Row varRow = varSheet.createRow(varRownum++)
         int varCellnum = 0
         varHeaders.each {
