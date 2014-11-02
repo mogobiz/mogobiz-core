@@ -84,7 +84,7 @@ grails.project.dependency.resolution = {
         compile ":facebook-graph:0.14"
         compile ':platform-core:1.0.0'
         compile ":google-data:0.1.3"
-        runtime ":resources:1.2.8"
+//        runtime ":resources:1.2.8"
         compile (":email-confirmation:2.0.8") {
             excludes 'quartz'
         }
