@@ -125,7 +125,7 @@ class ImportService {
         }
     }
 
-    def purge(Catalog catalog) {
+    int purge(Catalog catalog) {
         /*
         alter table product drop column creation_fk
         alter table xresource drop column creation_fk
@@ -163,8 +163,7 @@ class ImportService {
             sql.execute("delete from category where catalog_fk = ${catalog.id}")
             sql.execute("delete from xcatalog where id = ${catalog.id}")
         }
-        else
-            println(count)
+        return count
     }
 }
 
