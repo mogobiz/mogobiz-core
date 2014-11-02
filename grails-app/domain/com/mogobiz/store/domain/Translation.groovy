@@ -60,7 +60,7 @@ class Translation
 
         tablePerHierarchy false
 
-        table 'translation'
+        table 'xtranslation'
 
         version false
 
