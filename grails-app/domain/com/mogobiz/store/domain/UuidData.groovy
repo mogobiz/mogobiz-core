@@ -40,6 +40,10 @@ class UuidData
      * </p>
      */
     java.util.Calendar expireDate 
+    /**
+     * 
+     */
+    java.lang.String userUuid 
     static transients = [ 'uuidDataValidation', 'uuidDataRender' ]
 
 
@@ -63,6 +67,7 @@ class UuidData
         payload column:"payload",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         xtype column:"xtype",insertable:true,updateable:true,lazy:false,cache:false
         expireDate column:"expire_date",insertable:true,updateable:true,lazy:false,cache:false
+        userUuid column:"user_uuid",insertable:true,updateable:true,lazy:false,cache:false
 
     }
 
@@ -72,6 +77,7 @@ class UuidData
         payload (nullable:true, unique:false)
         xtype ( blank:false, nullable:false, unique:false)
         expireDate ( blank:false, nullable:false, unique:false)
+        userUuid (nullable:true, unique:false)
     }
 
 
