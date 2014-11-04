@@ -61,7 +61,6 @@ class CompanyController {
     }
 
     def show() {
-        def id = params.id
         if (params.id) {
             def company = Company.get(params.id)
             if (company) {

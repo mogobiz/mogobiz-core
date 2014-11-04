@@ -83,6 +83,7 @@ class CatalogService {
 			sql.execute("update ticket_type set variation1_fk = null, variation2_fk=null, variation3_fk= null where product_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("delete from ticket_type  where product_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("delete from product2_resource  where product_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
+			sql.execute("delete from xresource where id not in (select resource_fk from product2_resource)")
 			sql.execute("delete from product  where category_fk  in (select id from category where catalog_fk = ${catalog.id})")
 			sql.execute("delete from variation_value where variation_fk in (select v.id from variation v, category c where v.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("delete from variation  where category_fk  in (select id from category where catalog_fk = ${catalog.id})")

@@ -12,7 +12,6 @@ import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
 
 class ImportService {
-    CategoryService categoryService
     SanitizeUrlService sanitizeUrlService
 
     private String getFormulaCell(String cellValue, Map<String, XSSFSheet> sheets) {
@@ -171,7 +170,7 @@ class ImportService {
                             cat.description = description
                             cat.keywords = keywords
                             cat.hide = hide
-                            cat.sanitizedName = seo
+                            cat.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(cat.name) : seo
                             cat.googleCategory = google
                             cat.deleted = deleted.toLowerCase().equals("false") ? false : true
                             cat.catalog = catalog
