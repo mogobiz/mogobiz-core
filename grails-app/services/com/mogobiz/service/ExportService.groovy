@@ -23,6 +23,7 @@ class ExportService {
     final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide"]
     final List<String> varValHeaders = ["category-uuid", "category-path", "variation-uuid", "variation-name", "uuid", "external-code", "value", "google"]
     final List<String> prdHeaders = ["category-uuid", "category-path", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords", "brand-name"]
+    final List<String> prdPropHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "name", "value"]
     final List<String> skuHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-name-1", "variation-value-1", "variation-name-2", "variation-value-2", "variation-name-3", "variation-value-3"]
 
     List<String> toArray(Brand it) {
@@ -59,6 +60,10 @@ class ExportService {
         ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.sku, it.name, it.price, it.minOrder, it.maxOrder, it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.xprivate, it.stock ? it.stock.stock : "", it.stock ? it.stock.stockUnlimited : "", it.stock ? it.stock.stockOutSelling : "", it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : "", it.gtin, it.mpn, it.variation1?.variation?.name, it.variation1?.value, it.variation2?.variation?.name, it.variation2?.value, it.variation3?.variation?.name, it.variation3?.value]
     }
 
+    List<String> toArray(ProductProperty it, int catRowNum, int prdRowNum) {
+        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.name, it.value]
+    }
+
     CellStyle unlockedCellStyle
 
 
@@ -83,6 +88,7 @@ class ExportService {
         int prdRownum = 0
         int prdFeatRownum = 0
         int skuRownum = 0
+        int prdPropRownum = 0
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         unlockedCellStyle = workbook.createCellStyle();
@@ -157,6 +163,15 @@ class ExportService {
             prdFeatCell.setCellValue(it)
         }
 
+        XSSFSheet prdPropSheet = workbook.createSheet("product-property");
+//        prdPropSheet.protectSheet("")
+        Row prdPropRow = prdPropSheet.createRow(prdPropRownum++)
+        int prdPropCellnum = 0
+        prdPropHeaders.each {
+            Cell prdPropCell = prdPropRow.createCell(prdPropCellnum++)
+            prdPropCell.setCellValue(it)
+        }
+
         XSSFSheet skuSheet = workbook.createSheet("sku");
 //        skuSheet.protectSheet("")
         Row skuRow = skuSheet.createRow(skuRownum++)
@@ -166,7 +181,7 @@ class ExportService {
             skuCell.setCellValue(it)
         }
 
-        categories(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum])
+        categories(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum, prdPropRownum])
         File outFile = File.createTempFile("mogobiz-" + (new SimpleDateFormat("yyyy-MM-dd").format(new Date())), ".xlsx")
         //Write the workbook in file system
         FileOutputStream out = new FileOutputStream(outFile);
@@ -183,6 +198,7 @@ class ExportService {
         int prdRownum = rownums[4]
         int prdFeatRownum = rownums[5]
         int skuRownum = rownums[6]
+        int prdPropRownum = rownums[7]
 
         XSSFSheet brandSheet = workbook.getSheet("brand");
         XSSFSheet catSheet = workbook.getSheet("category");
@@ -190,6 +206,7 @@ class ExportService {
         XSSFSheet varSheet = workbook.getSheet("variation");
         XSSFSheet varValSheet = workbook.getSheet("variation-value");
         XSSFSheet prdSheet = workbook.getSheet("product");
+        XSSFSheet prdPropSheet = workbook.getSheet("product-property");
         XSSFSheet prdFeatSheet = workbook.getSheet("product-feature");
         XSSFSheet skuSheet = workbook.getSheet("sku");
 
@@ -293,6 +310,22 @@ class ExportService {
                     }
                 }
 
+                List<ProductProperty> pproperties = ProductProperty.findAllByProduct(Product.get(it.id))
+                pproperties.each {
+                    int prdPropCellnum = 0
+                    Row prdPropRow = prdPropSheet.createRow(prdPropRownum++)
+                    toArray(it, catRownum, prdRownum).each {
+                        Cell prdPropCell = prdPropRow.createCell(prdPropCellnum++)
+                        prdPropCell.setCellValue(it)
+                        if (prdPropCellnum <= 4)
+                            prdPropCell.setCellFormula(it)
+                        else {
+                            prdPropCell.setCellValue(it)
+                            prdPropCell.setCellStyle(unlockedCellStyle)
+                        }
+                    }
+                }
+
                 List<TicketType> ticketTypes = TicketType.findAllByProduct(it)
                 ticketTypes.each {
                     int skuCellnum = 0
@@ -315,6 +348,8 @@ class ExportService {
             rownums[4] = prdRownum
             rownums[5] = prdFeatRownum
             rownums[6] = skuRownum
+            rownums[7] = prdPropRownum
+
             categories(catalogId, workbook, it, deleted, rownums)
             catRownum = rownums[0]
             catfeatRownum = rownums[1]
@@ -323,6 +358,7 @@ class ExportService {
             prdRownum = rownums[4]
             prdFeatRownum = rownums[5]
             skuRownum = rownums[6]
+            prdPropRownum = rownums[7]
 
         }
     }

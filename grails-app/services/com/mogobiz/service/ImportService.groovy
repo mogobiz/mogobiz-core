@@ -79,6 +79,7 @@ class ImportService {
         XSSFSheet varValSheet = workbook.getSheet("variation-value");
         XSSFSheet prdSheet = workbook.getSheet("product");
         XSSFSheet prdFeatSheet = workbook.getSheet("product-feature");
+        XSSFSheet prdPropSheet = workbook.getSheet("product-property");
         XSSFSheet skuSheet = workbook.getSheet("sku");
         Map<String, XSSFSheet> sheets = [
                 'category'       : catSheet,
@@ -391,6 +392,38 @@ class ImportService {
                     else {
                         f.errors.allErrors.each { println(it) }
                         return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
+                    }
+
+                }
+            }
+        }
+
+        // Product Properties
+        for (int rownum = 1; rownum < prdPropSheet.getPhysicalNumberOfRows(); rownum++) {
+            XSSFRow row = prdPropSheet.getRow(rownum)
+            if (row != null) {
+                String cell = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell.length() > 0) {
+                    String catuuid = getFormulaCell(row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String catpath = getFormulaCell(row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String prduuid = getFormulaCell(row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String prdcode = getFormulaCell(row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String uuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String name = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    String value = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+
+
+                    ProductProperty pp = new ProductProperty()
+                    Category category = getCategoryFromPath(catpath, catalog)
+                    pp.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                    pp.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog:catalog.id, code:prdcode, category:category.id]).get(0)
+                    pp.name = name
+                    pp.value = value
+                    if (pp.validate())
+                        pp.save(flush: true)
+                    else {
+                        pp.errors.allErrors.each { println(it) }
+                        return [errors: pp.errors.allErrors, sheet: "product-property", line: rownum]
                     }
 
                 }
