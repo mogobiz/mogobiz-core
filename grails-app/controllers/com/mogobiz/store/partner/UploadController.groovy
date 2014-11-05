@@ -207,7 +207,7 @@ class UploadController {
         resource.active = true
         resource.deleted = false
 
-        def dir = grailsApplication.config.rootPath + '/resources/'
+        def dir = grailsApplication.config.rootPath + File.separator + 'resources' + File.separator
         if (company != null) {
             resource.company = company
             dir += company.code + '/'
@@ -287,7 +287,7 @@ class UploadController {
         map.put('action', "addResource")
         map.put("productId", params["product.id"])
         log.debug("Upload Controller Sending message" + map)
-        event(namespace:QUEUE_NS, topic:QUEUE_SOCIAL, data:map)
+        event(namespace: QUEUE_NS, topic: QUEUE_SOCIAL, data: map)
         log.debug("Upload Controller message sent " + map)
         return resource
     }

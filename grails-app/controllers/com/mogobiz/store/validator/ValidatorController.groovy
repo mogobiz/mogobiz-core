@@ -32,9 +32,6 @@ class ValidatorController {
 	def index = { }
 
 	def loginValidator = {
-		//TODO remove static parameters later and use : params.username,params.password
-		//		def username = 'validator@iper2010.com'
-		//		def password = 'changeit'
 		SecurityUtils.subject?.logout()
 		def user = null
 		def authToken = new UsernamePasswordToken(params.username, params.password)
@@ -50,7 +47,6 @@ class ValidatorController {
 			return
 		}
 		if (user) {
-//			chain(action:'getEventsData');
 			redirect(action: "getEventsData")
 		} else {
 			response.sendError 403

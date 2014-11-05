@@ -1,5 +1,6 @@
 package com.mogobiz.service
 
+import com.google.common.io.Files
 import com.mogobiz.store.domain.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
@@ -11,11 +12,16 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.text.SimpleDateFormat
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 class ExportService {
     CategoryService categoryService
     FeatureService featureService
+    def grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide"]
     final List<String> catHeaders = ["uuid", "external-code", "path", "description", "keywords", "hide", "seo", "google", "deleted"]
@@ -23,6 +29,7 @@ class ExportService {
     final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide"]
     final List<String> varValHeaders = ["category-uuid", "category-path", "variation-uuid", "variation-name", "uuid", "external-code", "value", "google"]
     final List<String> prdHeaders = ["category-uuid", "category-path", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords", "brand-name"]
+    final List<String> prdPropHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "name", "value"]
     final List<String> skuHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-name-1", "variation-value-1", "variation-name-2", "variation-value-2", "variation-name-3", "variation-value-3"]
 
     List<String> toArray(Brand it) {
@@ -59,6 +66,10 @@ class ExportService {
         ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.sku, it.name, it.price, it.minOrder, it.maxOrder, it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.xprivate, it.stock ? it.stock.stock : "", it.stock ? it.stock.stockUnlimited : "", it.stock ? it.stock.stockOutSelling : "", it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : "", it.gtin, it.mpn, it.variation1?.variation?.name, it.variation1?.value, it.variation2?.variation?.name, it.variation2?.value, it.variation3?.variation?.name, it.variation3?.value]
     }
 
+    List<String> toArray(ProductProperty it, int catRowNum, int prdRowNum) {
+        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.name, it.value]
+    }
+
     CellStyle unlockedCellStyle
 
 
@@ -83,6 +94,7 @@ class ExportService {
         int prdRownum = 0
         int prdFeatRownum = 0
         int skuRownum = 0
+        int prdPropRownum = 0
 
         XSSFWorkbook workbook = new XSSFWorkbook();
         unlockedCellStyle = workbook.createCellStyle();
@@ -157,6 +169,15 @@ class ExportService {
             prdFeatCell.setCellValue(it)
         }
 
+        XSSFSheet prdPropSheet = workbook.createSheet("product-property");
+//        prdPropSheet.protectSheet("")
+        Row prdPropRow = prdPropSheet.createRow(prdPropRownum++)
+        int prdPropCellnum = 0
+        prdPropHeaders.each {
+            Cell prdPropCell = prdPropRow.createCell(prdPropCellnum++)
+            prdPropCell.setCellValue(it)
+        }
+
         XSSFSheet skuSheet = workbook.createSheet("sku");
 //        skuSheet.protectSheet("")
         Row skuRow = skuSheet.createRow(skuRownum++)
@@ -166,16 +187,79 @@ class ExportService {
             skuCell.setCellValue(it)
         }
 
-        categories(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum])
-        File outFile = File.createTempFile("mogobiz-" + (new SimpleDateFormat("yyyy-MM-dd").format(new Date())), ".xlsx")
+        String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
+        File outDir = getExportDir(now)
+        File xlsFile = new File(outDir, "mogobiz.xlsx")
+        File zipFile = new File(outDir.getParentFile(), "mogobiz-${now}.zip")
+
+        doExport(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum, prdPropRownum], outDir)
         //Write the workbook in file system
-        FileOutputStream out = new FileOutputStream(outFile);
+        FileOutputStream out = new FileOutputStream(xlsFile);
         workbook.write(out);
         out.close();
-        return outFile
+        ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
+        addFolderToZip("", outDir, zip)
+        zip.close()
+        return zipFile
     }
 
-    void categories(long catalogId, XSSFWorkbook workbook, Category parent, boolean deleted, ArrayList<Integer> rownums) {
+    private void addFolderToZip(String path, String srcFolder, ZipOutputStream zip) throws Exception {
+        File folder = new File(srcFolder)
+        /*
+         * check the empty folder
+         */
+        if (folder.list().length == 0) {
+            addFileToZip(path, srcFolder, zip, true)
+        } else {
+            folder.listFiles().sort { it.lastModified() }.each { File file ->
+                def srcFile = srcFolder + File.separator + file.getName()
+                if (path.equals("")) {
+                    addFileToZip(folder.name, srcFile, zip, false)
+                } else {
+                    addFileToZip(path + File.separator + folder.name, srcFile, zip, false)
+                }
+            }
+        }
+    }
+
+    /*
+     * recursively add files to the zip files
+     */
+
+    private void addFileToZip(String path, String srcFile, ZipOutputStream zip, boolean flag) throws Exception {
+        File f = new File(srcFile)
+        if (flag) {
+            /*
+             * add empty folder to the Zip file
+             */
+            zip.putNextEntry(new ZipEntry(path + File.separator + f.name + File.separator))
+        } else {
+            if (f.isDirectory()) {
+                addFolderToZip(path, srcFile, zip)
+            } else {
+                byte[] buffer = new byte[1024]
+                int len
+                FileInputStream is = new FileInputStream(srcFile)
+                zip.putNextEntry(new ZipEntry(path + File.separator + f.name))
+                while ((len = is.read(buffer)) > 0) {
+                    zip.write(buffer, 0, len)
+                }
+                is.close()
+            }
+        }
+    }
+
+    public File getExportDir(String now) {
+        String impexPath = grailsApplication.config.impexPath
+        if (!impexPath)
+            impexPath = System.getProperty("java.io.tmpdir")
+        File impexDir = new File(new File(impexPath), now)
+        impexDir.mkdirs()
+        return impexDir
+    }
+
+
+    void doExport(long catalogId, XSSFWorkbook workbook, Category parent, boolean deleted, ArrayList<Integer> rownums, File exportDir) {
         int catRownum = rownums[0]
         int catfeatRownum = rownums[1]
         int varRownum = rownums[2]
@@ -183,6 +267,7 @@ class ExportService {
         int prdRownum = rownums[4]
         int prdFeatRownum = rownums[5]
         int skuRownum = rownums[6]
+        int prdPropRownum = rownums[7]
 
         XSSFSheet brandSheet = workbook.getSheet("brand");
         XSSFSheet catSheet = workbook.getSheet("category");
@@ -190,6 +275,7 @@ class ExportService {
         XSSFSheet varSheet = workbook.getSheet("variation");
         XSSFSheet varValSheet = workbook.getSheet("variation-value");
         XSSFSheet prdSheet = workbook.getSheet("product");
+        XSSFSheet prdPropSheet = workbook.getSheet("product-property");
         XSSFSheet prdFeatSheet = workbook.getSheet("product-feature");
         XSSFSheet skuSheet = workbook.getSheet("sku");
 
@@ -264,16 +350,26 @@ class ExportService {
             }
 
             List<Product> products = Product.findAllByCategoryAndDeleted(it, deleted)
-            products.each {
+            products.each { prd ->
                 int prdCellnum = 0
                 Row prdRow = prdSheet.createRow(prdRownum++)
-                toArray(it, catRownum).each {
+                toArray(prd, catRownum).each {
                     Cell prdCell = prdRow.createCell(prdCellnum++)
                     if (prdCellnum <= 2)
                         prdCell.setCellFormula(it)
                     else {
                         prdCell.setCellValue(it.toString())
                         prdCell.setCellStyle(unlockedCellStyle)
+                    }
+                }
+                List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
+                prdres.each {
+                    Path resUrl = Paths.get(it.resource.url)
+                    try {
+                        Files.copy(resUrl, Paths.get(exportDir, prd.sanitizedName))
+                    }
+                    catch (IOException ioe) {
+                        ioe.printStackTrace()
                     }
                 }
 
@@ -289,6 +385,22 @@ class ExportService {
                         else {
                             prdFeatCell.setCellValue(it)
                             prdFeatCell.setCellStyle(unlockedCellStyle)
+                        }
+                    }
+                }
+
+                List<ProductProperty> pproperties = ProductProperty.findAllByProduct(Product.get(it.id))
+                pproperties.each {
+                    int prdPropCellnum = 0
+                    Row prdPropRow = prdPropSheet.createRow(prdPropRownum++)
+                    toArray(it, catRownum, prdRownum).each {
+                        Cell prdPropCell = prdPropRow.createCell(prdPropCellnum++)
+                        prdPropCell.setCellValue(it)
+                        if (prdPropCellnum <= 4)
+                            prdPropCell.setCellFormula(it)
+                        else {
+                            prdPropCell.setCellValue(it)
+                            prdPropCell.setCellStyle(unlockedCellStyle)
                         }
                     }
                 }
@@ -315,7 +427,9 @@ class ExportService {
             rownums[4] = prdRownum
             rownums[5] = prdFeatRownum
             rownums[6] = skuRownum
-            categories(catalogId, workbook, it, deleted, rownums)
+            rownums[7] = prdPropRownum
+
+            doExport(catalogId, workbook, it, deleted, rownums)
             catRownum = rownums[0]
             catfeatRownum = rownums[1]
             varRownum = rownums[2]
@@ -323,6 +437,7 @@ class ExportService {
             prdRownum = rownums[4]
             prdFeatRownum = rownums[5]
             skuRownum = rownums[6]
+            prdPropRownum = rownums[7]
 
         }
     }
