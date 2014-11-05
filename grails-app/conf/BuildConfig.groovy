@@ -64,6 +64,8 @@ grails.project.dependency.resolution = {
         compile 'com.google.zxing:core:1.7'
         compile 'org.apache.poi:poi-ooxml:3.10.1'
 
+        compile 'org.jsoup:jsoup:1.8.1'
+
         provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
         provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
     }
