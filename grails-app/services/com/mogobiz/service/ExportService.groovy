@@ -1,6 +1,5 @@
 package com.mogobiz.service
 
-import com.google.common.io.Files
 import com.mogobiz.store.domain.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
@@ -12,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFDataValidationHelper
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.text.SimpleDateFormat
@@ -198,7 +198,7 @@ class ExportService {
         workbook.write(out);
         out.close();
         ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
-        addFolderToZip("", outDir, zip)
+        addFolderToZip("", outDir.getAbsolutePath(), zip)
         zip.close()
         return zipFile
     }
@@ -260,6 +260,7 @@ class ExportService {
 
 
     void doExport(long catalogId, XSSFWorkbook workbook, Category parent, boolean deleted, ArrayList<Integer> rownums, File exportDir) {
+        catalogId = 10L
         int catRownum = rownums[0]
         int catfeatRownum = rownums[1]
         int varRownum = rownums[2]
@@ -362,18 +363,20 @@ class ExportService {
                         prdCell.setCellStyle(unlockedCellStyle)
                     }
                 }
+
+                (new File(exportDir, prd.sanitizedName)).mkdirs()
                 List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
                 prdres.each {
                     Path resUrl = Paths.get(it.resource.url)
                     try {
-                        Files.copy(resUrl, Paths.get(exportDir, prd.sanitizedName))
+                        Files.copy(resUrl, Paths.get(exportDir.getAbsolutePath(), prd.sanitizedName, it.resource.name))
                     }
                     catch (IOException ioe) {
                         ioe.printStackTrace()
                     }
                 }
 
-                List<Feature> pfeatures = featureService.getProductFeatures(it.id, false)
+                List<Feature> pfeatures = featureService.getProductFeatures(prd.id, false)
                 pfeatures.each {
                     int prdFeatCellnum = 0
                     Row prdFeatRow = prdFeatSheet.createRow(prdFeatRownum++)
@@ -389,7 +392,7 @@ class ExportService {
                     }
                 }
 
-                List<ProductProperty> pproperties = ProductProperty.findAllByProduct(Product.get(it.id))
+                List<ProductProperty> pproperties = ProductProperty.findAllByProduct(Product.get(prd.id))
                 pproperties.each {
                     int prdPropCellnum = 0
                     Row prdPropRow = prdPropSheet.createRow(prdPropRownum++)
@@ -405,7 +408,7 @@ class ExportService {
                     }
                 }
 
-                List<TicketType> ticketTypes = TicketType.findAllByProduct(it)
+                List<TicketType> ticketTypes = TicketType.findAllByProduct(prd)
                 ticketTypes.each {
                     int skuCellnum = 0
                     Row skuRow = skuSheet.createRow(skuRownum++)
@@ -429,7 +432,7 @@ class ExportService {
             rownums[6] = skuRownum
             rownums[7] = prdPropRownum
 
-            doExport(catalogId, workbook, it, deleted, rownums)
+            doExport(catalogId, workbook, it, deleted, rownums, exportDir)
             catRownum = rownums[0]
             catfeatRownum = rownums[1]
             varRownum = rownums[2]

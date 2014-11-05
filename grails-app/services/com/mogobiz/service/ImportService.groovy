@@ -1,6 +1,22 @@
 package com.mogobiz.service
 
-import com.mogobiz.store.domain.*
+import com.mogobiz.store.domain.Category
+import com.mogobiz.store.domain.Brand
+import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Feature
+import com.mogobiz.store.domain.Product
+import com.mogobiz.store.domain.Product2Resource
+import com.mogobiz.store.domain.ProductCalendar
+import com.mogobiz.store.domain.ProductProperty
+import com.mogobiz.store.domain.ProductState
+import com.mogobiz.store.domain.ProductType
+import com.mogobiz.store.domain.Resource
+import com.mogobiz.store.domain.ResourceType
+import com.mogobiz.store.domain.Stock
+import com.mogobiz.store.domain.TicketType
+import com.mogobiz.store.domain.Variation
+import com.mogobiz.store.domain.VariationValue
+import com.mogobiz.utils.ZipFileUtil
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFCell
@@ -8,11 +24,16 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.jsoup.Jsoup
-
+import grails.transaction.Transactional
 import java.text.SimpleDateFormat
+import java.util.zip.ZipFile
 
+@Transactional
 class ImportService {
+
     SanitizeUrlService sanitizeUrlService
+    ResService resService
+    def grailsApplication
 
     private String getFormulaCell(String cellValue, Map<String, XSSFSheet> sheets) {
         String[] tab = cellValue.split('!')
@@ -68,8 +89,25 @@ class ImportService {
         return null
     }
 
-    Map ximport(Catalog catalog, File inputFile) {
-        inputFile = new File("/Users/hayssams/Downloads/mogobiz.xlsx")
+    public File getImportDir(String now) {
+        String impexPath = grailsApplication.config.impexPath
+        if (!impexPath)
+            impexPath = System.getProperty("java.io.tmpdir")
+        File impexDir = new File(new File(impexPath + "-import"), now)
+        impexDir.mkdirs()
+        return impexDir
+    }
+
+
+    Map ximport(Catalog catalog, ZipFile zipFile) {
+        String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
+        File impexDir = getImportDir(now)
+        ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
+        File dateDir = impexDir.listFiles().find {
+            it.isDirectory()
+        }
+        File inputFile = new File(dateDir, "mogobiz.xlsx")
+
         XSSFWorkbook workbook = new XSSFWorkbook(XSSFWorkbook.openPackage(inputFile.getAbsolutePath()))
         XSSFSheet brandSheet = workbook.getSheet("brand");
         XSSFSheet catSheet = workbook.getSheet("category");
@@ -89,8 +127,6 @@ class ImportService {
                 'product-feature': prdFeatSheet,
                 'sku'            : skuSheet
         ]
-
-//        final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide"]
 
         // Brand
         for (int rownum = 1; rownum < brandSheet.getPhysicalNumberOfRows(); rownum++) {
@@ -354,11 +390,38 @@ class ImportService {
 //                    }
                     if (p.validate()) {
                         p.save(flush: true)
+                        File resDir = new File(dateDir, p.sanitizedName)
+                        if (resDir.exists() && resDir.list().size() > 0) {
+                            File[] files = resDir.listFiles()
+                            int countRes = 1
+                            files.each { file ->
+                                Resource res = new Resource()
+                                res.code = ""
+                                res.description = ""
+                                res.name = file.getName()
+                                String ext = file.getName().substring(file.getName().lastIndexOf('.') + 1)
+                                res.content = ""
+                                res.contentType = "image/$ext"
+                                res.deleted = false
+                                res.uploaded = true
+                                res.xtype = ResourceType.PICTURE
+                                res.active = true
+                                resService.uploadResource(catalog.company, res, file, res.contentType)
+                                Product2Resource product2Resource = new Product2Resource(
+                                        montant: 0,
+                                        product: p,
+                                        resource: res,
+                                        position: countRes++
+                                )
+                                if (product2Resource.validate()) {
+                                    product2Resource.save(flush: true)
+                                }
+                            }
+                        }
                     } else {
                         p.errors.allErrors.each { println(it) }
                         return [errors: p.errors.allErrors, sheet: "product", line: rownum]
                     }
-
                 }
             }
         }
@@ -380,7 +443,7 @@ class ImportService {
 
                     Feature f = new Feature()
                     f.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    f.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog:catalog.id, code:prdcode]).get(0)
+                    f.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
                     f.externalCode = externalCode
                     f.domain = domain
                     f.name = name
@@ -415,7 +478,7 @@ class ImportService {
                     ProductProperty pp = new ProductProperty()
                     Category category = getCategoryFromPath(catpath, catalog)
                     pp.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    pp.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog:catalog.id, code:prdcode, category:category.id]).get(0)
+                    pp.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog: catalog.id, code: prdcode, category: category.id]).get(0)
                     pp.name = name
                     pp.value = value
                     if (pp.validate())
@@ -467,7 +530,7 @@ class ImportService {
 
                     TicketType t = new TicketType()
                     t.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    t.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog:catalog.id, code:prdcode]).get(0)
+                    t.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
                     t.externalCode = externalCode
                     t.sku = sku
                     t.name = name
@@ -510,10 +573,9 @@ class ImportService {
                 }
             }
         }
-
+        impexDir.deleteDir()
         return [errors: [], sheet: "", line: -1]
     }
-
 
 }
 
