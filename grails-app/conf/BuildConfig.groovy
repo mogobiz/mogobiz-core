@@ -64,8 +64,10 @@ grails.project.dependency.resolution = {
         compile 'com.google.zxing:core:1.7'
         compile 'org.apache.poi:poi-ooxml:3.10.1'
 
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0-SNAPSHOT")  {excludes "groovy-all"}
+        compile 'org.jsoup:jsoup:1.8.1'
+
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"0.1-SNAPSHOT")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"0.1-SNAPSHOT")  {excludes "groovy-all"}
     }
 
     plugins {
@@ -84,7 +86,7 @@ grails.project.dependency.resolution = {
         compile ":facebook-graph:0.14"
         compile ':platform-core:1.0.0'
         compile ":google-data:0.1.3"
-//        runtime ":resources:1.2.8"
+        runtime ":resources:1.2.8"
         compile (":email-confirmation:2.0.8") {
             excludes 'quartz'
         }

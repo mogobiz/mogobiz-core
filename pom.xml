@@ -338,7 +338,7 @@
         <dependency>
             <groupId>com.mogobiz.rivers</groupId>
             <artifactId>mogobiz-elasticsearch</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -556,7 +556,25 @@
             <type>zip</type>
         </dependency>
         //-->
-        
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.10.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.8.1</version>
+        </dependency>
+
         <!-- end from grails-app/BuildConfig.groovy //-->
 
     </dependencies>
@@ -614,6 +632,88 @@
                 <extensions>true</extensions>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <!-- derby scripts -->
+                                <artifact>
+                                    <file>${project.basedir}/scripts/derby/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>derby-create</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/derby/ddl.sql</file>
+                                    <type>sql</type>
+                                    <classifier>derby-ddl</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/derby/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>derby-drop</classifier>
+                                </artifact>
+                                <!-- mysql scripts -->
+                                <artifact>
+                                    <file>${project.basedir}/scripts/mysql/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>mysql-create</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/mysql/ddl.sql</file>
+                                    <type>sql</type>
+                                    <classifier>mysql-ddl</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/mysql/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>mysql-drop</classifier>
+                                </artifact>
+                                <!-- oracle scripts -->
+                                <artifact>
+                                    <file>${project.basedir}/scripts/oracle/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>oracle-create</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/oracle/ddl.sql</file>
+                                    <type>sql</type>
+                                    <classifier>oracle-ddl</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/oracle/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>oracle-drop</classifier>
+                                </artifact>
+                                <!-- postgresql scripts -->
+                                <artifact>
+                                    <file>${project.basedir}/scripts/postgresql/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>postgresql-create</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/postgresql/ddl.sql</file>
+                                    <type>sql</type>
+                                    <classifier>postgresql-ddl</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.basedir}/scripts/postgresql/create.sql</file>
+                                    <type>sql</type>
+                                    <classifier>postgresql-drop</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
