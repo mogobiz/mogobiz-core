@@ -1,4 +1,4 @@
-<plugin name='mogobiz-core' version='1.0-SNAPSHOT' grailsVersion='2.3 &gt; *'>
+<plugin name='mogobiz-core' version='0.1-SNAPSHOT' grailsVersion='2.3 &gt; *'>
   <author>Your name</author>
   <title>Mogobiz Core Plugin</title>
   <description>Brief summary/description of the plugin.
@@ -39,6 +39,7 @@
     <resource>com.mogobiz.store.partner.GoogleVariationController</resource>
     <resource>com.mogobiz.store.partner.GoogleVariationMappingsController</resource>
     <resource>com.mogobiz.store.partner.IbeaconController</resource>
+    <resource>com.mogobiz.store.partner.ImpexController</resource>
     <resource>com.mogobiz.store.partner.IntraDayPeriodController</resource>
     <resource>com.mogobiz.store.partner.PartnerController</resource>
     <resource>com.mogobiz.store.partner.ProductController</resource>
@@ -52,7 +53,6 @@
     <resource>com.mogobiz.store.partner.SocialController</resource>
     <resource>com.mogobiz.store.partner.SuggestionsController</resource>
     <resource>com.mogobiz.store.partner.TagController</resource>
-    <resource>com.mogobiz.store.partner.TestController</resource>
     <resource>com.mogobiz.store.partner.TicketTypeController</resource>
     <resource>com.mogobiz.store.partner.TranslationController</resource>
     <resource>com.mogobiz.store.partner.UploadController</resource>
@@ -159,6 +159,7 @@
     <resource>com.mogobiz.service.ExportService</resource>
     <resource>com.mogobiz.service.FeatureService</resource>
     <resource>com.mogobiz.service.IbeaconService</resource>
+    <resource>com.mogobiz.service.ImportService</resource>
     <resource>com.mogobiz.service.ProductJahiaService</resource>
     <resource>com.mogobiz.service.ProductService</resource>
     <resource>com.mogobiz.service.QueueSocialService</resource>

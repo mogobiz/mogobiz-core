@@ -338,7 +338,7 @@
         <dependency>
             <groupId>com.mogobiz.rivers</groupId>
             <artifactId>mogobiz-elasticsearch</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
