@@ -165,6 +165,7 @@
     <resource>com.mogobiz.service.QueueSocialService</resource>
     <resource>com.mogobiz.service.QueueUuidService</resource>
     <resource>com.mogobiz.service.RateService</resource>
+    <resource>com.mogobiz.service.ResService</resource>
     <resource>com.mogobiz.service.SaleService</resource>
     <resource>com.mogobiz.service.SanitizeUrlService</resource>
     <resource>com.mogobiz.service.SellerService</resource>
