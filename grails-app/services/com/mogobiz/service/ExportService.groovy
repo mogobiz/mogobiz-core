@@ -260,7 +260,6 @@ class ExportService {
 
 
     void doExport(long catalogId, XSSFWorkbook workbook, Category parent, boolean deleted, ArrayList<Integer> rownums, File exportDir) {
-        catalogId = 10L
         int catRownum = rownums[0]
         int catfeatRownum = rownums[1]
         int varRownum = rownums[2]
