@@ -86,7 +86,6 @@ class ImpexController {
                 response.sendError(403, "$countSales")
             }
         } else {
-            tmpFile.delete()
             response.sendError(401, "Missing file")
         }
     }
