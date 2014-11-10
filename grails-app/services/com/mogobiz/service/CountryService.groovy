@@ -24,7 +24,7 @@ class CountryService implements IperConstant {
 		try
 		{
 			def http = new HTTPBuilder(Holders.config.mogopay.url)
-			def data = http.get( path : 'country/countriesForShipping', query : [:])
+			def data = http.get( path : 'country/countries-for-shipping', query : [:])
 			List<JSONObject> res = JSON.parse(data.toString())
 			return res.collectEntries {
 				[(it.get('code')) : it.get('name')]

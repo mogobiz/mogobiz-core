@@ -80,11 +80,7 @@ class Resource
     /**
      * 
      */
-    java.lang.String sanitizedName     /**
-     * 
-     */
-    com.mogobiz.store.domain.Event creation
-
+    java.lang.String sanitizedName 
     /**
      * 
      */
@@ -139,8 +135,6 @@ class Resource
         sanitizedName column:"sanitized_name",insertable:true,updateable:true,lazy:false,cache:false
 
 
-        creation column:"creation_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
-
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         product2Resources column:"product2_resources_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -167,7 +161,6 @@ class Resource
         smallPicture (nullable:true, unique:false)
         externalCode (nullable:true, unique:false)
         sanitizedName ( blank:false, nullable:false, unique:false)
-        creation (nullable:true)
         company (nullable:true)
         poi (nullable:true)
         album (nullable:true)

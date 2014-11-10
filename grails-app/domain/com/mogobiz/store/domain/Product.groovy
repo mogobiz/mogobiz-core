@@ -150,10 +150,6 @@ class Product
     /**
      * 
      */
-    com.mogobiz.store.domain.Event creation
-    /**
-     * 
-     */
     com.mogobiz.store.domain.Shipping shipping
 
     /**
@@ -225,8 +221,6 @@ class Product
 
         seller column:"seller_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
-        creation column:"creation_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
-
         product2Resources column:"product2_resources_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         shipping column:"shipping_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -266,7 +260,6 @@ class Product
         brand (nullable:true)
         company ( blank:false, nullable:false)
         seller (nullable:true)
-        creation (nullable:true)
         shipping (nullable:true)
         taxRate (nullable:true)
         ibeacon (nullable:true)
