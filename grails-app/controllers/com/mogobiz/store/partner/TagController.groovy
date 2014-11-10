@@ -1,11 +1,11 @@
 package com.mogobiz.store.partner
 import com.mogobiz.ajax.AjaxResponse
 import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.service.PagedList
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Tag
 import grails.converters.JSON
-import grails.orm.PagedResultList
 
 import javax.servlet.http.HttpServletResponse
 
@@ -23,8 +23,8 @@ class TagController {
         }
 
         try {
-            PagedResultList list = tagService.list(seller, cmd)
-            render ajaxResponseService.preparePage(list, cmd) { Tag tag -> tag.asMapForJSON()} as JSON
+            PagedList pagedList = tagService.list(seller, cmd)
+            render ajaxResponseService.preparePage(pagedList.list, pagedList.totalCount, cmd) { Tag tag -> tag.asMapForJSON()} as JSON
         }
         catch (IllegalArgumentException ex) {
             response.sendError HttpServletResponse.SC_BAD_REQUEST

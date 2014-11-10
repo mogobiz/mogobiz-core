@@ -16,13 +16,17 @@ class AjaxResponseService {
 	MessageSource messageSource
 
     Page preparePage(PagedResultList pagedList, PagedListCommand cmd, Closure transform) {
+        return preparePage(pagedList, pagedList.totalCount, cmd, transform)
+    }
+
+    Page preparePage(List pagedList, int totalCount, PagedListCommand cmd, Closure transform) {
         long pageOffset = (cmd.pageOffset ? Math.max(0, cmd.pageOffset) : 0)
-        long pageSize = cmd.pageSize ? Math.max(0, cmd.pageSize) : pagedList.totalCount
+        long pageSize = cmd.pageSize ? Math.max(0, cmd.pageSize) : totalCount
 
         Page page = new Page()
         page.list = pagedList.collect() { transform(it) }
         page.pageSize = pagedList.size()
-        page.totalCount = pagedList.totalCount
+        page.totalCount = totalCount
         page.maxItemsPerPage = pageSize
         page.pageOffset = pageOffset
         page.pageCount = (pageSize == 0 ? 1 : (int)(page.totalCount / pageSize)+((page.totalCount % pageSize) > 0 ?1:0))
@@ -31,7 +35,7 @@ class AjaxResponseService {
         return page
     }
 
-	AjaxResponse prepareResponse(domainInstance, data, Locale locale = null){
+    AjaxResponse prepareResponse(domainInstance, data, Locale locale = null){
 		AjaxResponse ajaxResponse = new AjaxResponse()
 		ajaxResponse.success = !domainInstance.hasErrors()
 		if(!ajaxResponse.success){

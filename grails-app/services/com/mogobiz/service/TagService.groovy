@@ -9,19 +9,21 @@ import com.mogobiz.store.domain.Ibeacon
 import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Tag
-import com.mogobiz.utils.PagedResultList
 
 class TagService
 {
 
-    PagedResultList list(Seller seller, PagedListCommand cmd) {
+    PagedList<Tag> list(Seller seller, PagedListCommand cmd) {
         if (seller?.company == null || cmd == null) {
             throw new IllegalArgumentException()
         }
 
-        String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId ORDER BY tag.name ASC";
-        List<Tag> list = Tag.executeQuery(query, [companyId: seller.company.id])
-        return new PagedResultList(cmd, list)
+        def params = [companyId: seller.company.id]
+        final String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId ORDER BY tag.name ASC";
+        List<Tag> tags = Tag.executeQuery(query, params << cmd.getPagination())
+        final String count = "SELECT count(DISTINCT tag) FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId"
+        int totalCount = Tag.executeQuery(count, params).get(0) as Integer
+        new PagedList<Tag>(list:tags, totalCount:totalCount)
     }
 
 
@@ -83,5 +85,10 @@ class TagService
 		}
 		return result;
     }
-	
+
+}
+
+class PagedList<E>{
+    int totalCount = 0
+    List<E> list = []
 }

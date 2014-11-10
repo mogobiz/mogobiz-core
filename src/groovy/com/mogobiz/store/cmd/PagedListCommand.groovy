@@ -7,14 +7,14 @@ public class PagedListCommand {
     Long pageSize;
     Long pageOffset;
 
-    def getPagination()
+    def Map getPagination()
     {
-        def pagination = [:];
+        def pagination = [:]
         if (pageSize != null && pageSize > 0)
         {
             pagination = [max: pageSize, offset: (pageOffset ? Math.max(0, pageOffset * pageSize) : 0)]
         }
-        return pagination;
+        return pagination
     }
 
     List subList(List list) {
@@ -26,6 +26,6 @@ public class PagedListCommand {
             }
             return []
         }
-        return list;
+        return list
     }
 }
