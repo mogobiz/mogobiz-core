@@ -4,9 +4,8 @@ import com.maxmind.geoip2.DatabaseReader
 import com.maxmind.geoip2.model.CityResponse
 import grails.util.Holders
 import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationHolder
+import grails.util.Holders.*
 import org.codehaus.groovy.grails.commons.GrailsApplication
-
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -16,13 +15,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat
 
 import com.mogobiz.store.domain.DatePeriod
-import com.mogobiz.store.domain.Event
 import com.mogobiz.store.domain.IntraDayPeriod
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.TicketType
-import com.mogobiz.store.domain.User
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.geolocation.domain.Poi
 import com.mogobiz.geolocation.domain.PoiType
@@ -565,7 +562,7 @@ class IperUtil {
 
     static DatabaseReader getGeoService() {
         if (geoService == null) {
-            File layoutFolder = ApplicationHolder.application.parentContext.getResource("WEB-INF/geoip").file
+            File layoutFolder = Holders.grailsApplication.parentContext.getResource("WEB-INF/geoip").file
             File ipdbfile = new File(layoutFolder, "GeoLite2-City.mmdb")
             geoService = new DatabaseReader.Builder(ipdbfile).build()
         }

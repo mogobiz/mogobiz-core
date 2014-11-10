@@ -9,7 +9,6 @@ import grails.converters.XML
 
 import java.text.SimpleDateFormat
 
-import com.mogobiz.store.domain.Event
 import com.mogobiz.store.domain.EventType
 import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.Resource
@@ -222,19 +221,7 @@ class ResourceController {
 			
 			resourceMap = resource.asMapForJSON()
 			resource.save()
-			
-			if(resource.deleted) {
-				def deleteEvent = new Event()
-				deleteEvent.resource=resource
-				deleteEvent.date=Calendar.getInstance()
-				deleteEvent.user = request.seller
-				deleteEvent.xtype = EventType.DELETE
-				
-				if(deleteEvent.validate()) {
-					deleteEvent.save()
-				}
-			}
-			
+
 			withFormat {
 				xml{
 					if(!resource.hasErrors()){
