@@ -232,7 +232,7 @@ class ExportService {
             /*
              * add empty folder to the Zip file
              */
-            zip.putNextEntry(new ZipEntry(path + File.separator + f.name + File.separator))
+            zip.putNextEntry(new ZipEntry(path + File.separator + f.name + "/")) // Suffix elpty dirs by '/'
         } else {
             if (f.isDirectory()) {
                 addFolderToZip(path, srcFile, zip)
