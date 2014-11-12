@@ -31,6 +31,7 @@ class CountryService implements IperConstant {
 			}
 		}
 		catch (Exception ex) {
+			ex.printStackTrace();
 			throw new CountryException("Unable to retrieve countries")
 		}
 	}

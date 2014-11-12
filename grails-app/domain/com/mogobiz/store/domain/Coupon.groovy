@@ -70,6 +70,10 @@ class Coupon
     /**
      * 
      */
+    java.lang.String pastille 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
     /**
      * 
@@ -108,6 +112,7 @@ class Coupon
         forSale column:"for_sale",insertable:true,updateable:true,lazy:false,cache:false
         description column:"description",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         anonymous column:"anonymous",insertable:true,updateable:true,lazy:false,cache:false
+        pastille column:"pastille",insertable:true,updateable:true,lazy:false,cache:false
 
 
         categories column:"categories_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -136,6 +141,7 @@ class Coupon
         forSale ( blank:false, nullable:false, unique:false)
         description (nullable:true, unique:false)
         anonymous ( blank:false, nullable:false, unique:false)
+        pastille (nullable:true, unique:false)
         company ( blank:false, nullable:false)
         reductionSold (nullable:true)
     }

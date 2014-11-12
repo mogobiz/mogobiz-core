@@ -27,7 +27,6 @@
     <resource>com.mogobiz.store.admin.TaxRateController</resource>
     <resource>com.mogobiz.store.customer.CartController</resource>
     <resource>com.mogobiz.store.customer.EventController</resource>
-    <resource>com.mogobiz.store.partner.AppEventController</resource>
     <resource>com.mogobiz.store.partner.BrandController</resource>
     <resource>com.mogobiz.store.partner.CatalogController</resource>
     <resource>com.mogobiz.store.partner.CategoryController</resource>
@@ -83,7 +82,6 @@
     <resource>com.mogobiz.store.domain.DatePeriod</resource>
     <resource>com.mogobiz.store.domain.EmotIcon</resource>
     <resource>com.mogobiz.store.domain.EsEnv</resource>
-    <resource>com.mogobiz.store.domain.Event</resource>
     <resource>com.mogobiz.store.domain.EventPeriodSale</resource>
     <resource>com.mogobiz.store.domain.EventType</resource>
     <resource>com.mogobiz.store.domain.ExternalAccount</resource>
