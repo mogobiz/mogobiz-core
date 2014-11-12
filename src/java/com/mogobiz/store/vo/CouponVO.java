@@ -19,7 +19,7 @@ public class CouponVO
     /**
      * The serial version UID of this class. Needed for serialization.
      */
-    private static final long serialVersionUID = 4980458506912272456L;
+    private static final long serialVersionUID = -7647362223679698282L;
 
     public CouponVO()
     {
@@ -39,7 +39,7 @@ public class CouponVO
         this.price = price;
     }
 
-    public CouponVO(long id, java.lang.String name, java.lang.String code, boolean active, java.util.Calendar startDate, java.util.Calendar endDate, long price)
+    public CouponVO(long id, java.lang.String name, java.lang.String code, boolean active, java.util.Calendar startDate, java.util.Calendar endDate, long price, java.lang.String pastille)
     {
         this.id = id;
         this.name = name;
@@ -48,6 +48,7 @@ public class CouponVO
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
+        this.pastille = pastille;
     }
 
     /**
@@ -58,7 +59,7 @@ public class CouponVO
      */
     public CouponVO(CouponVO otherBean)
     {
-        this(otherBean.getId(), otherBean.getName(), otherBean.getCode(), otherBean.isActive(), otherBean.getStartDate(), otherBean.getEndDate(), otherBean.getPrice());
+        this(otherBean.getId(), otherBean.getName(), otherBean.getCode(), otherBean.isActive(), otherBean.getStartDate(), otherBean.getEndDate(), otherBean.getPrice(), otherBean.getPastille());
     }
 
     /**
@@ -75,6 +76,7 @@ public class CouponVO
             this.setStartDate(otherBean.getStartDate());
             this.setEndDate(otherBean.getEndDate());
             this.setPrice(otherBean.getPrice());
+            this.setPastille(otherBean.getPastille());
         }
     }
 
@@ -181,6 +183,21 @@ public class CouponVO
     public void setPrice(long price)
     {
         this.price = price;
+    }
+
+    private java.lang.String pastille;
+
+    /**
+     * 
+     */
+    public java.lang.String getPastille()
+    {
+        return this.pastille;
+    }
+
+    public void setPastille(java.lang.String pastille)
+    {
+        this.pastille = pastille;
     }
 
 }

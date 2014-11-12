@@ -11,6 +11,7 @@ import grails.validation.Validateable
 class CouponCreateUpdateCommand {
     Long id
     String name
+    String pastille
     String code
     Boolean active
     Boolean catalogWise
