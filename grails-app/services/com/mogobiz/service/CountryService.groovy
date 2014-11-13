@@ -1,6 +1,7 @@
 package com.mogobiz.service
 
 import com.mogobiz.constant.IperConstant
+import com.mogobiz.store.domain.Country
 import com.mogobiz.store.exception.CountryException
 import grails.converters.JSON
 import grails.plugin.cache.CacheEvict
@@ -23,11 +24,8 @@ class CountryService implements IperConstant {
 	public Map<String, String> retrieveCountries() throws CountryException {
 		try
 		{
-			def http = new HTTPBuilder(Holders.config.mogopay.url)
-			def data = http.get( path : 'country/countries-for-shipping', query : [:])
-			List<JSONObject> res = JSON.parse(data.toString())
-			return res.collectEntries {
-				[(it.get('code')) : it.get('name')]
+			return Country.findAllByShipping(true).collectEntries {
+				[(it.code) : it.name]
 			}
 		}
 		catch (Exception ex) {
