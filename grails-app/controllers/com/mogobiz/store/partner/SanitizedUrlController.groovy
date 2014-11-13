@@ -8,9 +8,7 @@ import com.mogobiz.store.domain.Resource
 import com.mogobiz.service.StoreService
 
 class SanitizedUrlController {
-	StoreService storeService
 	void getProduct(String companyCode, String sanitizedUrl) {
-		session.storeData = storeService.loadStoreSessionData(companyCode)
 		Product product = Product.findBySanitizedName(sanitizedUrl)
 		Company company = Company.findByCode(companyCode)
 		if (product && company) {
@@ -21,7 +19,6 @@ class SanitizedUrlController {
 		}
 	}
 	void getResource(String companyCode, String sanitizedUrl) {
-		session.storeData = storeService.loadStoreSessionData(companyCode)
 		Resource resource = Resource.findBySanitizedName(sanitizedUrl)
 		Company company = Company.findByCode(companyCode)
 		if (resource && company) {
