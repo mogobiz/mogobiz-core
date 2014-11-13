@@ -40,6 +40,7 @@ class CouponService {
 
         couponVO.name = coupon.name;
         couponVO.code = coupon.code;
+        couponVO.description = coupon.description
         couponVO.pastille = coupon.pastille;
         couponVO.startDate = coupon.startDate;
         couponVO.endDate = coupon.endDate;
@@ -214,6 +215,7 @@ class CouponService {
     private Coupon createOrUpdate(Coupon coupon, CouponCreateUpdateCommand params) throws IllegalArgumentException {
         coupon.name = params.name
         coupon.pastille = params.pastille
+        coupon.description = params.description
         coupon.code = params.code ? params.code : generateCode()
         coupon.active = params.active ? params.active : true
         coupon.anonymous = params.anonymous ? params.anonymous : false
