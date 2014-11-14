@@ -132,7 +132,7 @@ class Coupon
     uuid (nullable:false, unique:false)
 
         name ( blank:false, nullable:false, unique:false)
-        code ( blank:false, nullable:false, unique:true)
+        code ( blank:false, nullable:false, unique:false, validator:com.mogobiz.store.domain.CouponValidation.couponCodeValidator)
         active ( blank:false, nullable:false, unique:false)
         numberOfUses (nullable:true, unique:false)
         startDate (nullable:true, unique:false)
