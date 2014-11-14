@@ -183,7 +183,7 @@ class BrandController {
         if (!user) {
             user = authenticationService.retrieveAuthenticatedUser()
         }
-        String dir = grailsApplication.config.rootPath + '/brands/logos/' + user.company.code + '/'
+        String dir = grailsApplication.config.resources.path + '/brands/logos/' + user.company.code + '/'
         File fdir = new File(dir)
         String logoName = brandId.toString()
         fdir.listFiles(new FilenameFilter() {
@@ -216,7 +216,7 @@ class BrandController {
         if (index > 0) {
             extension = name.substring(index)
         }
-        String dir = grailsApplication.config.rootPath + '/brands/logos/' + user.company.code + '/'
+        String dir = grailsApplication.config.resources.path + '/brands/logos/' + user.company.code + '/'
         String logoName = brandId.toString()
         File d = new File(dir)
         d.mkdirs()
@@ -236,7 +236,7 @@ class BrandController {
             user = authenticationService.retrieveAuthenticatedUser()
         }
         String logoName = brandId.toString()
-        File dir = new File(grailsApplication.config.rootPath + '/brands/logos/' + user.company.code)
+        File dir = new File(grailsApplication.config.resources.path + '/brands/logos/' + user.company.code)
         File[] files = dir.listFiles(
                 new FilenameFilter() {
                     @Override
@@ -266,7 +266,7 @@ class BrandController {
             user = authenticationService.retrieveAuthenticatedUser()
         }
         String logoName = brandId.toString()
-        File dir = new File(grailsApplication.config.rootPath + '/brands/logos/' + user.company.code)
+        File dir = new File(grailsApplication.config.resources.path + '/brands/logos/' + user.company.code)
         File[] files = dir.listFiles(
                 new FilenameFilter() {
                     @Override

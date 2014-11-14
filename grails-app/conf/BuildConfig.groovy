@@ -21,7 +21,7 @@ grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
     inherits("global") {
         // uncomment to disable ehcache
-        // excludes 'ehcache'
+        excludes 'ehcache'
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
@@ -75,10 +75,6 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
-// plugins for the compile step
-        //compile ':scaffolding:2.0.3'
-        compile ':cache:1.1.3'
-//        compile ':asset-pipeline:1.8.3'
 
 // plugins needed at runtime but not for compilation
         runtime ':hibernate:3.6.10.15' // ':hibernate4:4.3.5.3' for Hibernate 4
@@ -98,7 +94,6 @@ grails.project.dependency.resolution = {
         compile ':recaptcha:0.6.8'
         compile ":cache-headers:1.1.6"
         compile ":cached-resources:1.0"
-        compile ":cookie:0.51"
         compile ":rest:0.8"
         compile ":joda-time:1.4"
     }

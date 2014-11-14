@@ -44,7 +44,7 @@ public class CommonService {
         // création de l'admin
         User userAdmin = User.findByLogin(Holders.config.superadmin.login)
         if(userAdmin == null) {
-            userAdmin = new User(login:Holders.config.superadmin.login, email:Holders.config.superadmin.email, password:new Sha256Hash(Holders.config.superadmin.password).toHex(), active:true)
+            userAdmin = new User(login:Holders.config.superadmin.login, email:Holders.config.superadmin.email, password:Holders.config.superadmin.password, active:true)
             userAdmin.addToRoles(admin)
             saveEntity(userAdmin)
         }

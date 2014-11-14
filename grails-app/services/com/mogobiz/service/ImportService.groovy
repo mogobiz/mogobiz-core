@@ -90,7 +90,7 @@ class ImportService {
     }
 
     public File getImportDir(String now) {
-        String impexPath = grailsApplication.config.impexPath
+        String impexPath = grailsApplication.config.impex.path
         if (!impexPath)
             impexPath = System.getProperty("java.io.tmpdir")
         File impexDir = new File(new File(impexPath, "import"), now)

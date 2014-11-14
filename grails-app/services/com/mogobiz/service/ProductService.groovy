@@ -36,236 +36,13 @@ import java.util.concurrent.TimeUnit
  */
 class ProductService
 {
-	UuidDataService uuidDataService;	
 	SanitizeUrlService sanitizeUrlService
-	RateService rateService;
 	TaxRateService taxRateService
 
     ESRiver river = ESRivers.instance.loadRiver("product")
 
     def servletContext = SCH.servletContext
 
-	/**
-	 * Extracts the "maxItemsPerPage" of the map or returns
-	 * {@link IperConstant#NUMBER_PRODUCT_PER_PAGE} if not set
-	 * @param criteria
-	 * @return
-	 */
-	private Integer extractMaxItemsPerPage(Map criteria) {
-		Integer maxItemsPerPage = criteria["maxItemsPerPage"];
-		if (!maxItemsPerPage) {
-			maxItemsPerPage = IperConstant.NUMBER_PRODUCT_PER_PAGE;
-		}
-		return maxItemsPerPage;
-	}
-	
-	/**
-	 * Extracts the "pageOffset" of the map or returns
-	 * 0 if not set
-	 * @param criteria
-	 * @return
-	 */
-	private Integer extractPageOffset(Map criteria) {
-		Integer pageOffset = criteria["pageOffset"]
-		if (!pageOffset) {
-			pageOffset = 0
-		}
-		return pageOffset;
-	}
-
-	/**
-	 * Transforms the product into a map (with formated prices)
-	 * @param locale
-	 * @param currencyCode
-	 * @param product
-	 * @return
-	 * @throws CurrencyRateException
-	 */
-	protected Map renderProduct(Locale locale, String currencyCode, Product product) throws CurrencyRateException {
-		Map mapProduct = product.asMapForJSON(null, null, locale?.language)
-		// formatting price
-		mapProduct["price"] = renderProductPrice(locale, currencyCode, product)
-		return mapProduct
-	}
-	
-	/**
-	 * Transforms the price of product into a map
-	 * @param locale
-	 * @param locale
-	 * @param currencyCode
-	 * @param product
-	 * @return
-	 * @throws CurrencyRateException
-	 */
-	protected Map renderProductPrice(Locale locale, String currencyCode, Product product) throws CurrencyRateException {
-		// formatting price
-		Float taxRate = taxRateService.findTaxRateByProduct(product, locale?.country)
-		Long endPrice = taxRateService.calculateEndPrix(product.price, taxRate)
-		Map price = [:]
-		price["price"] = rateService.format(product.price, currencyCode, locale);
-		price["taxRate"] = taxRate
-		price["endPrice"] = rateService.format(endPrice, currencyCode, locale);
-		return price
-	}
-
-	/**
-	 * Transforms the PagedResultList of Product into a Page of map (with formated prices)
-	 * @param locale
-	 * @param currencyCode
-	 * @param maxItemsPerPage
-	 * @param pageOffset
-	 * @param pagedListe
-	 * @return
-	 * @throws CurrencyRateException
-	 */
-	private Page renderPagedResultList(Locale locale, String currencyCode, Integer maxItemsPerPage, Integer pageOffset, PagedResultList pagedListe) throws CurrencyRateException {
-		List<Map> result = [];
-		pagedListe.list?.each { Product p ->
-			result << renderProduct(locale, currencyCode, p);
-		}
-
-		return IperUtil.createListePagine(result, pagedListe.totalCount, maxItemsPerPage, pageOffset)
-	}
-	
-	/**
-	 * This method searches a list of active product for the company, which is salable today and meet the criteria. Criteria are :<br/>
-	 * - maxItemsPerPage : Integer (Optional) : The default value is {@link IperConstant.NUMBER_PRODUCT_PER_PAGE}<br/>
-	 * - pageOffset : Integer (Optional) : The default value is 0<br/>
-	 * - xtype : String (Optional) : If set, this method searches the products corresponding to the given xtype<br/>
-	 * - name : String (Optional) : If set, this method searches the products containing to the given name<br/>
-	 * - code : String (Optional) : If set, this method searches the products corresponding to the given code<br/>
-	 * - categoryId : Long (Optional) : If set, this method searches the products corresponding to the given categoryId<br/>
-	 * - brandId : Long (Optional) : If set, this method searches the products corresponding to the given brandId<br/>
-	 * - tagName : String (Optional) : If set, this method searches the products corresponding to the given tagName<br/>
-	 * - priceMin : Long (Optional) : If set, this method searches the products which price is greater or equal than the given priceMin<br/>
-	 * - priceMax : Long (Optional) : If set, this method searches the products which price is less or equal than the given priceMax<br/>
-	 * - creationDateMin : Calendar (Optional) : If set, this method searches the products which create date is greater or equal than the given creationDateMin<br/>
-	 * - orderBy : String (Optional) : the default value is "startDate"<br/>
-	 * - orderDirection : String (Optional) : the default value is "desc"<br/>
-	 * @param locale
-	 * @param currencyCode
-	 * @param companyId
-	 * @param criteria
-	 * @return
-	 * @throws CurrencyRateException
-	 */
-	Page search(Locale locale, String currencyCode, long companyId, Map criteria) throws CurrencyRateException {
-		def today = IperUtil.today()
-
-		Integer maxItemsPerPage = extractMaxItemsPerPage(criteria)
-		Integer pageOffset = extractPageOffset(criteria)
-		
-		PagedResultList pagedListe = Product.createCriteria().list (max: maxItemsPerPage, offset: pageOffset * maxItemsPerPage) {
-			company { eq('id', companyId) }
-            eq('deleted', false)
-			eq('state', ProductState.ACTIVE)
-			le('startDate',today)
-			ge('stopDate',today)
-			if (criteria["xtype"]) {
-				eq('xtype', ProductType.valueOf(criteria["xtype"]))
-			}
-			if (criteria["name"]) {
-				ilike('name', "%" + criteria["name"] + "%")
-			}
-			if (criteria["code"]) {
-				eq('code', criteria["code"])
-			}
-			if (criteria["categoryId"]) {
-				category { eq('id', Long.valueOf(criteria["categoryId"])) }
-			}
-			if (criteria["brandId"]) {
-				brand { eq('id', Long.valueOf(criteria["brandId"])) }
-			}
-			if (criteria["tagName"]) {
-				tags { eq('name', criteria["tagName"]) }
-			}			
-			if (criteria["priceMin"] && criteria["priceMax"]) {
-				between('price', Long.valueOf(criteria["priceMin"]), Long.valueOf(criteria["priceMax"]))
-			}
-			else if (criteria["priceMin"]) {
-				ge('price', Long.valueOf(criteria["priceMin"]))
-			}
-			else if (criteria["priceMax"]) {
-				le('price', Long.valueOf(criteria["priceMax"]))
-			}
-			if (criteria["creationDateMin"]) {
-				ge('dateCreated', criteria["creationDateMin"])
-			}
-			order(criteria["orderBy"] ?: "startDate", criteria["orderDirection"] ?: "desc")
-		}
-		
-		return renderPagedResultList(locale, currencyCode, maxItemsPerPage, pageOffset, pagedListe);
-	}
-
-	/**
-	 * This method searches a list of active product for the company, which is featured today and meet the criteria. Criteria are :<br/>
-	 * - maxItemsPerPage : Integer (Optional) : The default value is {@link IperConstant.NUMBER_PRODUCT_PER_PAGE}<br/>
-	 * - pageOffset : Integer (Optional) : The default value is 0<br/>
-	 * - xtype : String (Optional) : If set, this method searches the products corresponding to the given xtype<br/>
-	 * - name : String (Optional) : If set, this method searches the products containing to the given name<br/>
-	 * - code : String (Optional) : If set, this method searches the products corresponding to the given code<br/>
-	 * - categoryId : Long (Optional) : If set, this method searches the products corresponding to the given categoryId<br/>
-	 * - brandId : Long (Optional) : If set, this method searches the products corresponding to the given brandId<br/>
-	 * - tagName : String (Optional) : If set, this method searches the products corresponding to the given tagName<br/>
-	 * - priceMin : Long (Optional) : If set, this method searches the products which price is greater or equal than the given priceMin<br/>
-	 * - priceMax : Long (Optional) : If set, this method searches the products which price is less or equal than the given priceMax<br/>
-	 * - creationDateMin : Calendar (Optional) : If set, this method searches the products which create date is greater or equal than the given creationDateMin<br/>
-	 * - orderBy : String (Optional) : the default value is "startDate"<br/>
-	 * - orderDirection : String (Optional) : the default value is "desc"<br/>
-	 * @param locale
-	 * @param currencyCode
-	 * @param companyId
-	 * @param criteria
-	 * @return
-	 * @throws CurrencyRateException
-	 */
-	Page searchFeatured(Locale locale, String currencyCode, long companyId, Map criteria) throws CurrencyRateException {
-		def today = IperUtil.today()
-		
-		Integer maxItemsPerPage = extractMaxItemsPerPage(criteria)
-		Integer pageOffset = extractPageOffset(criteria)
-		
-		PagedResultList pagedListe = Product.createCriteria().list (max: maxItemsPerPage, offset: pageOffset * maxItemsPerPage) {
-			company { eq('id', companyId) }
-            eq('deleted', false)
-			eq('state', ProductState.ACTIVE)
-			le('startFeatureDate',today)
-			ge('stopFeatureDate',today)
-			if (criteria["xtype"]) {
-				eq('xtype', ProductType.valueOf(criteria["xtype"]))
-			}
-			if (criteria["name"]) {
-				ilike('name', "%" + criteria["name"] + "%")
-			}
-			if (criteria["code"]) {
-				eq('code', criteria["code"])
-			}
-			if (criteria["categoryId"]) {
-				category { eq('id', criteria["categoryId"]) }
-			}
-			if (criteria["brandId"]) {
-				brand { eq('id', criteria["brandId"]) }
-			}
-			if (criteria["tagName"]) {
-				tags { eq('name', criteria["tagName"]) }
-			}
-			if (criteria["priceMin"] && criteria["priceMax"]) {
-				between('price', criteria["priceMin"], criteria["priceMax"])
-			}
-			else if (criteria["priceMin"]) {
-				ge('price', criteria["priceMin"])
-			}
-			else if (criteria["priceMax"]) {
-				le('price', criteria["priceMax"])
-			}
-			if (criteria["creationDateMin"]) {
-				ge('dateCreated', criteria["creationDateMin"])
-			}
-			order(criteria["orderBy"] ?: "startDate", criteria["orderDirection"] ?: "desc")
-		}
-		
-		return renderPagedResultList(locale, currencyCode, maxItemsPerPage, pageOffset, pagedListe);
-	}
 
 	/**
 	 * Returns the map corresponding to the given product.
@@ -294,7 +71,8 @@ class ProductService
 		}
 		else
 		{
-			Map map = renderProduct(locale, currencyCode, product)
+			Map map = product.asMapForJSON(null, null, locale?.language)
+
 			//adding ticket types
 			def ticketTypes = []
 			TicketType.createCriteria().list {eq('product.id', product.id)}.each { TicketType ticketType ->
@@ -349,130 +127,11 @@ class ProductService
 				tabPictures << IperUtil.getResourceVOSimple(r);
 			}
 			map.put("pictures", tabPictures)
-			
-			if (addToHistory == null || addToHistory == true)
-			{
-				uuidDataService.addProduct(productId);
-			}
 			return map
 		}
 	}
 	
-	/**
-	 * Returns the list of map of visited products
-	 * @param locale
-	 * @param currencyCode
-	 * @param companyId
-	 * @return
-	 * @throws CurrencyRateException
-	 * @throws ProductNotFoundException
-	 */
-	List<Map> getVisited(Locale locale, String currencyCode, long companyId) throws CurrencyRateException, ProductNotFoundException {
-		String [] idProducts = uuidDataService.getProducts();
-		if (!idProducts) 
-		{
-			return []
-		}
-		else 
-		{
-			def today = IperUtil.today()
-			
-			List<Product> list = Product.createCriteria().list {
-				company { eq('id', companyId) }
-				eq('state', ProductState.ACTIVE)
-				le('startDate',today)
-				ge('stopDate',today)
-				'in' ('id', idProducts.collect{ String item -> item.toLong() })
-			}
-	
-			List<Map> result = [];
-			list?.each { Product p ->
-				result << renderProduct(locale, currencyCode, p);
-			}
-			return result;
-		}
-	}
-	
-	/**
-	 * Return the list of salable dates for the given product and between the given dates.
-	 * If startCalendar is before today, today is use instead
-	 * @param productId
-	 * @param startCalendar
-	 * @param endCalendar
-	 * @return
-	 * @throws ProductNotFoundException
-	 */
-	List<String> getProductDatesBetween(long productId, Calendar startCalendar, Calendar endCalendar) throws ProductNotFoundException {
-		def today = IperUtil.today()
 
-		if (startCalendar.compareTo(today) < 0) {
-			startCalendar = today
-		}
-
-		Product product = Product.get(productId)
-		if (product == null) {
-			throw new ProductNotFoundException("The product " + productId + "was not found")			
-		}
-		
-		List<String> result = []
-		if (product.calendarType != ProductCalendar.NO_DATE) {
-			// On récupère les dates possibles à cheval sur la période donnée
-			List<IntraDayPeriod> listIncluded = IntraDayPeriod.createCriteria().list{
-				eq('product',product)
-				le('startDate', endCalendar)
-				ge('endDate', startCalendar)
-			}
-			// On récupère les dates à exclure à cheval sur la période donnée
-			List<DatePeriod> listExcluded = DatePeriod.createCriteria().list{
-				eq('product',product)
-				le('startDate', endCalendar)
-				ge('endDate', startCalendar)
-			}
-
-			Calendar currentDate = startCalendar.clone()
-			while (currentDate.before(endCalendar)) {
-				if (IperUtil.isDateIncluded(listIncluded, currentDate) && !IperUtil.isDateExcluded(listExcluded, currentDate)) {
-					result << RenderUtil.asMapForJSON(currentDate, IperConstant.DATE_FORMAT_WITHOUT_HOUR)
-				}
-				currentDate.add(Calendar.DAY_OF_YEAR,1)
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Return the list of salable times for the given product and the given date.
-	 * @param productId
-	 * @param date
-	 * @return
-	 * @throws ProductNotFoundException
-	 */
-	List<String> getProductTimesForDate(long productId, Calendar date) throws ProductNotFoundException {
-		def today = IperUtil.today()
-		
-		Product product = Product.get(productId)
-		if (product == null) {
-			throw new ProductNotFoundException("The product " + productId + "was not found")
-		}
-		
-		List<String> result = []
-		if (date.compareTo(IperUtil.today()) >= 0 && product.calendarType == ProductCalendar.DATE_TIME) {
-			List<IntraDayPeriod> listIncluded = IntraDayPeriod.createCriteria().list{
-				eq('product', product)
-				le('startDate', date)
-				ge('endDate', date)
-			}
-			listIncluded.each {
-				if (IperUtil.isDateIncluded([it], date)) 
-				{
-					result << RenderUtil.asMapForJSON(it.startDate, IperConstant.TIME_FORMAT)
-				}
-			}
-		}
-		return result;		
-	}
-
-	
 	com.mogobiz.store.domain.Resource retrievePicture(Product entity) {
 		def pictures = getPictures(entity)
 		return (pictures && pictures.size() > 0)?pictures[0]:null
@@ -496,6 +155,7 @@ class ProductService
 		}
 		return pictures
 	}
+
 	public com.mogobiz.store.domain.Resource retrieveVideo(Product entity) {
 		def params = [:]
 		params['product'] = entity
@@ -507,89 +167,6 @@ class ProductService
 				+ " order by pr.position asc\
 			", params, [max:1, offset:0])
 		return bindedResource?bindedResource.resource:null
-	}
-
-	/**
-	 * Increment the stock of the ticketType of the ticket for the given date and decrement the number of sale
-	 * @param ticketType
-	 * @param quantity
-	 * @param date
-	 */
-	void increment(TicketType ticketType, long quantity, Calendar date) {
-		Product product = ticketType.product
-		Stock stock = ticketType.stock
-		if (stock != null)
-		{
-			// Search the corresponding StockCalendar
-			StockCalendar stockCalendar = retrieveStockCalendar(product, ticketType, date, stock)
-			
-			// sale decrement			
-			product.nbSales -= quantity
-			ticketType.nbSales -= quantity
-			stockCalendar.sold -= quantity
-			stockCalendar.save(flush:true)
-
-            upsertProduct(product)
-		}
-	}
-
-    /**
-	 * Decrement the stock of the ticketType of the ticket for the given date and increment the number of sale
-	 * If stock is insufficient, Exception is thrown
-	 * @param ticketType
-	 * @param quantity
-	 * @param date
-	 * @throws InsufficientStockException
-	 */
-	void decrement(TicketType ticketType, long quantity, Calendar date) throws InsufficientStockException {
-		Product product = ticketType.product
-		Stock stock = ticketType.stock
-		if (stock != null)
-		{
-			// Search the corresponding StockCalendar
-			StockCalendar stockCalendar = retrieveStockCalendar(product, ticketType, date, stock)
-
-			// stock vérification
-			if (!stock.stockUnlimited&& !stock.stockOutSelling && stockCalendar.stock < (quantity + stockCalendar.sold))
-			{
-				throw new InsufficientStockException('The available stock is insufficient for the quantity required')
-			}
-			
-			// sale increment
-			product.nbSales += quantity
-			product.save()
-			
-			ticketType.nbSales += quantity
-			ticketType.save()
-
-			stockCalendar.sold += quantity
-			stockCalendar.save(flush:true)
-
-            upsertProduct(product)
-		}
-	}
-	
-	/**
-	 * retrieve the StockCalendar of the TicketType for the given date.
-	 * If the StockCalendar does not exist, it is be created
-	 * @param product
-	 * @param ticketType
-	 * @param date
-	 * @return
-	 */
-	private StockCalendar retrieveStockCalendar(Product product, TicketType ticketType, Calendar date, Stock stock) {
-		StockCalendar stockCalendar = StockCalendar.createCriteria().get {
-			eq ('ticketType', ticketType)
-			if (product.calendarType != ProductCalendar.NO_DATE) {eq ('startDate', date)}
-		}
-		
-		if (!stockCalendar)
-		{
-			// creation of StockCalendar
-			stockCalendar = new StockCalendar(sold: 0, stock: stock.stock, startDate: date, ticketType: ticketType, product: product)
-			stockCalendar.save()
-		}
-		return stockCalendar
 	}
 	
 	/**
@@ -603,6 +180,7 @@ class ProductService
 	List<Product> list() {
 		Product.findAll()
 	}
+
 	Product saveProduct(Product entity, Map params, Seller seller, com.mogobiz.store.domain.EventType eventType) {
 		if(params['product.state.name']){
 			if (params['product.state.name'] == 'ACTIVE') {
@@ -756,48 +334,8 @@ class ProductService
 			return entity
 		}
 		else {
+			entity.errors.allErrors.each { println it }
 			return null;
 		}
 	}
-
-    private void upsertProduct(Product product) {
-        Company company = product.company
-        String store = company?.code
-        String url = servletContext.getAttribute(store)
-        if (!url) {
-            Collection envs = EsEnv.executeQuery(
-                    'from EsEnv env where env.active=true and env.company.code=:code', [code: store])
-            if (envs && envs.size() > 0) {
-                url = envs.get(0).url
-                servletContext.setAttribute(store, url)
-            }
-        }
-        if (url) {
-            ExecutionContext ec = ESRivers.dispatcher()
-            Collection<Catalog> catalogs = Catalog.findAllByActivationDateLessThanEqualsAndCompany(
-                    new Date(),
-                    Company.get(company.id),
-                    [sort:'activationDate', order:'desc'])
-            Catalog catalog = catalogs.size() > 0 ? catalogs.get(0) : null
-            def languages = Translation.executeQuery(
-                    'SELECT DISTINCT t.lang FROM Translation t WHERE t.companyId=:idCompany',
-                    [idCompany: company?.id]) as String[]
-            RiverConfig config = new RiverConfig(
-                    clientConfig: new ClientConfig(
-                            url: url,
-                            debug: true,
-                            config: [index:store]
-                    ),
-                    idCatalog: catalog.id,
-                    languages: languages,
-                    defaultLang: 'fr')
-            Future<BulkResponse> future = BlockingObservable.from(
-                    (river as AbstractRiver<Product, ? extends Client>)?.upsertCatalogObjects(config, [product], ec)).last()
-            BulkResponse response = Await.result(future, Duration.create(10, TimeUnit.SECONDS))
-            if(response){
-                log.info('product ' + product.id + ' updated to es')
-            }
-        }
-    }
-
 }

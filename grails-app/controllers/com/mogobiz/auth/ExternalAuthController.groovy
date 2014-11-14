@@ -112,33 +112,27 @@ class ExternalAuthController {
 		}
 	}
 
-    def eboutique = {
-        def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
-        def externalAuthPath = grailsApplication.config.externalAuthPath + '/eboutique/authstart?returnURI=' + returnURI.encodeAsURL()
-        redirect(url:externalAuthPath)
-    }
-
     def facebook = {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 
 	def google = {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/google/authstart?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/google/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 
     def idn = {
         def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
-        def externalAuthPath = grailsApplication.config.externalAuthPath + '/idn/authstart?returnURI=' + returnURI.encodeAsURL()
+        def externalAuthPath = grailsApplication.config.external.authPath + '/idn/authstart?returnURI=' + returnURI.encodeAsURL()
         redirect(url:externalAuthPath)
     }
 
     def twitter = {
         def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
-        def externalAuthPath = grailsApplication.config.externalAuthPath + '/twitter/authstart?returnURI=' + returnURI.encodeAsURL()
+        def externalAuthPath = grailsApplication.config.external.authPath + '/twitter/authstart?returnURI=' + returnURI.encodeAsURL()
         redirect(url:externalAuthPath)
     }
 
@@ -183,7 +177,7 @@ class ExternalAuthController {
         }
         def scope = 'https://www.googleapis.com/auth/content'
         def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/googleShoppingToken?targetUri=' + params.targetUri
-        def externalAuthPath = grailsApplication.config.externalAuthPath + '/google/authstart?returnURI=' + returnURI.encodeAsURL() + '&scope=' + scope.encodeAsURL()
+        def externalAuthPath = grailsApplication.config.external.authPath + '/google/authstart?returnURI=' + returnURI.encodeAsURL() + '&scope=' + scope.encodeAsURL()
         redirect(url:externalAuthPath)
     }
 

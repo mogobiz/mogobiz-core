@@ -42,8 +42,11 @@ class ProductValidation
     }
 
 	def static productCodeValidator = {  value, product ->
-        List<Catalog> catalog = Catalog.executeQuery("select d from Product p, Category c, Catalog d where p.category = c and c.catalog = d and p.code = :code and p.company = :company", [code:value, company:product.company])
-        List<Long> ids = catalog.collect { catalog.id }
+        List<Catalog> catalogs = Catalog.executeQuery("select d from Product p, Category c, Catalog d where p.category = c and c.catalog = d and p.code = :code and p.company = :company", [code:value, company:product.company])
+        List<Long> ids = []
+        catalogs.each {
+            ids << it.id
+        }
         Map res = ids.groupBy { it }.findAll { it.value.size() > 1}
         return res.keySet().size() == 0
 	}

@@ -13,14 +13,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class CountryService implements IperConstant {
 	static transactional = false
 
-	UuidDataService uuidDataService;
-	
-	/**
-	 * Call Mogopay and return the map (code/name) of countries
-	 * @return
-	 * @throws CountryException
-	 */
-	@Cacheable('countryCache')
+
 	public Map<String, String> retrieveCountries() throws CountryException {
 		try
 		{
@@ -63,34 +56,4 @@ class CountryService implements IperConstant {
 		}
 	}
 
-	/**
-	 * Returns true if the country is managed by Mogopay
-	 * @param country
-	 * @return
-	 */
-	boolean isManaged(String country) throws CountryException {
-		if (country == null || country.length() == 0) {
-			return false;
-		}
-		else
-		{
-			Map<String, String> map = retrieveCountries()
-			return map.containsKey(country)
-		}
-	}
-	
-	String getCurrent() {
-		String country = uuidDataService.getCountry();
-		if (country == null) {
-			List<Map> l = list();
-			if (l != null && l.size() > 0) {
-				country = l[0]["code"]
-			}
-		}
-		return country;
-	}
-	
-	@CacheEvict(value = 'countryCache', allEntries = true)
-	void clearCache() {
-	}
 }

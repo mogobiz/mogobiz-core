@@ -19,7 +19,7 @@ class TranslationService {
 	 * @return
 	 */
     List<String> languages() {
-		return Holders.config.partner.languages
+		return Holders.config.application.languages
     }
 	
 	/**

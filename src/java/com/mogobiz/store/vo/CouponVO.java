@@ -19,7 +19,7 @@ public class CouponVO
     /**
      * The serial version UID of this class. Needed for serialization.
      */
-    private static final long serialVersionUID = -7647362223679698282L;
+    private static final long serialVersionUID = -1205858241710040686L;
 
     public CouponVO()
     {
@@ -39,7 +39,7 @@ public class CouponVO
         this.price = price;
     }
 
-    public CouponVO(long id, java.lang.String name, java.lang.String code, boolean active, java.util.Calendar startDate, java.util.Calendar endDate, long price, java.lang.String pastille)
+    public CouponVO(long id, java.lang.String name, java.lang.String code, boolean active, java.util.Calendar startDate, java.util.Calendar endDate, long price, java.lang.String pastille, java.lang.String description)
     {
         this.id = id;
         this.name = name;
@@ -49,6 +49,7 @@ public class CouponVO
         this.endDate = endDate;
         this.price = price;
         this.pastille = pastille;
+        this.description = description;
     }
 
     /**
@@ -59,7 +60,7 @@ public class CouponVO
      */
     public CouponVO(CouponVO otherBean)
     {
-        this(otherBean.getId(), otherBean.getName(), otherBean.getCode(), otherBean.isActive(), otherBean.getStartDate(), otherBean.getEndDate(), otherBean.getPrice(), otherBean.getPastille());
+        this(otherBean.getId(), otherBean.getName(), otherBean.getCode(), otherBean.isActive(), otherBean.getStartDate(), otherBean.getEndDate(), otherBean.getPrice(), otherBean.getPastille(), otherBean.getDescription());
     }
 
     /**
@@ -77,6 +78,7 @@ public class CouponVO
             this.setEndDate(otherBean.getEndDate());
             this.setPrice(otherBean.getPrice());
             this.setPastille(otherBean.getPastille());
+            this.setDescription(otherBean.getDescription());
         }
     }
 
@@ -198,6 +200,21 @@ public class CouponVO
     public void setPastille(java.lang.String pastille)
     {
         this.pastille = pastille;
+    }
+
+    private java.lang.String description;
+
+    /**
+     * 
+     */
+    public java.lang.String getDescription()
+    {
+        return this.description;
+    }
+
+    public void setDescription(java.lang.String description)
+    {
+        this.description = description;
     }
 
 }

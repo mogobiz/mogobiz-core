@@ -23,7 +23,6 @@ import com.mogobiz.store.domain.TagValidation;
 import com.mogobiz.store.domain.TaxRate;
 import com.mogobiz.store.domain.TaxRateRender;
 import com.mogobiz.store.domain.TaxRateValidation
-import com.mogobiz.service.RateService;
 import com.mogobiz.service.TaxRateService;
 import com.mogobiz.service.ProductService
 import grails.test.mixin.TestMixin;
@@ -43,14 +42,6 @@ class AbstractTestService {
 		saveEntity(catalog)		
 	}
 	
-	protected RateService mockRateService() {
-		RateService service = new RateService();
-		service.metaClass.rates = {
-			return ["EUR": 0.01, "USD": 0.0137485]
-		}
-		return service
-	}
-
 	protected TaxRateService mockTaxRateService() {
 		TaxRateService service = new TaxRateService();
 		service.metaClass.findTaxRate = { TaxRate taxRate, String country -> 

@@ -32,7 +32,8 @@ class UploadController {
 
     def retrievePictures = {
         def pictures = []
-        def album = params['album']?.id ? Album.get(params['album']?.id) : null
+        Album album = params['album']?.id ? Album.get(params['album']?.id) : null
+        List<Resource> dftPictures
         if (album) {
             dftPictures = Resource.findAllByAlbum(album)
         } else {

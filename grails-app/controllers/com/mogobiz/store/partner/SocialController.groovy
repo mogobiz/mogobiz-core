@@ -44,19 +44,19 @@ public class SocialController {
 	
 	def facebook = {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/social/addExternalAccount'
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 	def twitter = {
 		User seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/social/addExternalAccount'
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/twitter/authstart?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/twitter/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 	def google = {
 		User seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/social/addExternalAccount'
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/google/hybrid?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/google/hybrid?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 	def error = {

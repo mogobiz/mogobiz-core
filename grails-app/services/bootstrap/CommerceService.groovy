@@ -29,7 +29,7 @@ import com.mogobiz.store.vo.RegisteredCartItemVO
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
 
-class JahiaCommerceService {
+class CommerceService {
 
     CommonService commonService
     def destroy() {}

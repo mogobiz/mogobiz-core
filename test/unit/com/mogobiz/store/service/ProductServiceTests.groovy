@@ -52,7 +52,6 @@ class ProductServiceTests extends AbstractTestService {
 		p4 = createProduct("p4", "produitActif", company, hideBrand, adult, taxRate, ProductState.ACTIVE, null, 3000);	
 		
 		service = new ProductService();
-		service.rateService = mockRateService();
 		service.taxRateService = mockTaxRateService()
     }
 

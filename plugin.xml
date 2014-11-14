@@ -133,21 +133,18 @@
     <resource>com.mogobiz.store.domain.User</resource>
     <resource>com.mogobiz.store.domain.UserPermission</resource>
     <resource>com.mogobiz.store.domain.UserProperty</resource>
-    <resource>com.mogobiz.store.domain.UuidData</resource>
     <resource>com.mogobiz.store.domain.Variation</resource>
     <resource>com.mogobiz.store.domain.VariationPriceType</resource>
     <resource>com.mogobiz.store.domain.VariationValue</resource>
     <resource>com.mogobiz.store.domain.WeightUnit</resource>
-    <resource>com.mogobiz.job.RecycleUuidDataJob</resource>
     <resource>com.mogobiz.auth.AuthRealm</resource>
     <resource>bootstrap.CommonService</resource>
-    <resource>bootstrap.JahiaCommerceService</resource>
+    <resource>bootstrap.CommerceService</resource>
     <resource>com.mogobiz.ajax.AjaxResponseService</resource>
     <resource>com.mogobiz.authentication.AuthenticationService</resource>
     <resource>com.mogobiz.geolocation.partner.PoiService</resource>
     <resource>com.mogobiz.service.BrandService</resource>
     <resource>com.mogobiz.service.CartJahiaService</resource>
-    <resource>com.mogobiz.service.CartService</resource>
     <resource>com.mogobiz.service.CatalogService</resource>
     <resource>com.mogobiz.service.CategoryService</resource>
     <resource>com.mogobiz.service.CompanyService</resource>
@@ -161,8 +158,6 @@
     <resource>com.mogobiz.service.ProductJahiaService</resource>
     <resource>com.mogobiz.service.ProductService</resource>
     <resource>com.mogobiz.service.QueueSocialService</resource>
-    <resource>com.mogobiz.service.QueueUuidService</resource>
-    <resource>com.mogobiz.service.RateService</resource>
     <resource>com.mogobiz.service.ResService</resource>
     <resource>com.mogobiz.service.SaleService</resource>
     <resource>com.mogobiz.service.SanitizeUrlService</resource>
@@ -173,8 +168,6 @@
     <resource>com.mogobiz.service.StoreService</resource>
     <resource>com.mogobiz.service.TagService</resource>
     <resource>com.mogobiz.service.TaxRateService</resource>
-    <resource>com.mogobiz.service.TrackingService</resource>
     <resource>com.mogobiz.service.TranslationService</resource>
-    <resource>com.mogobiz.service.UuidDataService</resource>
   </resources>
 </plugin>

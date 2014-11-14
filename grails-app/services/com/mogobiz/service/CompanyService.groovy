@@ -59,7 +59,7 @@ class CompanyService
         if (exist) {
             throw new CompanyAlreadyExistException()
         }
-        company.website = company.website ?: "http://" + company.code + grailsApplication.config.rootDomain
+        company.website = company.website ?: "http://" + company.code + "mogobiz.com"
         company.aesPassword = SecureCodec.genKey();
         if (company.validate()) {
             if (company.location) {

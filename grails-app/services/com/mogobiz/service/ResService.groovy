@@ -13,7 +13,7 @@ class ResService {
     SanitizeUrlService sanitizeUrlService
 
     def uploadResource(Company company, Resource resource, File file, String contentType) {
-        String dir = grailsApplication.config.rootPath + File.separator + 'resources' + File.separator
+        String dir = grailsApplication.config.resources.path + File.separator + 'resources' + File.separator
         resource.company = company
         dir += company.code + '/'
 
@@ -39,7 +39,7 @@ class ResService {
         def albumName = 'Mogobiz'
         def albumDescription = 'Mogobiz'
         Album album
-        log.debug("Processing Upload resource rul = " + resource.url)
+        log.debug("Processing Upload resource url = " + resource.url)
         if (company != null) {
             album = Album.findByNameAndCompany(albumName, company)
             if (!album) {

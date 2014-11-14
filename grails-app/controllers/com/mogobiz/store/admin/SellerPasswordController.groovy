@@ -72,7 +72,7 @@ class SellerPasswordController {
         User account = User.findByEmail(email)
         if (account) {
             String clearData = email + ";" + System.currentTimeMillis() + ";" + UUID.randomUUID().toString()
-            String cryptedData = SymmetricCrypt.encrypt(clearData, Holders.config.crypto.secret as String, Holders.config.crypto.algorithm as String)
+            String cryptedData = SymmetricCrypt.encrypt(clearData, Holders.config.application.secret as String, "AES")
             mailService.sendMail {
                 to account.email
                 subject 'Password reset security check'
@@ -84,7 +84,7 @@ class SellerPasswordController {
     }
 
     def resendPasswordConfirmation(String resendEmail, String resendKey) {
-        String clearText = SymmetricCrypt.decrypt(resendKey, Holders.config.crypto.secret as String, Holders.config.crypto.algorithm as String)
+        String clearText = SymmetricCrypt.decrypt(resendKey, Holders.config.application.secret as String, "AES")
         String[] clearData = clearText.split(';')
         long now = Calendar.instance.time.time
         long duration = now - clearData[1].toLong()

@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletResponse
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Resource
-import com.mogobiz.service.StoreService
 
 class SanitizedUrlController {
 	void getProduct(String companyCode, String sanitizedUrl) {

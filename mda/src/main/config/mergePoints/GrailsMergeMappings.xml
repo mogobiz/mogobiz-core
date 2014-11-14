@@ -42,20 +42,11 @@
 	//loadBeans("classpath:*defaultResources.groovy")
 
 	sanitizeUrlService (com.com.mogobiz.service.SanitizeUrlService)
-	rateService (com.com.mogobiz.service.RateService)
 	taxRateService (com.com.mogobiz.service.TaxRateService)
-	cookieService (com.dalew.CookieService)
-	iperCookieService (com.com.mogobiz.service.IperCookieService) {
-		cookieService = ref("cookieService")
-	}
-	uuidDataService (com.com.mogobiz.service.UuidDataService) {
-		iperCookieService = ref("iperCookieService")
-	}
+
 	productService (com.com.mogobiz.service.ProductService) {
 		sanitizeUrlService = ref("sanitizeUrlService")
-		rateService = ref("rateService")
 		taxRateService = ref("taxRateService")
-		uuidDataService = ref("uuidDataService")
 	}
 	productRender (com.com.mogobiz.store.domain.ProductRender) {
 		productService = ref("productService")

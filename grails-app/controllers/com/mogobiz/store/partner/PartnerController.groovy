@@ -80,13 +80,13 @@ class PartnerController {
 
 	def addFacebookExternalAccount = {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/partner/addExternalAccount'
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 	
 	def addGoogleExternalAccount = {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/partner/addExternalAccount'
-		def externalAuthPath = grailsApplication.config.externalAuthPath + '/google/hybrid?returnURI=' + returnURI.encodeAsURL()
+		def externalAuthPath = grailsApplication.config.external.authPath + '/google/hybrid?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 
