@@ -41,5 +41,8 @@ class CouponValidation
         super.onLoad(entity)
     }
 
-
+    def static couponCodeValidator = {  value, coupon ->
+        List<Coupon> coupons = Coupon.findAllByCodeAndCompanyAndIdNotEqual(value, coupon.company, coupon.id)
+        return coupons.size() ==0
+    }
 }
