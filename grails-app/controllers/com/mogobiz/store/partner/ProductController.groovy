@@ -27,7 +27,6 @@ import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
  */
 class ProductController {
     AjaxResponseService ajaxResponseService
-    MailService mailService
     AuthenticationService authenticationService
     ProductService productService
 

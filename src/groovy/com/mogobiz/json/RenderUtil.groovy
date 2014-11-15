@@ -11,7 +11,6 @@ import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.constant.IperConstant
 
 class RenderUtil {
-	
 	public static String asMapForJSON(Calendar c) {
 		if (c != null) {
 			return format(c.getTime());
@@ -210,9 +209,6 @@ class RenderUtil {
 	
 	public static String completerUrl(String url) {
 		if (url != null && !url.startsWith("http://")) {
-            if(url.startsWith('/iper2010')){
-                url = url.substring(9)
-            }
 			url = Holders.config.grails.serverURL + url;
 		}
 		return url;

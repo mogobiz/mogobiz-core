@@ -51,6 +51,7 @@ class SellerPasswordController {
                 }
                 // email
                 mailService.sendMail {
+                    from grailsApplication.config.grails.mail.from
                     to seller.email
                     subject 'Password reset'
                     body(view: '/sellerPassword/resetPasswordEmail', model: [targetUri: targetUri, login: seller.email, password: clearPassword])
@@ -74,6 +75,7 @@ class SellerPasswordController {
             String clearData = email + ";" + System.currentTimeMillis() + ";" + UUID.randomUUID().toString()
             String cryptedData = SymmetricCrypt.encrypt(clearData, Holders.config.application.secret as String, "AES")
             mailService.sendMail {
+                from grailsApplication.config.grails.mail.from
                 to account.email
                 subject 'Password reset security check'
                 body(view: '/sellerPassword/resendPasswordEmail', model: [resendEmail: account.email, resendKey: cryptedData])
@@ -102,6 +104,7 @@ class SellerPasswordController {
 
                 // email
                 mailService.sendMail {
+                    from grailsApplication.config.grails.mail.from
                     to account.email
                     subject 'Password reset'
                     body(view: '/sellerPassword/resendPasswordConfirmationEmail', model: [targetUri: targetUri, login: account.email, password: clearPassword])

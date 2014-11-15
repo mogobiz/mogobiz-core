@@ -3,6 +3,9 @@
  */
 package com.mogobiz.store.partner
 
+import com.mogobiz.authentication.AuthenticationService
+import grails.plugin.mail.MailService
+
 import java.util.Map;
 import grails.util.Environment
 
@@ -19,9 +22,8 @@ import com.mogobiz.store.domain.ExternalAuthLogin
  */
 class PartnerController {
 
-	def authenticationService
+	AuthenticationService authenticationService
 	def grailsApplication
-	def mailService
 	def index = {	}
 
 	def settings = {
