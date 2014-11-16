@@ -12,7 +12,8 @@ import com.mogobiz.store.domain.TicketType
 import com.mogobiz.store.domain.VariationValue;
 import com.mogobiz.constant.IperConstant;
 import com.mogobiz.json.RenderUtil;
-import com.mogobiz.utils.IperUtil;
+import com.mogobiz.utils.IperUtil
+import grails.transaction.Transactional;
 
 /**
  * @version $Id $
@@ -23,7 +24,8 @@ public class TicketTypeController {
 
 	def authenticationService
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -75,7 +77,8 @@ public class TicketTypeController {
 		}
 	}
 
-	def save = {
+	@Transactional
+	def save() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -133,7 +136,8 @@ public class TicketTypeController {
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -209,7 +213,8 @@ public class TicketTypeController {
 		}
 	}
 
-	def delete = {
+	@Transactional
+	def delete() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -231,7 +236,8 @@ public class TicketTypeController {
 		}
 	}
 
-	def exists = {
+	@Transactional(readOnly = true)
+	def exists() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401

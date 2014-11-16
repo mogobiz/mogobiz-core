@@ -6,6 +6,7 @@ import grails.converters.XML
 
 import com.mogobiz.store.domain.Company
 import com.mogobiz.json.RenderUtil
+import grails.transaction.Transactional
 
 /**
  * 
@@ -16,7 +17,8 @@ class CompanyPaymentPolicyController
 {
 	AjaxResponseService ajaxResponseService
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		def company = params['company']?.id?Company.get(params['company']?.id):null
 		if(company)
 		{
@@ -33,7 +35,8 @@ class CompanyPaymentPolicyController
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		def company = params['company']?.id?Company.get(params['company']?.id):null
 		if(company)
 		{

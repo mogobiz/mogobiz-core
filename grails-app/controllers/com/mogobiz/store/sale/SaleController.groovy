@@ -5,6 +5,7 @@ import com.mogobiz.json.RenderUtil
 import com.mogobiz.service.SaleService
 import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
+import grails.transaction.Transactional
 
 class SaleController {
 
@@ -19,7 +20,8 @@ class SaleController {
     /**
      * Retrieve BOCart and BOCartItem by criteria
      */
-	def getSalesByCriteria = {Criteria criteria ->
+	@Transactional(readOnly = true)
+	def getSalesByCriteria(Criteria criteria) {
         Seller user = authenticationService.retrieveAuthenticatedSeller()
 		if (!user && !authenticationService.isAdministrator()){
 			response.sendError 401
@@ -45,7 +47,8 @@ class SaleController {
 	}
 
 	//liste des vente par produit
-	def getSalesByProduct = {
+	@Transactional(readOnly = true)
+	def getSalesByProduct() {
 		def user = authenticationService.retrieveAuthenticatedSeller()
 		if (!user && !authenticationService.isAdministrator()){
 			response.sendError 401
@@ -106,7 +109,8 @@ class SaleController {
 	}*/
 
 	//returns products by name and/or sku(code)
-	def getProducts = {
+	@Transactional(readOnly = true)
+	def getProducts() {
 		def user = authenticationService.retrieveAuthenticatedSeller()
 		if (!user && !authenticationService.isAdministrator()){
 			response.sendError 401

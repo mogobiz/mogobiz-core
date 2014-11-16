@@ -7,7 +7,8 @@ import grails.converters.XML
 import com.mogobiz.store.domain.DatePeriod
 import com.mogobiz.store.domain.Product
 import com.mogobiz.constant.IperConstant;
-import com.mogobiz.json.RenderUtil;
+import com.mogobiz.json.RenderUtil
+import grails.transaction.Transactional;
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -23,7 +24,8 @@ class ProductKoPeriodsController {
 		redirect(action: "show", params: params)
 	}
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -57,7 +59,8 @@ class ProductKoPeriodsController {
 		}
 	}
 
-	def save = {
+	@Transactional
+	def save() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -92,8 +95,9 @@ class ProductKoPeriodsController {
 			response.sendError 404
 		}
 	}
-	
-	def update = {
+
+	@Transactional
+	def update() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -128,7 +132,8 @@ class ProductKoPeriodsController {
 		}
 	}
 
-	def delete = {
+	@Transactional
+	def delete() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401

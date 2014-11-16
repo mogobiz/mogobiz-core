@@ -3,12 +3,8 @@
  */
 package com.mogobiz.store.admin
 
-import grails.converters.JSON
-import grails.converters.XML
-import java.security.MessageDigest
-
+import grails.transaction.Transactional
 import com.mogobiz.store.domain.Company
-import java.util.UUID;
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -16,7 +12,8 @@ import java.util.UUID;
  */
 class KeyGenController {
 
-	def generateAPIKey = {
+	@Transactional
+	def generateAPIKey() {
 		def company = params['company']?.id?Company.get(params['company']?.id):null
 		if(company) {
 			company.apiKey = company.id+"-"+UUID.randomUUID();

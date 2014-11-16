@@ -2,6 +2,7 @@ package com.mogobiz.auth
 
 import com.mogobiz.store.domain.Token
 import com.mogobiz.store.domain.User
+import grails.transaction.Transactional
 import org.apache.commons.lang.StringUtils
 import org.apache.oltu.oauth2.as.issuer.MD5Generator
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer
@@ -20,6 +21,7 @@ class ResourceController {
 
     def authenticationService
 
+    @Transactional
     def sessionToken(){
         String body
 
@@ -134,6 +136,7 @@ class ResourceController {
         redirectToPage(sessionToken, resource, redirections ? redirections[resource] as String : null)
     }
 
+    @Transactional(readOnly = true)
     private void redirectToPage(final String token, final String action, final String pageURI){
         if(StringUtils.isEmpty(token)){
             log.warn('SSO - missing token')

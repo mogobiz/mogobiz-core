@@ -2,6 +2,7 @@ package com.mogobiz.geolocation
 
 import com.mogobiz.service.CountryService
 import grails.converters.JSON
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpServletResponse;
 

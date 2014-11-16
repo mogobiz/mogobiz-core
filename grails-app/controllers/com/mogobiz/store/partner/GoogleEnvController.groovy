@@ -4,6 +4,7 @@ import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.GoogleEnv
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 
 class GoogleEnvController {
 
@@ -11,7 +12,8 @@ class GoogleEnvController {
 
     def grailsApplication
 
-    def show = {
+    @Transactional(readOnly = true)
+    def show() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -29,7 +31,8 @@ class GoogleEnvController {
         }
     }
 
-    def saveOrUpdate = {
+    @Transactional
+    def saveOrUpdate() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -63,7 +66,8 @@ class GoogleEnvController {
         }
     }
 
-    def delete = {
+    @Transactional
+    def delete() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401

@@ -1,5 +1,7 @@
 package com.mogobiz.store.partner
 
+import grails.transaction.Transactional
+
 import javax.servlet.http.HttpServletResponse;
 
 import grails.converters.JSON
@@ -19,7 +21,8 @@ class TranslationController {
 	/**
 	 * Returns a list of configurable languages ​​by the Partner application
 	 */
-    def languages() { 
+	@Transactional(readOnly = true)
+    def languages() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if (seller == null) {
 			response.sendError HttpServletResponse.SC_UNAUTHORIZED
@@ -33,6 +36,7 @@ class TranslationController {
 	 * Returns a list of Translation corresponding to the given target
 	 * Parameter "target" is required
 	 */
+	@Transactional(readOnly = true)
 	def list() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if (seller == null) {
@@ -53,6 +57,7 @@ class TranslationController {
 	 * Delete the Translation corresponding to the given target and language
 	 * Parameters "target" and "language" are required
 	 */
+	@Transactional
 	def delete() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if (seller == null) {
@@ -75,6 +80,7 @@ class TranslationController {
 	 * Create or update the Translation corresponding to the given target and language.
 	 * Parameters "target", "language" and "value" are required
 	 */
+	@Transactional
 	def update() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if (seller == null) {

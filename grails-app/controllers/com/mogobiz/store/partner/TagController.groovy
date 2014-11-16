@@ -6,6 +6,7 @@ import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Tag
 import grails.converters.JSON
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpServletResponse
 
@@ -15,6 +16,7 @@ class TagController {
     def tagService
     AjaxResponseService ajaxResponseService
 
+    @Transactional(readOnly = true)
     def list(PagedListCommand cmd) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(seller == null){
@@ -32,6 +34,7 @@ class TagController {
         }
     }
 
+    @Transactional
     def save(Long tagId, Long ibeaconId) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(seller == null){

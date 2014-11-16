@@ -14,6 +14,7 @@ import com.mogobiz.store.exception.CountryException
 import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
 
 import javax.servlet.http.HttpServletResponse
@@ -60,6 +61,7 @@ class CompanyController {
         }
     }
 
+    @Transactional(readOnly = true)
     def show() {
         if (params.id) {
             def company = Company.get(params.id)
@@ -105,6 +107,7 @@ class CompanyController {
     /**
      * update company's general informations
      */
+    @Transactional
     def update() {
 
         def companyVO = [:]
@@ -157,6 +160,7 @@ class CompanyController {
     }
 
 
+    @Transactional(readOnly = true)
     def isNameNew() {
         def normalizedName = IperUtil.normalizeName(params['name'])
         def exist = Company.findByName(normalizedName)
@@ -167,6 +171,7 @@ class CompanyController {
         }
     }
 
+    @Transactional(readOnly = true)
     def isCodeNew() {
         def normalizedCode = IperUtil.normalizeName(params['code'])
         def exist = Company.findByCode(normalizedCode)
@@ -180,6 +185,7 @@ class CompanyController {
     /**
      * create new company
      */
+    @Transactional
     def save() {
         try {
             Company company = companyService.save(new Company(params['company']))
@@ -205,10 +211,12 @@ class CompanyController {
         }
     }
 
+    @Transactional
     def delete() {
         // TODO
     }
 
+    @Transactional
     def saveProperty(Long company_id, String name, String value) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -231,6 +239,7 @@ class CompanyController {
         }
     }
 
+    @Transactional
     def updateProperty(Long company_id, String name, String value) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -256,6 +265,7 @@ class CompanyController {
         }
     }
 
+    @Transactional
     def deleteProperty(Long id) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {

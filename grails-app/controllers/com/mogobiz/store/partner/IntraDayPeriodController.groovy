@@ -11,6 +11,7 @@ import com.mogobiz.store.domain.Product
 
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.json.RenderUtil
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -21,8 +22,9 @@ class IntraDayPeriodController {
 	AjaxResponseService ajaxResponseService
 	
 	def authenticationService
-	
-	def show = {
+
+	@Transactional(readOnly = true)
+	def show() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -45,8 +47,9 @@ class IntraDayPeriodController {
 			response.sendError 404
 		}
 	}
-	
-	def save = {
+
+	@Transactional
+	def save() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -88,8 +91,9 @@ class IntraDayPeriodController {
 			response.sendError 404
 		}
 	}
-	
-	def update = {
+
+	@Transactional
+	def update() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -131,8 +135,9 @@ class IntraDayPeriodController {
 			response.sendError 404
 		}
 	}
-	
-	def delete = {
+
+	@Transactional
+	def delete() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401

@@ -5,12 +5,14 @@ import com.mogobiz.store.domain.GoogleCategory
 import grails.converters.JSON
 import grails.converters.XML
 import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class GoogleCategoryController {
 
     AuthenticationService authenticationService
 
+    @Transactional(readOnly = true)
     def show(String parentPath) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {

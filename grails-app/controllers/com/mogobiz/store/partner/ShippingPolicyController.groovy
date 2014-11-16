@@ -9,6 +9,7 @@ import com.mogobiz.store.domain.Product;
 
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -20,7 +21,8 @@ class ShippingPolicyController {
 
 	def authenticationService
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -37,7 +39,8 @@ class ShippingPolicyController {
 		}
 	}
 
-	def save = {
+	@Transactional
+	def save() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -62,7 +65,8 @@ class ShippingPolicyController {
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -89,7 +93,8 @@ class ShippingPolicyController {
 		}
 	}
 
-	def delete = {
+	@Transactional
+	def delete() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -109,7 +114,8 @@ class ShippingPolicyController {
 		}
 	}
 
-	def bindProductToShippingPolicy = {
+	@Transactional
+	def bindProductToShippingPolicy() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -129,7 +135,8 @@ class ShippingPolicyController {
 		}
 	}
 
-	def unbindProductToShippingPolicy = {
+	@Transactional
+	def unbindProductToShippingPolicy() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401

@@ -6,6 +6,7 @@ package com.mogobiz.store.partner
 import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 
 import java.text.SimpleDateFormat
 
@@ -36,8 +37,9 @@ class ResourceController {
 	 * 
 	 */
 	static final int BUFFER_SIZE = 2048
-	
-	def display = {
+
+	@Transactional(readOnly = true)
+	def display() {
 		def id = params.id
 		def size = params.size
 		if(id != null){
@@ -81,9 +83,10 @@ class ResourceController {
 				}
 			}
 		}
-	}	
-	
-	def show = {
+	}
+
+	@Transactional(readOnly = true)
+	def show() {
 		
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -162,9 +165,10 @@ class ResourceController {
 	}
 	
 	/**
-	 * mise � jour d'une ressource
+	 * mise a jour d'une ressource
 	 */
-	def update = {
+	@Transactional
+	def update() {
 		def resourceMap = new HashMap()
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -187,7 +191,8 @@ class ResourceController {
 	/**
 	 * creation d'une nouvelle ressource
 	 */
-	def save = {
+	@Transactional
+	def save() {
 		
 		def resourceMap = new HashMap()
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
@@ -203,8 +208,9 @@ class ResourceController {
 		resource.company = seller.company
 		saveResource(params, resource, EventType.CREATE)
 	}
-	
-	def delete = {
+
+	@Transactional
+	def delete() {
 		def resourceMap = new HashMap()
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){

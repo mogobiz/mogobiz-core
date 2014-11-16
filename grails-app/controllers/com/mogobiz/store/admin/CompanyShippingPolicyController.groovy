@@ -5,6 +5,8 @@ import com.mogobiz.store.domain.Company
 import com.mogobiz.json.RenderUtil
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
+
 /**
  * 
  * @author stephane.manciot@ebiznext.com
@@ -14,7 +16,8 @@ class CompanyShippingPolicyController {
 
 	AjaxResponseService ajaxResponseService
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		def company = params['company']?.id?Company.get(params['company']?.id):null
 		if(company) {
 			def map = toShippingVO(company)
@@ -29,7 +32,8 @@ class CompanyShippingPolicyController {
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		def company = params['company']?.id?Company.get(params['company']?.id):null
 		if(company) {
             company.properties = params['company']

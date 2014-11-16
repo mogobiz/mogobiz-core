@@ -45,12 +45,15 @@ class IbeaconService {
                 return beaconInBase
             }
             else {
-                beaconInBase.delete()
+                beaconInBase.properties = cmd.properties
+                beaconInBase.company = seller.company
             }
         }
-        beaconInBase = new Ibeacon()
-        beaconInBase.properties = cmd.properties
-        beaconInBase.company = seller.company
+        else {
+            beaconInBase = new Ibeacon()
+            beaconInBase.properties = cmd.properties
+            beaconInBase.company = seller.company
+        }
 
         if (beaconInBase.validate()) {
 

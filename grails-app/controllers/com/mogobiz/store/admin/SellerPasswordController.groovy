@@ -9,6 +9,7 @@ import com.mogobiz.store.domain.User
 import com.mogobiz.utils.RandomPassword
 import com.mogobiz.utils.SymmetricCrypt
 import grails.plugin.mail.MailService
+import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha256Hash
@@ -34,6 +35,7 @@ class SellerPasswordController {
      * @param id
      * @return
      */
+    @Transactional
     def resetPassword(long id) {
         Seller seller = Seller.get(id)
         String targetUri = grailsApplication.config.grails.serverURL
@@ -69,6 +71,7 @@ class SellerPasswordController {
      * @param email
      * @return
      */
+    @Transactional(readOnly = true)
     def resendPassword(String email) {
         User account = User.findByEmail(email)
         if (account) {
@@ -85,6 +88,7 @@ class SellerPasswordController {
         return ["login": email, "targetUri": targetUri]
     }
 
+    @Transactional
     def resendPasswordConfirmation(String resendEmail, String resendKey) {
         String clearText = SymmetricCrypt.decrypt(resendKey, Holders.config.application.secret as String, "AES")
         String[] clearData = clearText.split(';')

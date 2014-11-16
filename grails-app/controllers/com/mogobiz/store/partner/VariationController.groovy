@@ -10,12 +10,14 @@ import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
+import grails.transaction.Transactional
 
 class VariationController {
     AuthenticationService authenticationService
 	AjaxResponseService ajaxResponseService
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		Category category = params['category']?.id?Category.get(params['category']?.id):null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		boolean isAdmin = authenticationService.isAdministrator()
@@ -42,6 +44,9 @@ class VariationController {
 			response.sendError 404
 		}
 	}
+
+
+	@Transactional
 	def updatePosition() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -74,7 +79,8 @@ class VariationController {
 		}
 	}
 
-	def save = {
+	@Transactional
+	def save() {
 		Category category = params['category']?.id?Category.get(params['category']?.id):null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		boolean isAdmin = authenticationService.isAdministrator()
@@ -131,7 +137,8 @@ class VariationController {
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		boolean isAdmin = authenticationService.isAdministrator()
@@ -167,11 +174,10 @@ class VariationController {
 		}
 	}
 
-	def delete = {
-		def categoryIdddd = params['category']?.id
+	@Transactional
+	def delete() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-		def isAdmin = authenticationService.isAdministrator()
 		seller.company;
 		category.company
 		if (seller?(seller.company!=category.company):!authenticationService.isAdministrator()) {
@@ -191,7 +197,8 @@ class VariationController {
 		}
 	}
 
-	def addVariationValue = {
+	@Transactional
+	def addVariationValue() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		boolean isAdmin = authenticationService.isAdministrator()
@@ -231,7 +238,8 @@ class VariationController {
 		}
 	}
 
-	def removeVariationValue = {
+	@Transactional
+	def removeVariationValue() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		boolean isAdmin = authenticationService.isAdministrator()
@@ -266,7 +274,8 @@ class VariationController {
 		}
 	}
 
-	def updateVariationValue = {
+	@Transactional
+	def updateVariationValue() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		boolean isAdmin = authenticationService.isAdministrator()

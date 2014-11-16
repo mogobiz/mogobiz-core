@@ -13,6 +13,7 @@ import com.mogobiz.service.ResService
 import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
 import grails.converters.JSON
+import grails.transaction.Transactional
 
 import static com.mogobiz.constant.IperConstant.QUEUE_NS
 import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
@@ -30,7 +31,8 @@ class UploadController {
     ResService resService
     AuthenticationService authenticationService
 
-    def retrievePictures = {
+    @Transactional(readOnly = true)
+    def retrievePictures() {
         def pictures = []
         Album album = params['album']?.id ? Album.get(params['album']?.id) : null
         List<Resource> dftPictures
@@ -56,7 +58,8 @@ class UploadController {
         }
     }
 
-    def retrieveAlbums = {
+    @Transactional(readOnly = true)
+    def retrieveAlbums() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         def company = seller?.company
         def albums = []
@@ -64,7 +67,7 @@ class UploadController {
         switch (resourceAccountType) {
             case ResourceAccountType.FACEBOOK:
                 // on recherche le compte externe
-                def externalAccount = retrieveExternalAccount(seller?.id, AccountType.FACEBOOK)
+                def externalAccount = ExternalAccount.findByUserAndAccountType(seller, AccountType.FACEBOOK)
                 if (externalAccount) {
                     FBClient client = new FBClient(externalAccount.token)
                     def fbAlbums = client.fetchAlbums(0, 0)
@@ -137,7 +140,8 @@ class UploadController {
         }
     }
 
-    def retrieveExternalAccounts = {
+    @Transactional(readOnly = true)
+    def retrieveExternalAccounts() {
         def accountTypes = [AccountType.STANDARD]
         User user = authenticationService.retrieveAuthenticatedUser()
         List<ExternalAccount> externalAccounts = ExternalAccount.findAllByUser(user)
@@ -152,7 +156,8 @@ class UploadController {
         }
     }
 
-    def uploadResources = {
+    @Transactional
+    def uploadResources () {
         def files = request.getFileMap()
         def resources = []
         if (files) {

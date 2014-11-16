@@ -11,6 +11,7 @@ import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.utils.ImageUtil
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -21,8 +22,9 @@ class ProductResourceController {
 	def authenticationService
 	
 	def grailsUrlMappingsHolder
-	
-	def retrieveProductResources = {
+
+	@Transactional(readOnly = true)
+	def retrieveProductResources() {
 		def resources = []
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -52,8 +54,9 @@ class ProductResourceController {
 			json{ render resources as JSON }
 		}
 	}
-	
-	def bindResourcesToProduct = {
+
+	@Transactional
+	def bindResourcesToProduct() {
 		def resources = []
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -89,8 +92,9 @@ class ProductResourceController {
 			json{ render resources as JSON }
 		}
 	}
-	
-	def updateResourceToProduct = {
+
+	@Transactional
+	def updateResourceToProduct() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -116,9 +120,10 @@ class ProductResourceController {
 		withFormat {
 			json{ render product2Resource as JSON }
 		}
-	}	
+	}
 
-	def unbindResourceToProduct = {
+	@Transactional
+	def unbindResourceToProduct() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401

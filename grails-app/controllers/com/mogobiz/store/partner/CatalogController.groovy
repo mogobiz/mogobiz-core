@@ -2,7 +2,6 @@ package com.mogobiz.store.partner
 
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.elasticsearch.client.ESClient
 import grails.converters.JSON
 import grails.converters.XML
@@ -10,6 +9,7 @@ import grails.converters.XML
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Seller
+import grails.transaction.Transactional
 
 class CatalogController {
 
@@ -17,7 +17,8 @@ class CatalogController {
 
     static client = ESClient.instance
 
-    def show = {
+    @Transactional(readOnly = true)
+    def show() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         Long id = params['catalog']?.id?.toLong()
         if(id != null){
@@ -43,7 +44,8 @@ class CatalogController {
         }
     }
 
-    def save = {
+    @Transactional
+    def save() {
         def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(!seller){
             response.sendError 401
@@ -80,7 +82,8 @@ class CatalogController {
         }
     }
 
-    def update = {
+    @Transactional
+    def update() {
         def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(!seller){
             response.sendError 401
@@ -101,7 +104,8 @@ class CatalogController {
         }
     }
 
-    def delete = {
+    @Transactional
+    def delete() {
         def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(!seller){
             response.sendError 401
@@ -124,7 +128,9 @@ class CatalogController {
             json { render [:] as JSON }
         }
     }
-    def markDeleted = {
+
+    @Transactional
+    def markDeleted() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         Long id = params['catalog']?.id?.toLong()
         if (id != null) {

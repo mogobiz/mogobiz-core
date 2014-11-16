@@ -9,6 +9,7 @@ import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Feature
 import com.mogobiz.store.domain.Product
+import grails.transaction.Transactional
 
 /**
  * Controller utilisé pour gérer les produits
@@ -20,6 +21,7 @@ class FeatureController {
 	AuthenticationService authenticationService
 	FeatureService featureService
 
+	@Transactional(readOnly = true)
 	def show() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -52,6 +54,7 @@ class FeatureController {
 		}
 	}
 
+	@Transactional
 	def updatePosition() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -104,6 +107,7 @@ class FeatureController {
 		}
 	}
 
+	@Transactional
 	def save() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -168,6 +172,7 @@ class FeatureController {
 		}
 	}
 
+	@Transactional
 	def update() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
@@ -213,6 +218,7 @@ class FeatureController {
 		}
 	}
 
+	@Transactional
 	def delete() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){

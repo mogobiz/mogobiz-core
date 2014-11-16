@@ -5,7 +5,7 @@ package com.mogobiz.geolocation.partner
 
 import grails.converters.JSON
 import grails.converters.XML
-
+import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 
 import com.mogobiz.store.domain.Product
@@ -25,12 +25,12 @@ class PoiController {
 	AjaxResponseService ajaxResponseService
 	AuthenticationService authenticationService
 
-	def listPOITypes = {
+	def listPOITypes() {
 		def dirList = []
 		
 		File poiFile = new File(ServletContextHolder.servletContext.getRealPath("/images/markers"))
 		poiFile.eachFile {
-			if (it.isDirectory() && it.getName() != ".svn") {
+			if (it.isDirectory()) {
 				dirList.add(it.getName())
 			}
 		}
@@ -38,7 +38,8 @@ class PoiController {
 			json { render dirList as JSON }
 		}
 	}
-	def listPOIPictures = {
+
+	def listPOIPictures() {
 		def pngList = []
 		File poiFile = new File(ServletContextHolder.servletContext.getRealPath("/images/markers"), params.pictureType)
 		poiFile.eachFile {
@@ -51,7 +52,8 @@ class PoiController {
 		}
 	}
 
-	def save = {
+	@Transactional
+	def save() {
 		def poi = IperUtil.saveOrUpdatePoi (params)
 		def map = poi.asMapForJSON()
 		withFormat {
@@ -70,7 +72,8 @@ class PoiController {
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		def poi = IperUtil.saveOrUpdatePoi (params)
 		def map = poi.asMapForJSON()
 		withFormat {
@@ -89,7 +92,8 @@ class PoiController {
 		}
 	}
 
-	def delete = {
+	@Transactional
+	def delete() {
 		def id = params.id
 		if(id){
 			def poi = Poi.get(id)
@@ -112,7 +116,8 @@ class PoiController {
 		}
 	}
 
-	def show = {
+	@Transactional(readOnly = true)
+	def show() {
 		def id = params.id
 		def productId = params["product.id"]
 		if(id != null){

@@ -5,6 +5,7 @@ import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 
 /**
  * Controller utilisé pour gérer les categories 
@@ -13,7 +14,8 @@ class CategoryController {
     AuthenticationService authenticationService
     SanitizeUrlService sanitizeUrlService
 
-    def show = {
+    @Transactional(readOnly = true)
+    def show() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         Long catalogId = params['catalog']?.id?.toLong()
         def allCategories = params['allCategories']
@@ -74,7 +76,8 @@ class CategoryController {
         }
     }
 
-    def save = {
+    @Transactional
+    def save() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -138,7 +141,8 @@ class CategoryController {
         }
     }
 
-    def update = {
+    @Transactional
+    def update() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -199,7 +203,8 @@ class CategoryController {
         }
     }
 
-    def delete = {
+    @Transactional
+    def delete() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -226,7 +231,8 @@ class CategoryController {
         }
     }
 
-    def markDeleted = {
+    @Transactional
+    def markDeleted() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         Long id = params['category']?.id?.toLong()
         if (id != null) {

@@ -6,11 +6,13 @@ import com.mogobiz.store.domain.GoogleVariationValue
 import grails.converters.JSON
 import grails.converters.XML
 import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 
 class GoogleVariationController {
 
     AuthenticationService authenticationService
 
+    @Transactional(readOnly = true)
     def show(String type) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {

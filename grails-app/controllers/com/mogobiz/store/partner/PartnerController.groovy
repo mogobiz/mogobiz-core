@@ -5,6 +5,7 @@ package com.mogobiz.store.partner
 
 import com.mogobiz.authentication.AuthenticationService
 import grails.plugin.mail.MailService
+import grails.transaction.Transactional
 
 import java.util.Map;
 import grails.util.Environment
@@ -26,7 +27,8 @@ class PartnerController {
 	def grailsApplication
 	def index = {	}
 
-	def settings = {
+	@Transactional(readOnly = true)
+	def settings() {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -40,7 +42,8 @@ class PartnerController {
 		}
 	}
 
-	def addExternalAccount = {
+	@Transactional
+	def addExternalAccount() {
 		def status = params.status?params.status:'error'
 		switch (status) {
 			case 'error':
@@ -80,13 +83,13 @@ class PartnerController {
 		}
 	}
 
-	def addFacebookExternalAccount = {
+	def addFacebookExternalAccount() {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/partner/addExternalAccount'
 		def externalAuthPath = grailsApplication.config.external.authPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 	
-	def addGoogleExternalAccount = {
+	def addGoogleExternalAccount() {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/partner/addExternalAccount'
 		def externalAuthPath = grailsApplication.config.external.authPath + '/google/hybrid?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)

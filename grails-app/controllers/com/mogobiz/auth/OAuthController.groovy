@@ -2,6 +2,7 @@ package com.mogobiz.auth
 
 import com.mogobiz.store.domain.Token
 import com.mogobiz.store.domain.User
+import grails.transaction.Transactional
 import org.apache.oltu.oauth2.as.issuer.MD5Generator
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl
@@ -24,6 +25,7 @@ class OAuthController {
 
 	def authenticationService
 
+	@Transactional
 	def authorize() {
 		try {
 			String redirectURI = request.getParameter(OAuth.OAUTH_REDIRECT_URI)
@@ -171,6 +173,7 @@ class OAuthController {
 		}
 	}
 
+	@Transactional
 	def token() {
 		OAuthTokenRequest oauthRequest
 

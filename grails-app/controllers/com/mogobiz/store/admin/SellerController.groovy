@@ -9,6 +9,7 @@ import com.mogobiz.store.domain.UserProperty
 import com.mogobiz.utils.RandomPassword
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha256Hash
 
@@ -18,6 +19,7 @@ class SellerController {
 
     SellerService sellerService
 
+    @Transactional
     def addCompany() {
         if (!authenticationService.canAdminAllStores()) {
             redirect(controller: 'auth', action: 'unauthorized')
@@ -35,6 +37,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def removeCompany() {
         if (!authenticationService.canAdminAllStores()) {
             redirect(controller: 'auth', action: 'unauthorized')
@@ -52,6 +55,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def setActiveCompany() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -72,6 +76,7 @@ class SellerController {
         }
     }
 
+    @Transactional(readOnly = true)
     def existEmail(String email) {
         Seller seller = Seller.findByEmail(email)
         withFormat {
@@ -79,6 +84,7 @@ class SellerController {
         }
     }
 
+    @Transactional(readOnly = true)
     def show() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null && !authenticationService.canAdminAllStores()) {
@@ -124,6 +130,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def update() {
         def seller = params['seller']?.id ? Seller.get(params['seller']?.id) : null
 
@@ -152,6 +159,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def save() {
         def seller = new Seller(params['seller'])
 
@@ -181,6 +189,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def delete() {
     }
 
@@ -188,6 +197,7 @@ class SellerController {
 
     }
 
+    @Transactional
     def isEmailNew() {
         def email = params['email']
         def exist = Seller.findByLogin(email)
@@ -198,6 +208,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def saveProperty(Long seller_id, String name, String value) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -222,6 +233,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def updateProperty(Long seller_id, String name, String value) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -248,6 +260,7 @@ class SellerController {
         }
     }
 
+    @Transactional
     def deleteProperty(Long id) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {

@@ -3,6 +3,8 @@ package com.mogobiz.geolocation.partner
 import com.mogobiz.geolocation.domain.PoiType
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
+
 import java.util.HashMap
 
 /**
@@ -13,6 +15,7 @@ import java.util.HashMap
  */
 class PoiTypeController {
 
+	@Transactional(readOnly = true)
 	def show(Long id) {
 		if(id != null){
 			def poiType = PoiType.get(id)

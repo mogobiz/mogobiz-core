@@ -12,6 +12,7 @@ import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.service.CouponService
 import grails.converters.JSON
 import grails.orm.PagedResultList
+import grails.transaction.Transactional
 import org.springframework.web.servlet.support.RequestContextUtils
 
 import javax.servlet.http.HttpServletResponse
@@ -22,6 +23,7 @@ class CouponController {
     AjaxResponseService ajaxResponseService
     AuthenticationService authenticationService
 
+    @Transactional(readOnly = true)
     def list(CouponListCommand cmd) {
         Seller seller = authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -33,6 +35,7 @@ class CouponController {
         }
     }
 
+    @Transactional
     def create(CouponCreateUpdateCommand cmd) {
         Seller seller = authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -50,6 +53,7 @@ class CouponController {
         }
     }
 
+    @Transactional
     def update(CouponCreateUpdateCommand cmd) {
         Seller seller = authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {

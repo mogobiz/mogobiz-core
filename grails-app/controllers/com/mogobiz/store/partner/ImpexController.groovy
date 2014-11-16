@@ -8,6 +8,7 @@ import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import grails.converters.JSON
+import grails.transaction.Transactional
 
 import java.util.zip.ZipFile
 
@@ -18,9 +19,11 @@ class ImpexController {
     AuthenticationService authenticationService
     ImportService importService
 
+    @Transactional
     def purge() {
         try {
-            int count = catalogService.purge(31063L)
+            long catalogId = params.long(["catalog.id"])
+            int count = catalogService.purge(catalogId)
             render "$count"
         }
         catch (Exception e) {
@@ -28,6 +31,7 @@ class ImpexController {
         }
     }
 
+    @Transactional(readOnly = true)
     def export() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
@@ -48,6 +52,7 @@ class ImpexController {
         zipFile.delete()
     }
 
+    @Transactional
     def ximport() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {

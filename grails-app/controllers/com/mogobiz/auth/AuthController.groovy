@@ -7,6 +7,7 @@ import com.megatome.grails.RecaptchaService
 import com.mogobiz.service.CompanyService
 import com.mogobiz.service.SellerService
 import com.mogobiz.store.domain.Company
+import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
@@ -26,7 +27,8 @@ class AuthController {
     SellerService sellerService
 
     // sign up	Company
-    def signUpCompany = {
+    @Transactional
+    def signUpCompany() {
         // recaptcha check
         boolean ok = true
         if (!recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)) {
@@ -49,7 +51,8 @@ class AuthController {
     }
 
     // sign in
-    def signIn = {
+    @Transactional
+    def signIn() {
         if (params.data) {
             try {
                 sellerService.autoSignIn(params.data)
@@ -116,7 +119,7 @@ class AuthController {
     }
 
 // sign out
-    def signOut = {
+    def signOut() {
         // Log the user out of the application.
         SecurityUtils.subject?.logout()
         // Redirect to the home page.
@@ -124,11 +127,11 @@ class AuthController {
     }
 
 // Just show the "unauthorized.gsp" view.
-    def unauthorized = {
+    def unauthorized() {
     }
 
 // prepare login view for redirection.
-    def login = {
+    def login() {
         SavedRequest sRequest = WebUtils.getSavedRequest(request)
         if (sRequest) {
             String uri = sRequest.getRequestURI()

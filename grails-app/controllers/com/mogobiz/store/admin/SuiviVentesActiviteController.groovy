@@ -2,13 +2,15 @@ package com.mogobiz.store.admin
 
 import com.mogobiz.store.domain.BOCartItem;
 import com.mogobiz.store.domain.Seller;
-import com.mogobiz.utils.DateUtilitaire;
+import com.mogobiz.utils.DateUtilitaire
+import grails.transaction.Transactional;
 
 class SuiviVentesActiviteController {
 
 	def authenticationService
-	
-    def index() { 
+
+	@Transactional(readOnly = true)
+    def index() {
 		response.contentType = "text/csv";
 				
 		def Seller seller = authenticationService.retrieveAuthenticatedSeller()

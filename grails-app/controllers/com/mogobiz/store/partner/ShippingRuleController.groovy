@@ -10,6 +10,7 @@ import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.ShippingRule
 import grails.converters.JSON
 import grails.orm.PagedResultList
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpServletResponse
 
@@ -18,6 +19,7 @@ class ShippingRuleController {
     ShippingRuleService shippingRuleService
     AjaxResponseService ajaxResponseService
 
+    @Transactional(readOnly = true)
     def list(PagedListCommand cmd) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -35,6 +37,7 @@ class ShippingRuleController {
         }
     }
 
+    @Transactional
     def save(ShippingRuleCommand cmd) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -53,6 +56,7 @@ class ShippingRuleController {
         }
     }
 
+    @Transactional
     def delete(Long id) {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {

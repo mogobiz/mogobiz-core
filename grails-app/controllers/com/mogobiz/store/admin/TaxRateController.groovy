@@ -2,6 +2,7 @@ package com.mogobiz.store.admin
 
 import com.mogobiz.service.TaxRateService
 import grails.converters.JSON
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,7 +23,8 @@ class TaxRateController {
 	 * List all TaxRate for the company of the admin
 	 * @return
 	 */
-    def listTaxRate() { 
+	@Transactional(readOnly = true)
+    def listTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
 		if (admin == null || company == null) {
@@ -42,6 +44,7 @@ class TaxRateController {
 	 * Create a TaxRate for the company of the admin
 	 * @return
 	 */
+	@Transactional
 	def createTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
@@ -64,6 +67,7 @@ class TaxRateController {
 	 * Update the given TaxRate for the company of the admin
 	 * @return
 	 */
+	@Transactional
 	def updateTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
@@ -87,6 +91,7 @@ class TaxRateController {
 	 * Delete the given TaxRate for the company of the admin
 	 * @return
 	 */
+	@Transactional
 	def deleteTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
@@ -109,6 +114,7 @@ class TaxRateController {
 	 * List all LocalTaxRate for the given TaxRate for the company of the admin
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	def listLocalTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
@@ -135,6 +141,7 @@ class TaxRateController {
 	 * Create a LocalTaxRate for the given TaxRate for the given company
 	 * @return
 	 */
+	@Transactional
 	def createLocalTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
@@ -160,6 +167,7 @@ class TaxRateController {
 	 * Update a LocalTaxRate for the given TaxRate for the given company
 	 * @return
 	 */
+	@Transactional
 	def updateLocalTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);
@@ -184,6 +192,7 @@ class TaxRateController {
 	 * Delete a LocalTaxRate for the given TaxRate for the given company
 	 * @return
 	 */
+	@Transactional
 	def deleteLocalTaxRate() {
 		User admin = request.admin ? request.admin : authenticationService.retrieveAuthenticatedUser()
 		Company company = getCompanyFromUserOrParam(admin);

@@ -3,7 +3,7 @@ package com.mogobiz.store.admin
 import com.mogobiz.ajax.AjaxResponseService
 import grails.converters.JSON
 import grails.converters.XML
-
+import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
 
 import com.mogobiz.store.domain.TaxRate
@@ -16,8 +16,12 @@ import com.mogobiz.store.domain.TaxRate
 class CompanyTaxPolicyController {
 
 	AjaxResponseService ajaxResponseService
+
 	def initTaxRateDialogPage() {}
-	def show = {
+
+
+	@Transactional(readOnly = true)
+	def show(){
 		def taxRate = params.id?TaxRate.get(params.id):null
 		def companyId = params['company']?.id
 		if(taxRate){
@@ -46,7 +50,8 @@ class CompanyTaxPolicyController {
 		}
 	}
 
-	def save = {
+	@Transactional
+	def save() {
 		def taxRate = new TaxRate(params['taxRate'])
 		if(taxRate.validate()){
 			taxRate.save()
@@ -58,7 +63,8 @@ class CompanyTaxPolicyController {
 		}
 	}
 
-	def update = {
+	@Transactional
+	def update() {
 		def taxRate = params['taxRate']?.id?TaxRate.get(params['taxRate']?.id):null
 
 		if(taxRate){
@@ -84,7 +90,8 @@ class CompanyTaxPolicyController {
 		}
 	}
 
-	def delete = {
+	@Transactional
+	def delete() {
 		def taxRate = params['taxRate']?.id?TaxRate.get(params['taxRate']?.id):null
 
 		if(taxRate){

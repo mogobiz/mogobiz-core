@@ -14,6 +14,7 @@ import com.mogobiz.store.domain.ExternalAuthLogin
 import com.mogobiz.facebook.FBClient
 import com.restfb.exception.FacebookException
 import com.restfb.types.User
+import grails.transaction.Transactional
 
 /**
  * @version $Id $
@@ -30,7 +31,8 @@ class ExternalAuthController {
 /*
  * Authentification au sein d'iper 2010 via OAuth
  */
-	def signIn = {
+	@Transactional
+	def signIn() {
 		def status = params.status?params.status:'error'
 		switch (status) {
 			case 'error':
@@ -81,7 +83,8 @@ class ExternalAuthController {
 	/*
 	 * Creation de store sans nommage par l'utilisateur (garageSale)
 	 */
-	def externalSignIn = {
+	@Transactional
+	def externalSignIn() {
 		def status = params.status?params.status:'error'
 		def targetUri = params.targetUri
 		switch (status) {
@@ -112,31 +115,31 @@ class ExternalAuthController {
 		}
 	}
 
-    def facebook = {
+    def facebook() {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
 		def externalAuthPath = grailsApplication.config.external.authPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 
-	def google = {
+	def google() {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
 		def externalAuthPath = grailsApplication.config.external.authPath + '/google/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
 
-    def idn = {
+    def idn() {
         def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
         def externalAuthPath = grailsApplication.config.external.authPath + '/idn/authstart?returnURI=' + returnURI.encodeAsURL()
         redirect(url:externalAuthPath)
     }
 
-    def twitter = {
+    def twitter() {
         def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/externalAuth/signIn?targetUri=' + params.targetUri
         def externalAuthPath = grailsApplication.config.external.authPath + '/twitter/authstart?returnURI=' + returnURI.encodeAsURL()
         redirect(url:externalAuthPath)
     }
 
-    def checkToken = {
+    def checkToken() {
 		String token = params.accessToken
 		FBClient fbClient = new FBClient(token)
 		User user = null
@@ -164,7 +167,7 @@ class ExternalAuthController {
 	}
 
     // add google access token to company
-    def googleShopping = {
+    def googleShopping() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -181,7 +184,7 @@ class ExternalAuthController {
         redirect(url:externalAuthPath)
     }
 
-    def googleShoppingToken = {
+    def googleShoppingToken() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401

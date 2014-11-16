@@ -3,17 +3,19 @@ package com.mogobiz.facebook
 import grails.converters.JSON;
 
 import com.mogobiz.store.domain.Product
+import grails.transaction.Transactional
 
 class FBCreditController
 {
 
-	def callback = {
+	@Transactional(readOnly = true)
+	def callback() {
 		//TODO faire le controlle de la signature
 		
 		String method = params["method"];
 		if (method == "payments_get_items")
 		{
-			// pr�paration de la fenetre de confirmation
+			// preparation de la fenetre de confirmation
 			String idProduit = params["order_info"];
 			
 			Product p = Product.get(idProduit);

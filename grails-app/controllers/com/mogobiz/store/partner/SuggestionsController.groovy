@@ -5,7 +5,7 @@ package com.mogobiz.store.partner
 
 
 import grails.converters.JSON
-
+import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
 
 import com.mogobiz.store.domain.Company
@@ -23,7 +23,8 @@ class SuggestionsController {
 
 	def authenticationService
 
-	def retrieveProductSuggestions = {
+	@Transactional(readOnly = true)
+	def retrieveProductSuggestions() {
 		def suggestions = []
 		def product = params['product']?.id?Product.get(params['product']?.id):null
 		def authorized = canAccessProduct(product)
@@ -42,7 +43,8 @@ class SuggestionsController {
 		}
 	}
 
-	def bindSuggestionsToProduct = {
+	@Transactional
+	def bindSuggestionsToProduct() {
 		def suggestions = []
 		def admin = authenticationService.canAdminAllStores()
 		def product = params['product']?.id?Product.get(params['product']?.id):null
@@ -84,7 +86,8 @@ class SuggestionsController {
 		}
 	}
 
-	def listProductsForSuggestions = {
+	@Transactional(readOnly = true)
+	def listProductsForSuggestions() {
 		def products = []
 		Company company = params['company']?.id?Company.get(params['company']?.id):null
 		if(!authenticationService.canAdminAllStores()){
@@ -108,7 +111,8 @@ class SuggestionsController {
 		}
 	}
 
-	def listCompaniesForSuggestions = {
+	@Transactional(readOnly = true)
+	def listCompaniesForSuggestions() {
 		def companies = []
 		if(!authenticationService.canAdminAllStores()){
 			def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()

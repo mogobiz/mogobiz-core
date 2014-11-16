@@ -7,6 +7,7 @@ import com.mogobiz.store.domain.Ibeacon
 import com.mogobiz.store.domain.Seller
 import grails.converters.JSON
 import grails.orm.PagedResultList
+import grails.transaction.Transactional
 
 import javax.servlet.http.HttpServletResponse
 
@@ -16,6 +17,7 @@ class IbeaconController {
     def ibeaconService
     AjaxResponseService ajaxResponseService
 
+    @Transactional(readOnly = true)
     def list(PagedListCommand cmd) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(seller == null){
@@ -33,6 +35,7 @@ class IbeaconController {
         }
     }
 
+    @Transactional
     def save(IBeaconCommand cmd) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(seller == null){
@@ -51,6 +54,7 @@ class IbeaconController {
         }
     }
 
+    @Transactional
     def delete(Long id) {
         Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
         if(seller == null){

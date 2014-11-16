@@ -4,12 +4,15 @@ import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.authentication.AuthenticationService
 import grails.converters.JSON
 import grails.converters.XML
-import grails.plugin.cache.CacheEvict
+import grails.transaction.Transactional
 
 class EsEnvController {
 
     AuthenticationService authenticationService
-    def show = {
+
+
+    @Transactional(readOnly = true)
+    def show() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -39,7 +42,7 @@ class EsEnvController {
         }
     }
 
-    @CacheEvict(value='globalCache', allEntries=true)
+    @Transactional
     def save() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
@@ -62,7 +65,7 @@ class EsEnvController {
         }
     }
 
-    @CacheEvict(value='globalCache', allEntries=true)
+    @Transactional
     def update() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
@@ -87,7 +90,7 @@ class EsEnvController {
         }
     }
 
-    @CacheEvict(value='globalCache', allEntries=true)
+    @Transactional
     def delete() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {

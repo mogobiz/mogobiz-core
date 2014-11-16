@@ -12,6 +12,7 @@ import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Seller
 import grails.converters.JSON
 import grails.converters.XML
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -25,7 +26,8 @@ class BrandController {
 
     static final int BUFFER_SIZE = 2048
 
-    def show = {
+    @Transactional(readOnly = true)
+    def show() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -58,7 +60,8 @@ class BrandController {
         }
     }
 
-    def save = {
+    @Transactional
+    def save() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -87,7 +90,8 @@ class BrandController {
         }
     }
 
-    def update = {
+    @Transactional
+    def update() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -118,7 +122,8 @@ class BrandController {
         }
     }
 
-    def delete = {
+    @Transactional
+    def delete() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -138,7 +143,8 @@ class BrandController {
         }
     }
 
-    def bindProductToBrand = {
+    @Transactional
+    def bindProductToBrand() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -158,7 +164,8 @@ class BrandController {
         }
     }
 
-    def unbindProductToBrand = {
+    @Transactional
+    def unbindProductToBrand() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -177,7 +184,8 @@ class BrandController {
         }
     }
 
-    def removeLogo = {
+    @Transactional
+    def removeLogo() {
         long brandId = params.long("brand.id")
         Seller user = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!user) {
@@ -195,7 +203,8 @@ class BrandController {
         render "true"
     }
 
-    def uploadLogo = {
+    @Transactional
+    def uploadLogo() {
         Seller user = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!user) {
             user = authenticationService.retrieveAuthenticatedUser()
@@ -229,7 +238,8 @@ class BrandController {
     }
 
 
-    def displayLogo = {
+    @Transactional(readOnly = true)
+    def displayLogo() {
         Seller user = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         long brandId = params.long("brand.id")
         if (!user) {
@@ -259,7 +269,8 @@ class BrandController {
         }
     }
 
-    def hasLogo = {
+    @Transactional(readOnly = true)
+    def hasLogo() {
         Seller user = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         long brandId = params.long("brand.id")
         if (!user) {
@@ -282,6 +293,7 @@ class BrandController {
         }
     }
 
+    @Transactional
     def saveProperty(Long brand_id, String name, String value) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -306,6 +318,7 @@ class BrandController {
         }
     }
 
+    @Transactional
     def updateProperty(Long brand_id, String name, String value) {
         Brand brand = Brand.get(brand_id)
         BrandProperty property = BrandProperty.findByBrandAndName(brand, name)
@@ -319,6 +332,7 @@ class BrandController {
         }
     }
 
+    @Transactional
     def deleteProperty(Long id) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {

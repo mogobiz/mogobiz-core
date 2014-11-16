@@ -1,5 +1,7 @@
 package com.mogobiz.store.partner
 
+import grails.transaction.Transactional
+
 import javax.servlet.http.HttpServletResponse
 
 import com.mogobiz.store.domain.Company
@@ -7,7 +9,8 @@ import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Resource
 
 class SanitizedUrlController {
-	void getProduct(String companyCode, String sanitizedUrl) {
+	@Transactional(readOnly = true)
+	def getProduct(String companyCode, String sanitizedUrl) {
 		Product product = Product.findBySanitizedName(sanitizedUrl)
 		Company company = Company.findByCode(companyCode)
 		if (product && company) {
@@ -17,7 +20,9 @@ class SanitizedUrlController {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		}
 	}
-	void getResource(String companyCode, String sanitizedUrl) {
+
+	@Transactional(readOnly = true)
+	def getResource(String companyCode, String sanitizedUrl) {
 		Resource resource = Resource.findBySanitizedName(sanitizedUrl)
 		Company company = Company.findByCode(companyCode)
 		if (resource && company) {

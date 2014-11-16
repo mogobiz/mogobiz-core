@@ -11,6 +11,7 @@ import com.mogobiz.utils.Page
 import grails.converters.JSON
 import grails.converters.XML
 import grails.plugin.mail.MailService
+import grails.transaction.Transactional
 
 import java.text.DateFormat
 import java.text.ParseException
@@ -33,6 +34,7 @@ class ProductController {
     SimpleDateFormat sdf = new SimpleDateFormat(IperConstant.DATE_FORMAT)
     SimpleDateFormat sdfWithoutHour = new SimpleDateFormat(IperConstant.DATE_FORMAT_WITHOUT_HOUR)
 
+    @Transactional(readOnly = true)
     def existCode() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -48,6 +50,7 @@ class ProductController {
     }
 
 
+    @Transactional(readOnly = true)
     def list() {
         List<Product> ps = productService.list()
         ps.each { Product p ->
@@ -55,6 +58,7 @@ class ProductController {
         }
     }
 
+    @Transactional(readOnly = true)
     def show() {
 
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
@@ -138,6 +142,7 @@ class ProductController {
         }
     }
 
+    @Transactional
     def save() {
 
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
@@ -152,6 +157,7 @@ class ProductController {
         saveProduct(product, params, seller, EventType.CREATE)
     }
 
+    @Transactional
     def update() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -179,6 +185,7 @@ class ProductController {
      *
      */
 
+    @Transactional(readOnly = true)
     def getTagsByCompany() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -203,6 +210,7 @@ class ProductController {
         }
     }
 
+    @Transactional(readOnly = true)
     def getTagsByProduct() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -224,6 +232,7 @@ class ProductController {
     /**add product tags
      *
      */
+    @Transactional
     def addTag() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -254,6 +263,7 @@ class ProductController {
     /**add product tags
      *
      */
+    @Transactional
     def removeTag() {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -337,6 +347,7 @@ class ProductController {
         }
     }
 
+    @Transactional
     def deleteProperty(Long id) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
@@ -352,6 +363,8 @@ class ProductController {
             response.sendError 404
         }
     }
+
+    @Transactional
     def markDeleted(long id) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {

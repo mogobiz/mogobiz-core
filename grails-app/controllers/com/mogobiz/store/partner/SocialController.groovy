@@ -6,12 +6,14 @@ import grails.converters.XML
 import com.mogobiz.store.domain.ExternalAccount
 import com.mogobiz.store.domain.ExternalAuthLogin
 import com.mogobiz.store.domain.User
+import grails.transaction.Transactional
 
 public class SocialController {
 	def authenticationService
 	def grailsApplication
-	
-	def index = {
+
+	@Transactional(readOnly = true)
+	def index() {
 		User seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -28,7 +30,9 @@ public class SocialController {
 			json { render result as JSON }
 		}
 	}
-	def socialOff = {
+
+	@Transactional
+	def socialOff() {
 		User seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(!seller){
 			response.sendError 401
@@ -42,18 +46,18 @@ public class SocialController {
 		chain(action:"index")
 	}
 	
-	def facebook = {
+	def facebook() {
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/social/addExternalAccount'
 		def externalAuthPath = grailsApplication.config.external.authPath + '/facebook/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
-	def twitter = {
+	def twitter() {
 		User seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/social/addExternalAccount'
 		def externalAuthPath = grailsApplication.config.external.authPath + '/twitter/authstart?returnURI=' + returnURI.encodeAsURL()
 		redirect(url:externalAuthPath)
 	}
-	def google = {
+	def google() {
 		User seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		def returnURI = 'http' + (request.secure?'s':'') + '://' + request.serverName + ':' + request.serverPort + request.contextPath + '/social/addExternalAccount'
 		def externalAuthPath = grailsApplication.config.external.authPath + '/google/hybrid?returnURI=' + returnURI.encodeAsURL()
@@ -61,7 +65,8 @@ public class SocialController {
 	}
 	def error = {
 	}
-	def addExternalAccount = {
+	@Transactional
+	def addExternalAccount () {
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401

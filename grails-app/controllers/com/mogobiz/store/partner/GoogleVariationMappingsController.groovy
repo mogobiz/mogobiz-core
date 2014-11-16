@@ -11,11 +11,13 @@ import com.mogobiz.store.domain.VariationValue
 import grails.converters.JSON
 import grails.converters.XML
 import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 
 class GoogleVariationMappingsController {
 
     AuthenticationService authenticationService
 
+    @Transactional(readOnly = true)
     def show(Long id, String type, String value) {
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
@@ -51,6 +53,7 @@ class GoogleVariationMappingsController {
         }
     }
 
+    @Transactional
     def save(String type, String value, String mappings){
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
@@ -120,6 +123,7 @@ class GoogleVariationMappingsController {
         }
     }
 
+    @Transactional
     def update(Long id, String mappings){
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
@@ -158,6 +162,7 @@ class GoogleVariationMappingsController {
         }
     }
 
+    @Transactional
     def delete(Long id){
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {

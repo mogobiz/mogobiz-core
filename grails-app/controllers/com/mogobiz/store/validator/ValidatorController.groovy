@@ -10,8 +10,8 @@ import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.Product
 import com.mogobiz.constant.IperConstant;
 import com.mogobiz.json.RenderUtil;
-import com.mogobiz.utils.IperUtil;
-
+import com.mogobiz.utils.IperUtil
+import grails.transaction.Transactional;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException
 import grails.converters.JSON
@@ -31,7 +31,8 @@ class ValidatorController {
 
 	def index = { }
 
-	def loginValidator = {
+	@Transactional
+	def loginValidator() {
 		SecurityUtils.subject?.logout()
 		def user = null
 		def authToken = new UsernamePasswordToken(params.username, params.password)
@@ -53,7 +54,8 @@ class ValidatorController {
 		}
 	}
 
-	def getEventsData = {
+	@Transactional(readOnly = true)
+	def getEventsData() {
 		def user = request.user?request.user:authenticationService.retrieveAuthenticatedUser()
 		if(user == null || !authenticationService.isValidator()){
 			response.sendError 403
@@ -96,7 +98,8 @@ class ValidatorController {
 		render map as JSON
 	}
 
-	def synchronize = {
+	@Transactional
+	def synchronize() {
 		def user = request.user?request.user:authenticationService.retrieveAuthenticatedUser()
 		if(user == null || !authenticationService.isValidator()){
 			response.sendError 403
@@ -148,7 +151,8 @@ class ValidatorController {
 		redirect(action: "getEventsData")
 	}
 
-	def getEventDateTime = {
+	@Transactional(readOnly = true)
+	def getEventDateTime() {
 		def user = request.user?request.user:authenticationService.retrieveAuthenticatedUser()
 		if(user == null || !authenticationService.isValidator()){
 			response.sendError 403
