@@ -115,11 +115,11 @@ class Coupon
         pastille column:"pastille",insertable:true,updateable:true,lazy:false,cache:false
 
 
-        categories column:"categories_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
+        categories column:"categories_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
-        products column:"products_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
+        products column:"products_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
-        ticketTypes column:"ticket_types_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
+        ticketTypes column:"ticket_types_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         rules column:"rules_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
 

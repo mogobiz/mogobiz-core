@@ -126,6 +126,14 @@ class Product
     /**
      * 
      */
+    long downloadMaxTimes  = 0 
+    /**
+     * 
+     */
+    long downloadMaxDelayInDays  = 0 
+    /**
+     * 
+     */
     com.mogobiz.geolocation.domain.Poi poi 
 
     /**
@@ -207,6 +215,8 @@ class Product
         keywords column:"keywords",insertable:true,updateable:true,lazy:false,cache:false
         availabilityDate column:"availability_date",insertable:true,updateable:true,lazy:false,cache:false
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
+        downloadMaxTimes column:"download_max_times",insertable:true,updateable:true,lazy:false,cache:false
+        downloadMaxDelayInDays column:"download_max_delay_in_days",insertable:true,updateable:true,lazy:false,cache:false
 
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -255,6 +265,8 @@ class Product
         keywords (nullable:true, unique:false)
         availabilityDate (nullable:true, unique:false)
         deleted ( blank:false, nullable:false, unique:false)
+        downloadMaxTimes (nullable:true, unique:false)
+        downloadMaxDelayInDays (nullable:true, unique:false)
         poi (nullable:true)
         category ( blank:false, nullable:false)
         brand (nullable:true)
