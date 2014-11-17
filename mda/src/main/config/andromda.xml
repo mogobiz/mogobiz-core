@@ -96,7 +96,7 @@
                 <!-- gorm properties -->
 				<property name="optimisticLocking">false</property>
 
-                <property name="enumerations">${grails.output.dir}/domain</property>
+                <property name="enumerations">${pom.basedir}/src/groovy</property>
                 <property name="entities">${grails.output.dir}/domain</property>
                 <property name="entity-delegators">${pom.basedir}/src/groovy</property>
                 <property name="json">${pom.basedir}/src/groovy</property>
