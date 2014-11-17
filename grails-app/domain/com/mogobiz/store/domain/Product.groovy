@@ -130,7 +130,7 @@ class Product
     /**
      * 
      */
-    long downloadMaxDelayInDays  = 0 
+    long downloadMaxDelay  = 0 
     /**
      * 
      */
@@ -216,7 +216,7 @@ class Product
         availabilityDate column:"availability_date",insertable:true,updateable:true,lazy:false,cache:false
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
         downloadMaxTimes column:"download_max_times",insertable:true,updateable:true,lazy:false,cache:false
-        downloadMaxDelayInDays column:"download_max_delay_in_days",insertable:true,updateable:true,lazy:false,cache:false
+        downloadMaxDelay column:"download_max_delay",insertable:true,updateable:true,lazy:false,cache:false
 
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -266,7 +266,7 @@ class Product
         availabilityDate (nullable:true, unique:false)
         deleted ( blank:false, nullable:false, unique:false)
         downloadMaxTimes (nullable:true, unique:false)
-        downloadMaxDelayInDays (nullable:true, unique:false)
+        downloadMaxDelay (nullable:true, unique:false)
         poi (nullable:true)
         category ( blank:false, nullable:false)
         brand (nullable:true)
