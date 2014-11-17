@@ -89,9 +89,9 @@ class CommerceService {
         Catalog mogobizCatalog = Catalog.findByNameAndCompany("Default Catalog", mogobiz);
 
         // création des sellers
-        Seller seller = Seller.findByLogin("partner@iper2010.com")
+        Seller seller = Seller.findByLogin("partner@mogobiz.com")
         if(seller == null) {
-            seller = new Seller(login:"partner@iper2010.com", email:"partner@iper2010.com", password:new Sha256Hash('changeit').toHex(),
+            seller = new Seller(login:"partner@mogobiz.com", email:"partner@mogobiz.com", password:new Sha256Hash('changeit').toHex(),
                     firstName: 'rector', lastName: 'Dir', active: true, company: mogobiz, location: adresseMogobiz, admin:true)
             seller.addToRoles(commonService.createRole(RoleName.PARTNER))
             seller.addToCompanies(mogobiz)
@@ -114,10 +114,10 @@ class CommerceService {
         else if(userPermission) { userPermission.delete() }
 
         // création du valideur
-        Seller userValidator = Seller.findByLogin("validator@iper2010.com")
+        Seller userValidator = Seller.findByLogin("validator@mogobiz.com")
         if (userValidator == null)
         {
-            userValidator = new Seller(login:"validator@iper2010.com", email:"validator@iper2010.com", password:new Sha256Hash('changeit').toHex(),
+            userValidator = new Seller(login:"validator@mogobiz.com", email:"validator@mogobiz.com", password:new Sha256Hash('changeit').toHex(),
                     firstName:'Valid', lastName:'ator', active:true, company: mogobiz, location: adresseMogobiz, admin:true)
             userValidator.addToRoles(commonService.createRole(RoleName.VALIDATOR))
             userValidator.addToCompanies(mogobiz)

@@ -213,7 +213,7 @@ class CouponServiceSpec extends Specification {
     def "CouponService should calculate reduction for cart"() {
         given:
             Company company = new Company(code:'TEST', name:'TEST', aesPassword: 'PASSWORD', onlineValidation: false).save()
-            Seller seller = new Seller(login:"partner@iper2010.com", email:"partner@iper2010.com", password:"changeit", firstName: 'rector', lastName: 'Dir', active: true, company: company, admin:true).save()
+            Seller seller = new Seller(login:"partner@mogobiz.com", email:"partner@mogobiz.com", password:"changeit", firstName: 'rector', lastName: 'Dir', active: true, company: company, admin:true).save()
             AuthenticationService.metaClass.retrieveAuthenticatedSeller = {seller}
             Catalog catalog = new Catalog(name:'CATALOGUE', description: 'DESCRIPTION', uuid: UUID.randomUUID().toString(), activationDate:new Date(), company:company, social:false).save()
             Category category = commonService.createCategory("Habillement", null, company, catalog, 1)
