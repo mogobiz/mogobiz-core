@@ -265,6 +265,9 @@ class CouponService {
         if (!coupon.hasErrors() && coupon.validate()) {
             coupon.save()
         }
+        else {
+            coupon.errors.each { println(it)}
+        }
         return coupon
     }
 }
