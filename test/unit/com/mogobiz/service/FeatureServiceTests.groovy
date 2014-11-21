@@ -1,4 +1,4 @@
-package iper2010
+package com.mogobiz.service
 
 
 
