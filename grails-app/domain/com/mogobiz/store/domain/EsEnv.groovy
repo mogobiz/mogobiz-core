@@ -58,6 +58,10 @@ class EsEnv
     /**
      * 
      */
+    boolean success  = true 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'esEnvValidation', 'esEnvRender' ]
@@ -87,6 +91,7 @@ class EsEnv
         extra column:"extra",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         active column:"active",insertable:true,updateable:true,lazy:false,cache:false
         idx column:"idx",insertable:true,updateable:true,lazy:false,cache:false
+        success column:"success",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -102,6 +107,7 @@ class EsEnv
         extra (nullable:true, unique:false)
         active ( blank:false, nullable:false, unique:false)
         idx (nullable:true, unique:false)
+        success ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
     }
 

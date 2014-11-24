@@ -74,11 +74,11 @@ class Coupon
     /**
      * 
      */
-    com.mogobiz.store.domain.Company company 
+    java.lang.Long consumed 
     /**
      * 
      */
-    com.mogobiz.store.domain.ReductionSold reductionSold
+    com.mogobiz.store.domain.Company company 
 
     static hasMany = [ categories:com.mogobiz.store.domain.Category , products:com.mogobiz.store.domain.Product , ticketTypes:com.mogobiz.store.domain.TicketType ,  rules:com.mogobiz.store.domain.ReductionRule ]
 
@@ -113,6 +113,7 @@ class Coupon
         description column:"description",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         anonymous column:"anonymous",insertable:true,updateable:true,lazy:false,cache:false
         pastille column:"pastille",insertable:true,updateable:true,lazy:false,cache:false
+        consumed column:"consumed",insertable:true,updateable:true,lazy:false,cache:false
 
 
         categories column:"categories_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -124,8 +125,6 @@ class Coupon
         rules column:"rules_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
-
-        reductionSold column:"reduction_sold_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -142,8 +141,8 @@ class Coupon
         description (nullable:true, unique:false)
         anonymous ( blank:false, nullable:false, unique:false)
         pastille (nullable:true, unique:false)
+        consumed (nullable:true, unique:false)
         company ( blank:false, nullable:false)
-        reductionSold (nullable:true)
     }
 
 
