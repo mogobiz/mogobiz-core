@@ -96,7 +96,6 @@
     <resource>com.mogobiz.store.domain.Product2Resource</resource>
     <resource>com.mogobiz.store.domain.ProductProperty</resource>
     <resource>com.mogobiz.store.domain.ReductionRule</resource>
-    <resource>com.mogobiz.store.domain.ReductionSold</resource>
     <resource>com.mogobiz.store.domain.Resource</resource>
     <resource>com.mogobiz.store.domain.Role</resource>
     <resource>com.mogobiz.store.domain.RolePermission</resource>

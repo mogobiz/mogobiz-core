@@ -15,12 +15,12 @@ class CouponService {
 
     private static final String DICTIONARY = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	static transactional = true
+    static transactional = true
     AuthenticationService authenticationService
 
     Coupon findByCode(long companyId, String couponCode) {
         return Coupon.createCriteria().get {
-            eq ("code", couponCode)
+            eq("code", couponCode)
             company {
                 eq("id", companyId)
             }
@@ -48,8 +48,8 @@ class CouponService {
         couponVO.price = 0
 
         if (coupon.active &&
-            (coupon.startDate == null || DateUtilitaire.isBeforeOrEqual(coupon.startDate)) &&
-            (coupon.endDate == null || DateUtilitaire.isAfterOrEqual(coupon.endDate))) {
+                (coupon.startDate == null || DateUtilitaire.isBeforeOrEqual(coupon.startDate)) &&
+                (coupon.endDate == null || DateUtilitaire.isAfterOrEqual(coupon.endDate))) {
 
             List<TicketType> listTicketType = TicketType.createCriteria().list {
                 or {
@@ -58,11 +58,11 @@ class CouponService {
                     }
                     if (coupon.categories) {
                         product {
-                            'in' ('category', coupon.categories)
+                            'in'('category', coupon.categories)
                         }
                     }
                     if (coupon.ticketTypes) {
-                        "in"("id", coupon.ticketTypes.collect {it.id})
+                        "in"("id", coupon.ticketTypes.collect { it.id })
                     }
                 }
             }
@@ -71,7 +71,7 @@ class CouponService {
                 long quantity = 0
                 long xPurchasedPrice = Long.MAX_VALUE;
                 cart.cartItemVOs.each { CartItemVO cartItem ->
-                    if (listTicketType.find {it.id == cartItem.skuId} != null) {
+                    if (listTicketType.find { it.id == cartItem.skuId } != null) {
                         quantity += cartItem.quantity
                         if (cartItem.endPrice > 0) {
                             xPurchasedPrice = Math.min(xPurchasedPrice, cartItem.endPrice)
@@ -84,16 +84,14 @@ class CouponService {
 
                 if (quantity > 0) {
                     couponVO.active = true
-                    coupon.rules.each {ReductionRule rule ->
+                    coupon.rules.each { ReductionRule rule ->
                         if (ReductionRuleType.DISCOUNT.equals(rule.xtype)) {
                             if (cart.endPrice != null) {
                                 couponVO.price += IperUtil.computeDiscount(rule.discount, cart.endPrice)
-                            }
-                            else {
+                            } else {
                                 couponVO.price += IperUtil.computeDiscount(rule.discount, cart.price)
                             }
-                        }
-                        else if (ReductionRuleType.X_PURCHASED_Y_OFFERED.equals(rule.xtype)) {
+                        } else if (ReductionRuleType.X_PURCHASED_Y_OFFERED.equals(rule.xtype)) {
                             long multiple = quantity / rule.xPurchased
                             couponVO.price += xPurchasedPrice * rule.yOffered * multiple
                         }
@@ -110,28 +108,18 @@ class CouponService {
      * @return
      */
     boolean consumeCoupon(Coupon coupon) {
-        if (coupon.reductionSold == null) {
-            coupon.reductionSold = new ReductionSold();
-            coupon.reductionSold.sold = 0
-            coupon.reductionSold.save()
-            coupon.save()
-        }
-
-        if (coupon.numberOfUses != null && coupon.reductionSold.sold >= coupon.numberOfUses) {
+        if (coupon.numberOfUses != null && coupon.consumed >= coupon.numberOfUses) {
             return false;
-        }
-        else {
-            coupon.reductionSold.sold = coupon.reductionSold.sold + 1
-            coupon.reductionSold.save()
+        } else {
+            coupon.consumed = coupon.consumed + 1
+            coupon.save()
             return true;
         }
     }
 
     void releaseCoupon(Coupon coupon) {
-        if (coupon.reductionSold) {
-            coupon.reductionSold.sold = Math.max(0, coupon.reductionSold.sold - 1)
-            coupon.reductionSold.save()
-        }
+        coupon.consumed = Math.max(0, coupon.consumed - 1)
+        coupon.save()
     }
 
     /**
@@ -142,7 +130,7 @@ class CouponService {
         long v = System.currentTimeMillis();
         String result = "";
         while (v > 0) {
-            int index = (int)(v % DICTIONARY.length())
+            int index = (int) (v % DICTIONARY.length())
             result = DICTIONARY.substring(index, index + 1) + result
             v = v / DICTIONARY.length()
         }
@@ -155,7 +143,7 @@ class CouponService {
             throw new IllegalArgumentException("Unknown seller")
         }
         return Coupon.createCriteria().list(params.getPagination()) {
-            company { eq ("id", seller.company.id)}
+            company { eq("id", seller.company.id) }
             order("startDate", "desc")
         }
     }
@@ -256,17 +244,15 @@ class CouponService {
             if (!rule.hasErrors() && rule.validate()) {
                 rule.save()
                 coupon.addToRules(rule);
-            }
-            else {
+            } else {
                 coupon.errors = rule.errors
             }
         }
 
         if (!coupon.hasErrors() && coupon.validate()) {
             coupon.save()
-        }
-        else {
-            coupon.errors.each { println(it)}
+        } else {
+            coupon.errors.each { println(it) }
         }
         return coupon
     }
