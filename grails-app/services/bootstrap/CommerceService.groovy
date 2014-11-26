@@ -194,9 +194,9 @@ class CommerceService {
         commonService.createFeature("Resulution", "Standard", tvPhilipsHDReady, 2)
 
         // tags
-        Tag pull = commonService.createTag('PULL')
-        Tag tshirt = commonService.createTag('TSHIRT')
-        Tag theater = commonService.createTag('THEATER')
+        Tag pull = commonService.createTag('PULL', mogobiz)
+        Tag tshirt = commonService.createTag('TSHIRT', mogobiz)
+        Tag theater = commonService.createTag('THEATER', mogobiz)
 
         // Habillage
         Shipping shippingProduitPull = commonService.createShipping(2, 30, 2, 20)
@@ -238,7 +238,7 @@ class CommerceService {
         TicketType theatreAdulte = commonService.createSKU("Adult", 1000, theatre, null, null, null, 150);
         commonService.createIntraDayPeriod(theatre, commonService.getDateDebutMois(), commonService.getDateFinMois(), false, false, true, false, true, true, true)
 
-        Product cinema = commonService.createProduct("LesTontonsFlingeurs", "Les tontons flingeurs", 800, ProductType.SERVICE, ProductCalendar.DATE_TIME, company, null, categoryCinema, taxRate, "Séance de cinéma", [commonService.createTag('CINEMA')], null, "film action");
+        Product cinema = commonService.createProduct("LesTontonsFlingeurs", "Les tontons flingeurs", 800, ProductType.SERVICE, ProductCalendar.DATE_TIME, company, null, categoryCinema, taxRate, "Séance de cinéma", [commonService.createTag('CINEMA', mogobiz)], null, "film action");
         commonService.createSKU("Child", 400, cinema, null, null, null, 50);
         commonService.createSKU("Adult", 800, cinema, null, null, null, 150);
         commonService.createIntraDayPeriod(cinema, commonService.getDateDebutMois(15), commonService.getDateFinMois(17), false, false, false, false, false, true, true)

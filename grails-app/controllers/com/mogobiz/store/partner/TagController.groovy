@@ -25,7 +25,7 @@ class TagController {
         }
 
         try {
-            PagedList pagedList = tagService.list(seller, cmd)
+            PagedList pagedList = tagService.list(seller.company, cmd)
             render ajaxResponseService.preparePage(pagedList.list, pagedList.totalCount, cmd) { Tag tag -> tag.asMapForJSON()} as JSON
         }
         catch (IllegalArgumentException ex) {

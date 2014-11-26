@@ -170,7 +170,7 @@ class Product
      */
     com.mogobiz.store.domain.Ibeacon ibeacon 
 
-    static hasMany = [  tags:com.mogobiz.store.domain.Tag ,  product2Resources:com.mogobiz.store.domain.Product2Resource ]
+    static hasMany = [ tags:com.mogobiz.store.domain.Tag ,  product2Resources:com.mogobiz.store.domain.Product2Resource ]
 
     static transients = [ 'productValidation', 'productRender' ]
 
@@ -227,7 +227,7 @@ class Product
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
-        tags column:"tags_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
+        tags column:"tags_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         seller column:"seller_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 

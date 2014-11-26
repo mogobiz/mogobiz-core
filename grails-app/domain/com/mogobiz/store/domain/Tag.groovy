@@ -34,6 +34,11 @@ class Tag
      */
     com.mogobiz.store.domain.Ibeacon ibeacon 
 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Company company 
+
     static transients = [ 'tagValidation', 'tagRender' ]
 
 
@@ -58,6 +63,8 @@ class Tag
 
 
         ibeacon column:"ibeacon_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -65,6 +72,7 @@ class Tag
 
         name ( blank:false, nullable:false, unique:false)
         ibeacon (nullable:true)
+        company ( blank:false, nullable:false)
     }
 
 

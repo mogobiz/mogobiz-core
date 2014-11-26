@@ -5,6 +5,7 @@
  */
 package com.mogobiz.service
 import com.mogobiz.store.cmd.PagedListCommand
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Ibeacon
 import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.Seller
@@ -13,16 +14,19 @@ import com.mogobiz.store.domain.Tag
 class TagService
 {
 
-    PagedList<Tag> list(Seller seller, PagedListCommand cmd) {
+    PagedList<Tag> list(Company company, PagedListCommand cmd) {
         if (seller?.company == null || cmd == null) {
             throw new IllegalArgumentException()
         }
 
-        def params = [companyId: seller.company.id]
-        final String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId ORDER BY tag.name ASC";
-        List<Tag> tags = Tag.executeQuery(query, params << cmd.getPagination())
-        final String count = "SELECT count(DISTINCT tag) FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId"
-        int totalCount = Tag.executeQuery(count, params).get(0) as Integer
+//        def params = [companyId: seller.company.id]
+//        final String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId ORDER BY tag.name ASC";
+//        List<Tag> tags = Tag.executeQuery(query, params << cmd.getPagination())
+
+//        final String count = "SELECT count(DISTINCT tag) FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId"
+//        int totalCount = Tag.executeQuery(count, params).get(0) as Integer
+        List<Tag> tags = Tag.findAllByCompany(company, cmd.getPagination())
+        int totalCount = Tag.countByCompany(company)
         new PagedList<Tag>(list:tags, totalCount:totalCount)
     }
 
@@ -46,46 +50,6 @@ class TagService
         }
         return tagInBase
     }
-
-    /**
-	 * This method returns all active tags of the merchant's site for which there is at least one active product associated.
-	 * A tag is active if it is referenced by a active product
-	 * @param locale
-	 * @param categoryId
-	 * @return
-	 */
-	List<Map> listActiveByCompany(Locale locale, long companyId)
-	{
-		String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId AND p.state = :state";
-		List<Tag> liste = Tag.executeQuery(query, [companyId: companyId, state: ProductState.ACTIVE])
-
-		List<Map> result = [];
-		liste.each { Tag t ->
-			result << t.asMapForJSON(null, null, locale?.language)
-		}
-		return result;
-	}
-
-	/**
-	 * This method returns the active tags of the merchant's site for which there is at least one active product associated with the given category.
-	 * A tag is active if it is referenced by a active product
-	 * @param locale
-	 * @param companyId
-	 * @param categoryId
-	 * @return
-	 */
-    List<Map> listActiveByCategory(Locale locale, long companyId, long categoryId)
-    {
-		String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId AND p.state = :state AND p.category.id = :categoryId";
-		List<Tag> liste = Tag.executeQuery(query, [companyId: companyId, state: ProductState.ACTIVE, categoryId: categoryId])
-
-		List<Map> result = [];
-		liste.each { Tag t ->
-			result << t.asMapForJSON(null, null, locale?.language)
-		}
-		return result;
-    }
-
 }
 
 class PagedList<E>{

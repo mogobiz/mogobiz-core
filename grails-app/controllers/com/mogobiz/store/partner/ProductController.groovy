@@ -193,12 +193,12 @@ class ProductController {
             return
         }
         def company = seller.company
-        def tags = Tag.executeQuery("select p.tags from Product p where p.company.id = " + company.id + ')')
+        def tags = Tag.findAllByCompany(company)
+        
         String tagsString = '';
         if (tags) {
             def names = []
             tags.each { names << it.name }
-            names = names.unique();
             names.each { name ->
                 if (tagsString.length() > 0)
                     tagsString += ',:,;';
@@ -239,21 +239,26 @@ class ProductController {
             response.sendError 401
             return
         }
-        def tagName = params['tag']?.name
-        Product product = params['product']?.id ? Product.findById(params['product']?.id, [fetch: [tags: 'join']]) : null
-        if (product) {
-            def tag = product.tags.find { tag ->
-                tag.name == tagName
-            }
-            if (!tag) {
-                def newTag = new Tag(name: tagName)
-                newTag.save()
-                product.addToTags(newTag)
-                withFormat {
-                    html tags: product.tags
-                    xml { render product.tags as XML }
-                    json { render product.tags as JSON }
+        String tagName = params['tag']?.name
+
+        if (tagName != null && tagName.length() > 0) {
+            Product product = params['product']?.id ? Product.findById(params['product']?.id, [fetch: [tags: 'join']]) : null
+            if (product) {
+                def tag = product.tags.find { tag ->
+                    tag.name.toLowerCase() == tagName.toLowerCase()
                 }
+                if (!tag) {
+                    def newTag = new Tag(name: tagName, company: seller.company)
+                    newTag.save()
+                    product.addToTags(newTag)
+                    withFormat {
+                        html tags: product.tags
+                        xml { render product.tags as XML }
+                        json { render product.tags as JSON }
+                    }
+                }
+            } else {
+                response.sendError 404
             }
         } else {
             response.sendError 404
@@ -278,8 +283,11 @@ class ProductController {
             }
             if (tag) {
                 product.removeFromTags(tag)
-                product.save()
-
+                product.save(flush:true)
+                List<Product> productsWithTag = Product.executeQuery("select p from Product p left join p.tags as t where t.id=:idTag and t.company.id = :idCompany", [idTag:tag.id, idCompany:tag.company.id])
+                if (productsWithTag == null || productsWithTag.size() == 0) {
+                    tag.delete();
+                }
             }
             withFormat {
                 html tags: product.tags
@@ -329,17 +337,16 @@ class ProductController {
             return
         }
         Product product = Product.get(product_id)
-        if(product &&  product.company == seller.company){
+        if (product && product.company == seller.company) {
             ProductProperty property = ProductProperty.findByProductAndName(product, name)
-            if(!property){
+            if (!property) {
                 property = new ProductProperty(product: product, name: name, value: value)
-            }
-            else{
+            } else {
                 property.value = value
             }
             property.validate()
-            if(!property.hasErrors()){
-                property = property.save(flush:true)
+            if (!property.hasErrors()) {
+                property = property.save(flush: true)
             }
             render ajaxResponseService.prepareResponse(property, property?.asMapForJSON()).asMap() as JSON
         } else {
@@ -357,7 +364,7 @@ class ProductController {
         ProductProperty productProperty = ProductProperty.get(id)
         if (productProperty && productProperty.product.company == seller.company) {
             productProperty.delete(flush: true)
-            render ([success:true] as Map) as JSON
+            render([success: true] as Map) as JSON
             return
         } else {
             response.sendError 404
@@ -374,8 +381,8 @@ class ProductController {
         Product product = Product.get(id)
         if (product && product.company == seller.company) {
             product.setDeleted(true)
-            product.save(flush:true)
-            render ([success:true] as Map) as JSON
+            product.save(flush: true)
+            render([success: true] as Map) as JSON
             return
         } else {
             response.sendError 404

@@ -117,12 +117,12 @@ public class CommonService {
 		return brand;
 	}
 
-    public Tag createTag(String name)
+    public Tag createTag(String name, Company company)
     {
         Tag tag = Tag.findByName(name);
         if (tag == null)
         {
-            tag = new Tag(name: name);
+            tag = new Tag(name: name, company:company);
             saveEntity(tag);
         }
         return tag;

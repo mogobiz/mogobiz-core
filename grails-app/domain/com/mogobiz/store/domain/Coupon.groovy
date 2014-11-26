@@ -74,7 +74,7 @@ class Coupon
     /**
      * 
      */
-    java.lang.Long consumed 
+    long consumed  = 0 
     /**
      * 
      */
@@ -141,7 +141,7 @@ class Coupon
         description (nullable:true, unique:false)
         anonymous ( blank:false, nullable:false, unique:false)
         pastille (nullable:true, unique:false)
-        consumed (nullable:true, unique:false)
+        consumed ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
     }
 
