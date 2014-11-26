@@ -64,7 +64,7 @@ class CouponController {
                 Coupon coupon = couponService.update(cmd);
                 render ajaxResponseService.prepareResponse(coupon, coupon?.asMapForJSON(), RequestContextUtils.getLocale(request)).asMap() as JSON
             }
-            catch (IllegalArgumentException ex) {
+            catch (Exception ex) {
                 log.error(ex.message);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST)
             }

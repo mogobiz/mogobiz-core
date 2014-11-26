@@ -16,7 +16,7 @@ class CouponRender
 
     java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.Coupon entity, String lang = 'fr') {
         return RenderUtil.asMapForJSON(["id", "name", "code", "pastille","active", "numberOfUses", "startDate", "endDate", "catalogWise", "anonymous",
-                "consumed",
+                "consumed", "description",
                 "categories", "categories.id", "categories.name",
                 "products", "products.id", "products.name",
                 "ticketTypes", "ticketTypes.id", "ticketTypes.name",

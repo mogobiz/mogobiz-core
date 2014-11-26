@@ -180,16 +180,15 @@ class CouponService {
         if (coupon == null || seller.company.id != coupon.company.id) {
             throw new IllegalArgumentException("Unknown coupon")
         }
-
+        if (coupon.rules?.size() > 0) {
+            List<Long> ids = coupon.rules.collect { it.id }
+            ids.each {
+                coupon.removeFromRules(ReductionRule.load(it))
+            }
+        }
         coupon.categories?.clear()
         coupon.products?.clear()
         coupon.ticketTypes?.clear()
-
-        if (coupon.rules?.size() > 0) {
-            coupon.rules.each {
-                coupon.removeFromRules(it)
-            }
-        }
         return createOrUpdate(coupon, params)
     }
 
@@ -205,7 +204,7 @@ class CouponService {
         coupon.pastille = params.pastille
         coupon.description = params.description
         coupon.code = params.code ? params.code : generateCode()
-        coupon.active = params.active ? params.active : true
+        coupon.active = params.active
         coupon.anonymous = params.anonymous ? params.anonymous : false
         coupon.catalogWise = params.catalogWise ? params.catalogWise : false
         coupon.numberOfUses = params.numberOfUses
