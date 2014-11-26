@@ -81,6 +81,7 @@
     <resource>com.mogobiz.store.domain.ExternalAccount</resource>
     <resource>com.mogobiz.store.domain.ExternalAuthLogin</resource>
     <resource>com.mogobiz.store.domain.Feature</resource>
+    <resource>com.mogobiz.store.domain.FeatureValue</resource>
     <resource>com.mogobiz.store.domain.GoogleCategory</resource>
     <resource>com.mogobiz.store.domain.GoogleContent</resource>
     <resource>com.mogobiz.store.domain.GoogleEnv</resource>

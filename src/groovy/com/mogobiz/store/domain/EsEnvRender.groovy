@@ -13,8 +13,22 @@ class EsEnvRender
     extends RenderBase<EsEnv>
 {
 
-    java.util.Map asMap(com.mogobiz.store.domain.EsEnv entity) {return super.asMap(entity)}
+    Map asMap(EsEnv entity) {
+        return super.asMap([
+            'id',
+            'name',
+            'url',
+            'idx',
+            'active',
+            'cronExpr',
+            'running',
+            'success',
+            'extra',
+            'company',
+            'company.id'
+        ], [], entity)
+    }
 
-    def String asString(com.mogobiz.store.domain.EsEnv entity){return "com.mogobiz.store.domain.EsEnv : "+entity.id}
+    def String asString(EsEnv entity){return "com.mogobiz.store.domain.EsEnv : "+entity.id}
 
 }
