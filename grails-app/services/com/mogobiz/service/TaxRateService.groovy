@@ -34,7 +34,7 @@ class TaxRateService {
             }
             List<LocalTaxRate> listLocalTaxRate = LocalTaxRate.executeQuery(query.toString(), params)
 
-            if (listLocalTaxRate != null && listLocalTaxRate.size() > 0) {
+            if (listLocalTaxRate?.size() > 0) {
                 return listLocalTaxRate.get(0).rate
             }
             else if (!StringUtils.isEmpty(state)) {

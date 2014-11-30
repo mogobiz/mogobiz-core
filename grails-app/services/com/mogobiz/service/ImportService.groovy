@@ -542,7 +542,7 @@ class ImportService {
                     t.stopDate = getCalendar(stopDate)
                     t.xprivate = xprivate.toLowerCase().equals("false") ? false : true
                     t.stock = new Stock()
-                    if (remainingStock != null && remainingStock.length() > 0) {
+                    if (remainingStock?.length() > 0) {
                         t.stock.stockUnlimited = unlimitedStock.toLowerCase().equals("false") ? false : true
                         t.stock.stockOutSelling = outsellStock.toLowerCase().equals("false") ? false : true
                         t.stock.stock = remainingStock.toDouble().toLong()

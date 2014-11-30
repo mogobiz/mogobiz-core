@@ -72,7 +72,7 @@ class SaleService {
             bOCart {
                 eq("id", cart.id)
             }
-            if (code != null && code.length() > 0) {
+            if (code?.length() > 0) {
                 ilike("code", "%" + code + "%")
             }
             order("startDate", "desc")
