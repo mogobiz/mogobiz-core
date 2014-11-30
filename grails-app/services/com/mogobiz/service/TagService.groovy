@@ -18,13 +18,6 @@ class TagService
         if (seller?.company == null || cmd == null) {
             throw new IllegalArgumentException()
         }
-
-//        def params = [companyId: seller.company.id]
-//        final String query = "SELECT DISTINCT tag FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId ORDER BY tag.name ASC";
-//        List<Tag> tags = Tag.executeQuery(query, params << cmd.getPagination())
-
-//        final String count = "SELECT count(DISTINCT tag) FROM Product p RIGHT JOIN p.tags AS tag WHERE p.company.id = :companyId"
-//        int totalCount = Tag.executeQuery(count, params).get(0) as Integer
         List<Tag> tags = Tag.findAllByCompany(company, cmd.getPagination())
         int totalCount = Tag.countByCompany(company)
         new PagedList<Tag>(list:tags, totalCount:totalCount)

@@ -13,6 +13,7 @@ import com.mogobiz.store.domain.ProductType
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.store.domain.Stock
+import com.mogobiz.store.domain.Tag
 import com.mogobiz.store.domain.TicketType
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
@@ -383,11 +384,14 @@ class ImportService {
                     if (brandName.length() > 0)
                         p.brand = Brand.findByNameAndCompany(brandName, catalog.company)
 
-//                    tags.split(',').each {
-//                        Tag tag = new Tag(name:it)
-//                        tag.save()
-//                        p.addToTags(tag)
-//                    }
+                    tags.split(',').each {
+                        Tag tag = Tag.findByNameAndCompany(it, catalog.company)
+                        if (tag == null){
+                            tag = new Tag(name:it, catalog.company)
+                            tag.save()
+                        }
+                        p.addToTags(tag)
+                    }
                     if (p.validate()) {
                         p.save(flush: true)
                         File resDir = new File(dateDir, p.sanitizedName)

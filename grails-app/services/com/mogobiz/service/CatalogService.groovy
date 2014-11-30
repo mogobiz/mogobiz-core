@@ -70,6 +70,7 @@ class CatalogService {
 			sql.execute("delete from coupon_product  where product_id in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("update product set poi_fk = null  where id in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("delete from product_tag  where tags_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk =  ${catalog.id})")
+			sql.execute("delete from tag where id not in (select tag_id from product_tag)")
 			sql.execute("delete from suggestion  where product_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("delete from suggestion  where pack_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 			sql.execute("delete from date_period  where product_fk in (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
