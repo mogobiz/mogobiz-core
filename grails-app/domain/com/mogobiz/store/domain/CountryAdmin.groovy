@@ -69,7 +69,7 @@ class CountryAdmin
         id name:'id',column:'id',generator:'native'
         code column:"code",insertable:true,updateable:true,lazy:false,cache:false
         name column:"name",insertable:true,updateable:true,lazy:false,cache:false
-        level column:"level",insertable:true,updateable:true,lazy:false,cache:false
+        level column:"xlevel",insertable:true,updateable:true,lazy:false,cache:false
 
 
         country column:"country_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'

@@ -131,7 +131,7 @@ class UploadController {
                 } else {
                     def album = [:]
                     album['id'] = -1
-                    album['name'] = 'IPER2010'
+                    album['name'] = 'Mogobiz'
                     albums.add(album)
                 }
         }

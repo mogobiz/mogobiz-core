@@ -15,9 +15,6 @@ class TagService
 {
 
     PagedList<Tag> list(Company company, PagedListCommand cmd) {
-        if (seller?.company == null || cmd == null) {
-            throw new IllegalArgumentException()
-        }
         List<Tag> tags = Tag.findAllByCompany(company, cmd.getPagination())
         int totalCount = Tag.countByCompany(company)
         new PagedList<Tag>(list:tags, totalCount:totalCount)
