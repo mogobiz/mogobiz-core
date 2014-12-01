@@ -94,6 +94,11 @@ public class CommonService {
             pattern = new GoogleVariationType(xtype: 'pattern')
             saveEntity(pattern)
         }
+
+        EsEnv.findAll().each {env ->
+            env.running = false
+            env.save()
+        }
 	}
 
 	public Feature createFeature(String name, String value, Product product, int position)
