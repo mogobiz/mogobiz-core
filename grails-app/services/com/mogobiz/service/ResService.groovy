@@ -61,9 +61,11 @@ class ResService {
         def d = new File(dir)
         d.mkdirs()
         resource.url = dir + resource.id
-        file.renameTo(new File(resource.url))
+        final resourceFile = new File(resource.url)
+        file.renameTo(resourceFile)
         if (resource.xtype == ResourceType.PICTURE) {
-            resource.smallPicture = ImageUtil.getFile(new File(resource.url), ImageSize.SMALL, true)
+            copyFile(resourceFile, new File("${resource.url}${resource.name.toLowerCase()}"))
+            resource.smallPicture = ImageUtil.getFile(resourceFile, ImageSize.SMALL, true)
         }
         resource.uploaded = true
         if (resource.validate()) {
@@ -75,5 +77,17 @@ class ResService {
             return null
         }
         return resource
+    }
+
+    def static copyFile(File src, File dest){
+        InputStream is = new FileInputStream(src)
+        OutputStream os = new FileOutputStream(dest)
+        byte[] buffer = new byte[1024]
+        int len
+        while ((len = is.read(buffer)) > 0) {
+            os.write(buffer, 0, len)
+        }
+        is.close()
+        os.close()
     }
 }
