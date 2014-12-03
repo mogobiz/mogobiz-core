@@ -4,6 +4,7 @@ import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Feature
+import com.mogobiz.store.domain.FeatureValue
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.ProductCalendar
@@ -386,8 +387,8 @@ class ImportService {
 
                     tags.split(',').each {
                         Tag tag = Tag.findByNameAndCompany(it, catalog.company)
-                        if (tag == null){
-                            tag = new Tag(name:it, catalog.company)
+                        if (tag == null) {
+                            tag = new Tag(name: it, catalog.company)
                             tag.save()
                         }
                         p.addToTags(tag)
@@ -444,22 +445,32 @@ class ImportService {
                     String name = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
                     String value = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
                     String hide = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
-
-                    Feature f = new Feature()
-                    f.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    f.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
-                    f.externalCode = externalCode
-                    f.domain = domain
-                    f.name = name
-                    f.value = value
-                    f.hide = hide
-                    if (f.validate())
-                        f.save(flush: true)
-                    else {
-                        f.errors.allErrors.each { println(it) }
-                        return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
+                    Product product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
+                    boolean created = false
+                    if (uuid) {
+                        Feature feat = Feature.findByUuid(uuid)
+                        if (feat.category != null) {
+                            FeatureValue featVal = new FeatureValue(value:value, product: product, feature: feat)
+                            featVal.save(flush: true)
+                            created = true
+                        }
                     }
-
+                    if (!created) {
+                        Feature f = new Feature()
+                        f.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        f.product = product
+                        f.externalCode = externalCode
+                        f.domain = domain
+                        f.name = name
+                        f.value = value
+                        f.hide = hide
+                        if (f.validate())
+                            f.save(flush: true)
+                        else {
+                            f.errors.allErrors.each { println(it) }
+                            return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
+                        }
+                    }
                 }
             }
         }

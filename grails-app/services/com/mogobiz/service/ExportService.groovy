@@ -45,7 +45,7 @@ class ExportService {
     }
 
     List<String> toArrayForPrd(Feature it, int catRowNum, int prdRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.domain, it.name, it.value, it.hide]
+        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.domain, it.name, it.value?.indexOf("||||") >= 0 ? it.value.substring(it.value.indexOf("||||") + 4) : it.value, it.hide]
     }
 
     List<String> toArray(Variation it, int catRowNum) {
