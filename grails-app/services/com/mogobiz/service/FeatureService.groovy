@@ -2,6 +2,7 @@ package com.mogobiz.service
 
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Feature
+import com.mogobiz.store.domain.FeatureValue
 import com.mogobiz.store.domain.Product
 
 class FeatureService {
@@ -52,13 +53,20 @@ class FeatureService {
 			product { eq ('id', productId) }
 			order('position', "asc")
 		}
+		Product product = Product.get(productId)
 		if (includeParents) {
-
-			Product product = Product.get(productId)
 			Set<Long> cats = [product.category.id]
 			cats.addAll(getCategories(product.category.id))
 			List<Feature>  parentFeatures = getFeatures(cats)
 			features.addAll(0, parentFeatures)
+		}
+		List<FeatureValue> values = FeatureValue.findAllByProduct(product)
+		values.each {FeatureValue value ->
+			Feature feature = features.find {f -> f.id == value.feature.id}
+			if (feature != null) {
+				feature.value = feature.value + "||||" + value.value
+				feature.discard()
+			}
 		}
 		return features
 	}

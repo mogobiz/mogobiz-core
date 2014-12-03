@@ -2,6 +2,7 @@ package com.mogobiz.store.partner
 
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.service.FeatureService
+import com.mogobiz.store.domain.FeatureValue
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -205,8 +206,23 @@ class FeatureController {
 			if(product && product.company==company){
 				Feature feature = Feature.get(featureId)
 				if (feature) {
-					feature.properties = params["feature"]
-					feature.save(flush:true)
+					if (feature.category) {
+						FeatureValue featureValue = FeatureValue.findByFeatureAndProduct(feature, product)
+						if (featureValue == null) {
+							featureValue = new FeatureValue()
+							featureValue.product = product
+							featureValue.feature = feature
+						}
+						featureValue.value = params["feature.value"]
+						featureValue.save(flush: true)
+
+						feature.value = feature.value + "||||" + featureValue.value
+						feature.discard()
+					}
+					else {
+						feature.properties = params["feature"]
+						feature.save(flush: true)
+					}
 					withFormat {
 						json { render feature as JSON }
 					}
@@ -249,7 +265,13 @@ class FeatureController {
 			if(product && product.company==company){
 				Feature feature = Feature.get(featureId)
 				if (feature) {
-					feature.delete(flush:true)
+					if (feature.category) {
+						List<FeatureValue> list = FeatureValue.findAllByFeatureAndProduct(feature, product)
+						FeatureValue.deleteAll(list)
+					}
+					else {
+						feature.delete(flush: true)
+					}
 					withFormat {
 						json { render product as JSON }
 					}
