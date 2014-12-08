@@ -9,7 +9,7 @@
     <resource>com.mogobiz.auth.AuthController</resource>
     <resource>com.mogobiz.auth.ExternalAuthController</resource>
     <resource>com.mogobiz.auth.OAuthController</resource>
-    <resource>com.mogobiz.auth.ResourceController</resource>
+    <resource>com.mogobiz.auth.ResController</resource>
     <resource>com.mogobiz.facebook.FBCreditController</resource>
     <resource>com.mogobiz.geolocation.CountryController</resource>
     <resource>com.mogobiz.geolocation.partner.PoiController</resource>

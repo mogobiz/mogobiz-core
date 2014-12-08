@@ -17,7 +17,7 @@ import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest
 
 import javax.servlet.http.HttpServletResponse
 
-class ResourceController {
+class ResController {
 
     def authenticationService
 

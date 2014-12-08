@@ -6,7 +6,6 @@ import grails.converters.JSON
 import grails.converters.XML
 
 import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
@@ -15,6 +14,18 @@ import grails.transaction.Transactional
 class VariationController {
     AuthenticationService authenticationService
 	AjaxResponseService ajaxResponseService
+
+
+	private List<Variation> getVariations(Category category) {
+		List<Variation> variations = Variation.findAllByCategory(category,[sort:'position',order:'asc'])
+		Category parent = category.parent
+		while (parent != null) {
+			variations.addAll(Variation.findAllByCategory(parent,[sort:'position',order:'asc']))
+			parent = parent.parent
+		}
+		return variations
+	}
+
 
 	@Transactional(readOnly = true)
 	def show() {
@@ -26,7 +37,8 @@ class VariationController {
 			return
 		}
 		if(category) {
-			List<Variation> variations = Variation.findAllByCategory(category,[sort:'position',order:'asc'])
+			List<Variation> variations = getVariations(category).take(3)
+			variations.eachWithIndex { obj, i -> obj.position = i+1 }
 			List<Map> listVariations = []
 			if(!variations){
 				variations = []
