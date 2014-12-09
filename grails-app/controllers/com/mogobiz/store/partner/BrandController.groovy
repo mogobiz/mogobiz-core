@@ -13,6 +13,7 @@ import com.mogobiz.store.domain.Seller
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
+import org.apache.commons.io.FileUtils
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -189,17 +190,21 @@ class BrandController {
         long brandId = params.long("brand.id")
         Seller user = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!user) {
-            user = authenticationService.retrieveAuthenticatedUser()
+            user = authenticationService.retrieveAuthenticatedUser() as Seller
         }
-        String dir = grailsApplication.config.resources.path + '/brands/logos/' + user.company.code + '/'
-        File fdir = new File(dir)
         String logoName = brandId.toString()
-        fdir.listFiles(new FilenameFilter() {
-            @Override
-            boolean accept(File f, String name) {
-                return name.startsWith(logoName + ".")
-            }
-        }).each { it.delete() }
+        final resourcesPath = grailsApplication.config.resources.path
+        final companyCode = user.company.code
+        String dir = "$resourcesPath/brands/logos/$companyCode/"
+        String resourcesDir = "$resourcesPath/resources/$companyCode/"
+        [dir, resourcesDir].each {
+            new File(it).listFiles(new FilenameFilter() {
+                @Override
+                boolean accept(File f, String name) {
+                    return name.startsWith(logoName/* + "."*/)
+                }
+            }).each { it.delete() }
+        }
         render "true"
     }
 
@@ -207,7 +212,7 @@ class BrandController {
     def uploadLogo() {
         Seller user = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!user) {
-            user = authenticationService.retrieveAuthenticatedUser()
+            user = authenticationService.retrieveAuthenticatedUser() as Seller
         }
         def file = request.getFile('file')
         if (file && !file.empty) {
@@ -225,7 +230,9 @@ class BrandController {
         if (index > 0) {
             extension = name.substring(index)
         }
-        String dir = grailsApplication.config.resources.path + '/brands/logos/' + user.company.code + '/'
+        final resourcesPath = grailsApplication.config.resources.path
+        final companyCode = user.company.code
+        String dir = "$resourcesPath/brands/logos/$companyCode/"
         String logoName = brandId.toString()
         File d = new File(dir)
         d.mkdirs()
@@ -234,6 +241,8 @@ class BrandController {
         logoFile.delete()
         log.debug("Processing Upload Logo  url = " + url)
         file.transferTo(logoFile)
+        String resourcesDir = "$resourcesPath/resources/$companyCode"
+        FileUtils.copyFile(logoFile, new File("${resourcesDir}/$logoName"))
         return logoName
     }
 
