@@ -17,15 +17,15 @@ class SuiviVentesActiviteController {
 		def liste = [];
 		if (seller != null && seller.company != null)
 		{
-			String requete = "SELECT s.code, s.price, s.debut, s.fin, ";
+			String requete = "SELECT s.code, s.price, s.startDate, s.endDate, ";
 			requete += "p.code, p.name, "
 			requete += "t.date, t.status "
-			requete += "FROM BOCartItem as s INNER JOIN s.transaction as t INNER JOIN s.bOProducts as bop INNER JOIN bop.product as p INNER JOIN p.company as c ";
+			requete += "FROM BOCartItem as s INNER JOIN s.bOCart as t INNER JOIN s.bOProducts as bop INNER JOIN bop.product as p INNER JOIN p.company as c ";
 			requete += "WHERE bop.principal = true and c.id = :idCompany";
 			liste = BOCartItem.executeQuery(requete, [idCompany: seller.company.id])
 		}
 		
-		String r = "Code vente;prix vente;date debut;date fin;code pack;nom pack;date achat;statut paiement\n";
+		String r = "Code;Price;Start Date;End Date;Pack Code;Pack Name;Date;Payment Status\n";
 		if (liste != null)
 		{
 			liste.each {row ->
