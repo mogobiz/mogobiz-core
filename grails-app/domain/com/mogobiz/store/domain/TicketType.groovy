@@ -134,6 +134,11 @@ class TicketType
      */
     com.mogobiz.store.domain.Resource picture
 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Resource resource 
+
     static embedded = [  'stock' ]
 
     static transients = [ 'ticketTypeValidation', 'ticketTypeRender' ]
@@ -183,6 +188,8 @@ class TicketType
         variation3 column:"variation3_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         picture column:"picture_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        resource column:"resource_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -209,6 +216,7 @@ class TicketType
         product ( blank:false, nullable:false)
         variation3 (nullable:true)
         picture (nullable:true)
+        resource (nullable:true)
     }
 
     static java.util.Collection findSalableByProduct(final long idProduct)
