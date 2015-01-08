@@ -385,13 +385,15 @@ class ImportService {
                     if (brandName.length() > 0)
                         p.brand = Brand.findByNameAndCompany(brandName, catalog.company)
 
-                    tags.split(',').each {
-                        Tag tag = Tag.findByNameAndCompany(it, catalog.company)
-                        if (tag == null) {
-                            tag = new Tag(name: it, catalog.company)
-                            tag.save()
+                    if (tags.size() > 0) {
+                        tags.split(',').each {
+                            Tag tag = Tag.findByNameAndCompany(it, catalog.company)
+                            if (tag == null) {
+                                tag = new Tag(name: it, company: catalog.company)
+                                tag.save()
+                            }
+                            p.addToTags(tag)
                         }
-                        p.addToTags(tag)
                     }
                     if (p.validate()) {
                         p.save(flush: true)
