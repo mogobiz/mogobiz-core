@@ -229,6 +229,10 @@ public class TicketTypeController {
                     sc.delete()
                     ticketType.delete()
                 }
+                else {
+                    response.sendError 401
+                    return
+                }
             } else {
                 ticketType.delete()
             }
