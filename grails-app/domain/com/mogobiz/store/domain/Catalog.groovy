@@ -56,6 +56,10 @@ class Catalog
     /**
      * 
      */
+    java.lang.String xcatalog 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'catalogValidation', 'catalogRender' ]
@@ -85,6 +89,7 @@ class Catalog
         social column:"social",insertable:true,updateable:true,lazy:false,cache:false
         channels column:"channels",insertable:true,updateable:true,lazy:false,cache:false
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
+        xcatalog column:"xcatalog",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -100,6 +105,7 @@ class Catalog
         social ( blank:false, nullable:false, unique:false)
         channels (nullable:true, unique:false)
         deleted ( blank:false, nullable:false, unique:false)
+        xcatalog (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 
