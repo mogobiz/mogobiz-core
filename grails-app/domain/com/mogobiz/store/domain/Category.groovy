@@ -64,6 +64,10 @@ class Category
     /**
      * 
      */
+    long returnMaxDelay  = 0
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     /**
@@ -110,6 +114,7 @@ class Category
         sanitizedName column:"sanitized_name",insertable:true,updateable:true,lazy:false,cache:false
         googleCategory column:"google_category",insertable:true,updateable:true,lazy:false,cache:false
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
+        returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -133,6 +138,7 @@ class Category
         sanitizedName (nullable:true, unique:false)
         googleCategory (nullable:true, unique:false)
         deleted ( blank:false, nullable:false, unique:false)
+        returnMaxDelay ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
         parent (nullable:true)
         catalog (nullable:true)

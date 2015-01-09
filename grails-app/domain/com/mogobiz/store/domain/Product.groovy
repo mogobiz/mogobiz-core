@@ -134,6 +134,10 @@ class Product
     /**
      * 
      */
+    long returnMaxDelay  = 0 
+    /**
+     * 
+     */
     com.mogobiz.geolocation.domain.Poi poi 
 
     /**
@@ -217,6 +221,7 @@ class Product
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
         downloadMaxTimes column:"download_max_times",insertable:true,updateable:true,lazy:false,cache:false
         downloadMaxDelay column:"download_max_delay",insertable:true,updateable:true,lazy:false,cache:false
+        returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
 
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -267,6 +272,7 @@ class Product
         deleted ( blank:false, nullable:false, unique:false)
         downloadMaxTimes (nullable:true, unique:false)
         downloadMaxDelay (nullable:true, unique:false)
+        returnMaxDelay ( blank:false, nullable:false, unique:false)
         poi (nullable:true)
         category ( blank:false, nullable:false)
         brand (nullable:true)

@@ -71,18 +71,24 @@ class BOCartItem
      * aucun type de ticket) multiplié par le nombre de suggestion
      * </p>
      */
-    int quantity  = 1 
+    int quantity  = 1
 
-    /**
+     /**
      * champ pour stocker l'id du ticketType référence
      * pas de foreign, juste à titre indicatif pour la MAJ des nbSales
+     * 
      */
     long ticketTypeFk
-
+    
     /**
-     *
+     * 
      */
     com.mogobiz.store.domain.BOCart bOCart 
+
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.BODelivery bODelivery 
 
     static hasMany = [  bOProducts:com.mogobiz.store.domain.BOProduct ]
 
@@ -118,10 +124,11 @@ class BOCartItem
         quantity column:"quantity",insertable:true,updateable:true,lazy:false,cache:false
         ticketTypeFk column:"ticket_type_fk",insertable:true,updateable:true,lazy:false,cache:false
 
-
         bOCart column:"b_o_cart_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         bOProducts column:"b_o_products_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        bODelivery column:"b_o_delivery_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -139,6 +146,7 @@ class BOCartItem
         quantity ( blank:false, nullable:false, unique:false)
         ticketTypeFk (blank:false, nullable:false, unique:false)
         bOCart ( blank:false, nullable:false)
+        bODelivery (nullable:true)
     }
 
 
