@@ -175,9 +175,9 @@ public class TicketTypeController {
 
                 //update related stockCalendar and Global stock
                 def sockCalendarUpdated = true
-                def stockVariation = quantity > 0 ? quantity - (ticketType.stock.stock ? ticketType.stock.stock : 0) : null
-                if (0 != stockVariation) {
-                    sockCalendarUpdated = updateSockCalendar(ticketType, stockVariation, product.calendarType)
+                Long stockVariation = quantity > 0 ? quantity - (ticketType.stock.stock ? ticketType.stock.stock : 0) : null
+                if (stockVariation && 0 != stockVariation) {
+                    sockCalendarUpdated = updateStockCalendar(ticketType, stockVariation, product.calendarType)
                 }
 
                 if (sockCalendarUpdated) {
@@ -228,8 +228,7 @@ public class TicketTypeController {
                 if (sc.sold == 0) {
                     sc.delete()
                     ticketType.delete()
-                }
-                else {
+                } else {
                     response.sendError 401
                     return
                 }
@@ -272,7 +271,7 @@ public class TicketTypeController {
     }
 
 
-    private boolean updateSockCalendar(TicketType ticketType, Long stockVariation, ProductCalendar calendarType) {
+    private boolean updateStockCalendar(TicketType ticketType, long stockVariation, ProductCalendar calendarType) {
         def today = IperUtil.today()
         def stockCalendars = StockCalendar.createCriteria().list {
             eq('ticketType', ticketType)
@@ -280,36 +279,18 @@ public class TicketTypeController {
                 ge('startDate', today)
             }
         }
-
+        //
+        //  remaining = Math.max(0, stockCalendar.stock - stockCalendar.sold)
         def canUpdateStock = true
         stockCalendars.each {
-            if (stockVariation) {
-                canUpdateStock &= (it.remainingStock.stock ? it.remainingStock.stock : 0) + stockVariation >= 0
-            }
-        }
-
-        def stockCalendarGlobal
-        if (stockCalendars.size() > 0) {
-            stockCalendarGlobal = stockCalendars[0].stockCalendarGlobal
-            canUpdateStock &= (stockCalendarGlobal.stock.stock ? stockCalendarGlobal.stock.stock : 0) + (stockVariation ? stockVariation : 0) >= 0
+            long remaining = Math.max(0, it.stock - it.sold)
+            canUpdateStock = canUpdateStock && (remaining + stockVariation >= 0)
         }
 
         if (canUpdateStock) {
-            stockCalendars.each {
-                if (stockVariation) {
-                    it.remainingStock.stock = (it.remainingStock.stock ? it.remainingStock.stock : 0) + stockVariation
-                    it.remainingStock.stockUnlimited = false
-                } else {
-                    it.remainingStock.stockUnlimited = true
-                    it.remainingStock.stock = null
-                }
+            stockCalendars.each { StockCalendar it ->
+                it.stock = it.stock + stockVariation
                 it.save()
-            }
-            if (stockCalendarGlobal) {
-                if (stockVariation) {
-                    stockCalendarGlobal.stock.stock = (stockCalendarGlobal.stock.stock ? stockCalendarGlobal.stock.stock : 0) + stockVariation
-                    stockCalendarGlobal.save()
-                }
             }
             return true
         } else {
