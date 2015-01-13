@@ -451,7 +451,7 @@ class ImportService {
                     boolean created = false
                     if (uuid) {
                         Feature feat = Feature.findByUuid(uuid)
-                        if (feat.category != null) {
+                        if (feat?.category != null) {
                             FeatureValue featVal = new FeatureValue(value:value, product: product, feature: feat)
                             featVal.save(flush: true)
                             created = true
