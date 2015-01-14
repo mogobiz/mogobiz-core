@@ -94,6 +94,7 @@ class CatalogController {
         def parent = params['catalog']?.parent
         if(catalog && catalog.company == company){
             catalog.properties = params['catalog']
+            catalog.activationDate = new Date(params.int("catalog.activationDate_year")-1900, params.int("catalog.activationDate_month")-1, params.int("catalog.activationDate_day"), 12, 0, 0)
             if(catalog.validate()){
                 catalog.save()
             }
