@@ -77,11 +77,10 @@ class EsEnvController {
         if (env && env.company == company) {
             env.properties = params['esenv']
             if (env.validate()) {
+                env.save(flush:true)
                 if(env.active){
-                    EsEnv.executeUpdate("update EsEnv set active = :active", [active:false])
-                    servletContext.setAttribute(env.company.code, env.url)
+                    EsEnv.executeUpdate("update EsEnv set active = :active where company.id =  :idCompany and id != :id ", [id:env.id, active:false, idCompany:company.id])
                 }
-                env.save()
             }
         }
         withFormat {
