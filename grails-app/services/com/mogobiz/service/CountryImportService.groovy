@@ -80,11 +80,12 @@ class CountryImportService {
                             currencyNumericCode:currencyMap.get(currencyCode),
                             postalCodeRegex:postalCodeRegex
                     )
-                    country.save(flush:true)
                 }
                 else {
+                    country.lastUpdated = new Date()
                     log.info("CountryService.importCountries: $lineCount Not added $code $name (already exist)")
                 }
+                country.save(flush:true)
             }
         }
         return countries
