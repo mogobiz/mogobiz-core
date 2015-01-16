@@ -22,7 +22,7 @@ class CountryImportService {
             projections { max "lastUpdated" }
         } as Date
         if (lastUpdated && lastUpdated.getTime() >= countries.lastModified())
-            return ;
+            return;
 
         try {
             this.importCountries(countries)
@@ -42,6 +42,7 @@ class CountryImportService {
         }
 
     }
+
     File importCountries(File countriesDir) {
         File countries = new File(countriesDir, "countries.txt")
         File currencies = new File(countriesDir, "currencies.txt")
@@ -49,7 +50,7 @@ class CountryImportService {
             return null
 
         CountryAdmin.executeUpdate("delete from CountryAdmin")
-        Map<String,String> currencyMap = [:]
+        Map<String, String> currencyMap = [:]
         currencies.eachLine() { String line ->
             if (line.trim().length() > 0) {
                 def field = line.trim().tokenize("\t")
@@ -70,22 +71,21 @@ class CountryImportService {
                 Country country = Country.get(code)
                 if (country == null) {
                     log.info("CountryService.importCountries: $lineCount Adding $code $name")
-                    country = new Country(code:code,
-                            name:name,
-                            shipping:true,
-                            billing:true,
-                            phoneCode:phoneCode,
-                            currencyCode:currencyCode,
-                            currencyName:currencyName,
-                            currencyNumericCode:currencyMap.get(currencyCode),
-                            postalCodeRegex:postalCodeRegex
+                    country = new Country(code: code,
+                            name: name,
+                            shipping: true,
+                            billing: true,
+                            phoneCode: phoneCode,
+                            currencyCode: currencyCode,
+                            currencyName: currencyName,
+                            currencyNumericCode: currencyMap.get(currencyCode),
+                            postalCodeRegex: postalCodeRegex
                     )
-                }
-                else {
+                } else {
                     country.lastUpdated = new Date()
                     log.info("CountryService.importCountries: $lineCount Not added $code $name (already exist)")
                 }
-                country.save(flush:true)
+                country.save(flush: true)
             }
         }
         return countries
@@ -93,7 +93,7 @@ class CountryImportService {
 
     File importAdmin1(File countriesDir) {
         File admins1 = new File(countriesDir, "admins1.txt")
-        if(!admins1.exists()){
+        if (!admins1.exists()) {
             return null
         }
         Map<String, Boolean> map = [:]
@@ -110,24 +110,21 @@ class CountryImportService {
                 if (!map.get(countryCode)) {
                     if (localAdmin1.exists()) {
                         map.put(countryCode, true)
-                        def instance = this.class.classLoader.loadClass( countryCode+".Import", true)?.newInstance()
+                        def instance = this.class.classLoader.loadClass(countryCode + ".Import", true)?.newInstance()
                         instance.importAdmin1(localAdmin1)
-                    }
-                    else {
+                    } else {
                         CountryAdmin admin = CountryAdmin.findByCodeAndLevel(code, 1)
                         if (admin == null) {
                             log.info("CountryService.importAdmin1:----> $code")
                             Country country = Country.findByCode(countryCode)
                             if (country) {
-                                admin = new CountryAdmin(code:code, name:name, level:1, country:country)
-                                admin.save(flush:true)
+                                admin = new CountryAdmin(code: code, name: name, level: 1, country: country)
+                                admin.save(flush: true)
                                 log.info("CountryService.importAdmin1: $lineCount Adding $code $name")
-                            }
-                            else {
+                            } else {
                                 log.error("CountryService.importAdmin1: $lineCount Not Added $code $name (Country not found)")
                             }
-                        }
-                        else {
+                        } else {
                             log.info("CountryService.importAdmin1: $lineCount Not added $code $name (already exist)")
                         }
                     }
@@ -139,7 +136,7 @@ class CountryImportService {
 
     File importAdmin2(File countriesDir) {
         File admins2 = new File(countriesDir, "admins2.txt")
-        if(!admins2.exists()){
+        if (!admins2.exists()) {
             return null
         }
         long lineCount = 0
@@ -156,16 +153,15 @@ class CountryImportService {
                 if (!map.get(countryCode)) {
                     if (localAdmin2.exists()) {
                         map.put(countryCode, true)
-                        def instance = this.class.classLoader.loadClass( countryCode+".Import", true)?.newInstance()
+                        def instance = this.class.classLoader.loadClass(countryCode + ".Import", true)?.newInstance()
                         instance.importAdmin2(localAdmin2)
-                    }
-                    else {
+                    } else {
                         CountryAdmin admin2 = CountryAdmin.findByCodeAndLevel(code, 2)
                         if (admin2 == null) {
                             String admin1Code = countryCode + "." + code.tokenize(".").get(1)
                             CountryAdmin admin1 = CountryAdmin.findByCodeAndLevel(admin1Code, 1)
                             if (admin1) {
-                                name = name.replace("Departement ","")
+                                name = name.replace("Departement ", "")
                                 if (name.startsWith("de ") || name.startsWith("du "))
                                     name = name.substring(3);
                                 if (name.startsWith("des "))
@@ -175,15 +171,13 @@ class CountryImportService {
                                 if (name.startsWith("l'") || name.startsWith("d'"))
                                     name = name.substring(2);
 
-                                admin2 = new CountryAdmin(code:code, name:name, level:2, country:admin1.country, parent:admin1)
-                                admin2.save(flush:true)
+                                admin2 = new CountryAdmin(code: code, name: name, level: 2, country: admin1.country, parent: admin1)
+                                admin2.save(flush: true)
                                 log.info("CountryService.importAdmin2: $lineCount Adding $code $name")
-                            }
-                            else {
+                            } else {
                                 log.error("CountryService.importAdmin2: $lineCount Not Added $code $name (Admin1 $admin1Code not found)")
                             }
-                        }
-                        else {
+                        } else {
                             log.info("CountryService.importAdmin2: $lineCount Not added $code $name (already exist)")
                         }
                     }
@@ -195,7 +189,7 @@ class CountryImportService {
 
     File importCities(File countriesDir) {
         File cities = new File(countriesDir, "cities.txt")
-        if(!cities.exists()){
+        if (!cities.exists()) {
             return null
         }
         long lineCount = 0
@@ -208,8 +202,8 @@ class CountryImportService {
             String a1code = field[10]
             String a2code = field[11]
 
-            if (a1code.length() == 1) a1code = "0"+a1code;
-            if (a2code.length() == 1) a2code = "0"+a2code;
+            if (a1code.length() == 1) a1code = "0" + a1code;
+            if (a2code.length() == 1) a2code = "0" + a2code;
 
             if (Holders.config.importCountries.codes.contains(countryCode) || Holders.config.importCountries.codes.empty) {
                 File countryDir = new File(countriesDir, countryCode)
@@ -217,26 +211,23 @@ class CountryImportService {
                 if (!map.get(countryCode)) {
                     if (localCities.exists()) {
                         map.put(countryCode, true)
-                        def instance = this.class.classLoader.loadClass( countryCode+".Import", true)?.newInstance()
+                        def instance = this.class.classLoader.loadClass(countryCode + ".Import", true)?.newInstance()
                         instance?.importCities(localCities)
-                    }
-                    else {
+                    } else {
                         CountryAdmin city = CountryAdmin.findByCodeAndLevel(cityCode, 3)
                         if (city == null) {
-                            String admin2Code = countryCode + "." + a1code+ "." + a2code
+                            String admin2Code = countryCode + "." + a1code + "." + a2code
                             CountryAdmin admin2 = CountryAdmin.findByCodeAndLevel(admin2Code, 2)
                             if (admin2) {
-                                if (null == CountryAdmin.findByCodeAndLevel(cityCode,3)) {
-                                    city = new CountryAdmin(code:cityCode, name:cityCode, level:3, country:admin2.country, parent:admin2)
-                                    city.save(flush:true);
+                                if (null == CountryAdmin.findByCodeAndLevel(cityCode, 3)) {
+                                    city = new CountryAdmin(code: cityCode, name: cityCode, level: 3, country: admin2.country, parent: admin2)
+                                    city.save(flush: true);
                                 }
                                 log.info("CountryService.importCities: $lineCount Adding $cityCode")
-                            }
-                            else {
+                            } else {
                                 //log.error("CountryService.importCities: $lineCount Not Added $cityCode (Admin2 $admin2Code not found)")
                             }
-                        }
-                        else {
+                        } else {
                             //log.info("CountryService.importAdmin2: $lineCount Not added $cityCode (already exist)")
                         }
                     }

@@ -207,7 +207,7 @@ class ImportService {
                             cat.name = paths[depth - 1]
                             cat.description = description
                             cat.keywords = keywords
-                            cat.hide = hide
+                            cat.hide = hide.equalsIgnoreCase("true")
                             cat.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(cat.name) : seo
                             cat.googleCategory = google
                             cat.deleted = deleted.toLowerCase().equals("false") ? false : true
