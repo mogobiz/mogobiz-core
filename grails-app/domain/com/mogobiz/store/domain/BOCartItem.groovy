@@ -71,15 +71,11 @@ class BOCartItem
      * aucun type de ticket) multiplié par le nombre de suggestion
      * </p>
      */
-    int quantity  = 1
-
-     /**
-     * champ pour stocker l'id du ticketType référence
-     * pas de foreign, juste à titre indicatif pour la MAJ des nbSales
+    int quantity  = 1 
+    /**
      * 
      */
-    long ticketTypeFk
-    
+    long ticketTypeFk 
     /**
      * 
      */
@@ -124,6 +120,7 @@ class BOCartItem
         quantity column:"quantity",insertable:true,updateable:true,lazy:false,cache:false
         ticketTypeFk column:"ticket_type_fk",insertable:true,updateable:true,lazy:false,cache:false
 
+
         bOCart column:"b_o_cart_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         bOProducts column:"b_o_products_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -144,7 +141,7 @@ class BOCartItem
         startDate (nullable:true, unique:false)
         endDate (nullable:true, unique:false)
         quantity ( blank:false, nullable:false, unique:false)
-        ticketTypeFk (blank:false, nullable:false, unique:false)
+        ticketTypeFk ( blank:false, nullable:false, unique:false)
         bOCart ( blank:false, nullable:false)
         bODelivery (nullable:true)
     }

@@ -36,10 +36,6 @@ class BODelivery
     /**
      * 
      */
-    java.lang.String destination 
-    /**
-     * 
-     */
     java.lang.String extra 
     /**
      * 
@@ -68,7 +64,6 @@ class BODelivery
         id name:'id',column:'id',generator:'native'
         tracking column:"tracking",insertable:true,updateable:true,lazy:false,cache:false
         status column:"status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
-        destination column:"destination",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         extra column:"extra",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
@@ -80,7 +75,6 @@ class BODelivery
 
         tracking (nullable:true, unique:false)
         status ( blank:false, nullable:false, unique:false)
-        destination (nullable:true, unique:false)
         extra (nullable:true, unique:false)
         bOCart ( blank:false, nullable:false)
     }

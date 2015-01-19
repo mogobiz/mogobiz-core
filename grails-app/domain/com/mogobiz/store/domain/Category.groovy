@@ -64,7 +64,7 @@ class Category
     /**
      * 
      */
-    long returnMaxDelay  = 0
+    long returnMaxDelay  = 0 
     /**
      * 
      */

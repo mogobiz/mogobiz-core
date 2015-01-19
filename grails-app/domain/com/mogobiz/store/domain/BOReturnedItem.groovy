@@ -13,11 +13,11 @@ import groovy.transform.EqualsAndHashCode
  */
 @Entity
 @EqualsAndHashCode(includes="id")
-class BoReturnedItem
+class BOReturnedItem
     implements java.io.Serializable
 {
-    def boReturnedItemValidation
-    def boReturnedItemRender
+    def BOReturnedItemValidation
+    def BOReturnedItemRender
 
     java.util.Date dateCreated
     java.util.Date lastUpdated
@@ -58,7 +58,7 @@ class BoReturnedItem
      */
     com.mogobiz.store.domain.BOCartItem bOCartItem 
 
-    static transients = [ 'boReturnedItemValidation', 'boReturnedItemRender' ]
+    static transients = [ 'BOReturnedItemValidation', 'BOReturnedItemRender' ]
 
 
     static mapping = {
@@ -73,7 +73,7 @@ class BoReturnedItem
 
         tablePerHierarchy false
 
-        table 'bo_returned_item'
+        table 'b_o_returned_item'
 
         version false
 
@@ -101,41 +101,41 @@ class BoReturnedItem
     }
 
 
-    String toString(){return boReturnedItemRender?.asString(this)}
+    String toString(){return BOReturnedItemRender?.asString(this)}
 
     def beforeInsert = {
-        boReturnedItemValidation.beforeInsert(this)
+        BOReturnedItemValidation.beforeInsert(this)
     }
 
     def beforeUpdate = {
-        boReturnedItemValidation.beforeUpdate(this)
+        BOReturnedItemValidation.beforeUpdate(this)
     }
 
     def beforeDelete = {
-        boReturnedItemValidation.beforeDelete(this)
+        BOReturnedItemValidation.beforeDelete(this)
     }
 
     def beforeValidate = {
-        boReturnedItemValidation.beforeValidate(this)
+        BOReturnedItemValidation.beforeValidate(this)
     }
 
     def afterInsert = {
-        boReturnedItemValidation.afterInsert(this)
+        BOReturnedItemValidation.afterInsert(this)
     }
 
     def afterUpdate = {
-        boReturnedItemValidation.afterUpdate(this)
+        BOReturnedItemValidation.afterUpdate(this)
     }
 
     def afterDelete = {
-        boReturnedItemValidation.afterDelete(this)
+        BOReturnedItemValidation.afterDelete(this)
     }
 
     def onLoad = {
-        boReturnedItemValidation.onLoad(this)
+        BOReturnedItemValidation.onLoad(this)
     }
 
-    java.util.Map asMapForJSON(java.util.List<String> included = [], java.util.List<String> excluded = [], String lang = 'fr') {return boReturnedItemRender.asMap(included, excluded, this, lang)}
+    java.util.Map asMapForJSON(java.util.List<String> included = [], java.util.List<String> excluded = [], String lang = 'fr') {return BOReturnedItemRender.asMap(included, excluded, this, lang)}
 
     // GrailsEntity.vsl merge-point
 }
