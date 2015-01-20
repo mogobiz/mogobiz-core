@@ -154,7 +154,7 @@ class ImportService {
                         b.facebooksite = facebook
                         b.twitter = twitter
                         b.description = description
-                        b.hide = hide
+                        b.hide = hide.equalsIgnoreCase("true")
                         if (b.validate())
                             b.save(flush: true)
                         else {
