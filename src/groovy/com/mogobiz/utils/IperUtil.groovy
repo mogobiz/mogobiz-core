@@ -5,7 +5,10 @@ import com.maxmind.geoip2.model.CityResponse
 import grails.util.Holders
 import org.apache.commons.lang.StringUtils
 import grails.util.Holders.*
+import org.codehaus.groovy.grails.commons.ApplicationAttributes
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -40,12 +43,6 @@ class IperUtil {
         DEFAULT_DECIMAL_FORMAT = new DecimalFormat("#.00", new DecimalFormatSymbols(Locale.US));
     }
 
-    public static String escapeQuote(String s) {
-        s = s.replaceAll("\"", "\\\\\"");
-        s = s.replaceAll("'", "\\\\'");
-        return s;
-    }
-
     public static capitalize(String s) {
         if (s == null || s.length() == 0) {
             return s;
@@ -54,33 +51,8 @@ class IperUtil {
         }
     }
 
-    public static def getInfosForPoiMarker(Poi poi, langue) {
-        def infos = [:];
-        infos["type"] = poi.pictureType;
-        infos["icon"] = Holders.config.grails.serverURL + "/images/markers/" + poi.pictureType + "/" + poi.picture;
-        infos["libelleType"] = poi.pictureType;
-
-        return infos;
-    }
-
-    public static String genererNomVariableUnique(String valeurParDefaut, String prefixe) {
-        if (valeurParDefaut != null) {
-            return valeurParDefaut;
-        } else {
-            genererNomVariableUnique(prefixe);
-        }
-    }
-
-    public static String genererNomVariableUnique(String prefixe) {
-        return prefixe + "_" + (new Date()).getTime();
-    }
-
     public static parseDateFromParam(String stringDate) throws Exception {
         return parseDateFromParamWithFormat(stringDate, IperConstant.DATE_FORMAT_WITHOUT_HOUR);
-    }
-
-    public static parseDateTimeFromParam(String stringDate) throws Exception {
-        return parseDateFromParamWithFormat(stringDate, IperConstant.DATE_FORMAT);
     }
 
     public static parseDateFromParamWithFormat(String stringDate, String format) throws Exception {
@@ -195,62 +167,6 @@ class IperUtil {
         return nouveauPrix;
     }
 
-    public static Number parseAmount(String amount) {
-        return DEFAULT_DECIMAL_FORMAT.parse(amount)
-    }
-
-    /**
-     * @param amount1
-     *            - montant 1
-     * @param amount2
-     *            - montant 2
-     * @return amount1 + amount2
-     */
-    public static BigDecimal addAmount(float amount1, float amount2) {
-        String bdString1 = DEFAULT_DECIMAL_FORMAT.format(amount1);
-        String bdString2 = DEFAULT_DECIMAL_FORMAT.format(amount2);
-        BigDecimal bd1 = new BigDecimal(bdString1);
-        BigDecimal bd2 = new BigDecimal(bdString2);
-        bd1 = bd1.add(bd2);
-        return bd1;
-    }
-
-    /**
-     * @param amount1
-     *            - montant 1
-     * @param amount2
-     *            - montant 2
-     * @return amount1 + amount2
-     */
-    public static float addAmountAsFloat(float amount1, float amount2) {
-        return addAmount(amount1, amount2).floatValue();
-    }
-
-    /**
-     * @param amount
-     *            - montant unitaire
-     * @param quantity
-     *            - quantite
-     * @return montant*quantite
-     */
-    public static BigDecimal computeAmount(float amount, long quantity) {
-        String bdString = DEFAULT_DECIMAL_FORMAT.format(amount);
-        BigDecimal bd = new BigDecimal(bdString);
-        bd = bd.multiply(new BigDecimal(quantity));
-        bd = bd.multiply(new BigDecimal('100'));
-        return bd;
-    }
-
-    /**
-     * @param amount
-     *            - montant unitaire
-     * @param quantity
-     *            - quantite
-     * @return montant*quantite
-     */
-    public static long computeAmountAsLong(float amount, long quantity) {
-        return computeAmount(amount, quantity).longValue()
-    }
 
     public static Map getResourceVOSimple(Resource r) {
         def mapPicture = [:]
@@ -259,54 +175,6 @@ class IperUtil {
         return mapPicture
     }
 
-    public static Map getProductVO(Product p) {
-        def map = getProductVOSimple(p)
-
-        def tabPictures = [];
-        p.getPictures().each { Resource r ->
-            tabPictures << getResourceVOSimple(r);
-        }
-        map.put("pictures", tabPictures)
-
-        return map;
-    }
-
-    public static Map getProductDetailVO(Product p, Post[] posts) {
-        def map = getProductVO(p);
-
-        if (posts) {
-            def tabPosts = []
-            posts.each {
-                def mapPosts = [:]
-                def idPost = it.id
-                mapPosts.put("id", idPost)
-                mapPosts.put("idProduct", p.id)
-                mapPosts.put("from", it.from?.name)
-                mapPosts.put("message", it.message)
-                mapPosts.put("date", it.createdTime)
-                mapPosts.put("likesCount", it.likesCount)
-
-                /*
-                 def tabLikes = []
-                 if (it.likes) {
-                 it.likes.data.each {like ->
-                 def mapLikes = [:]
-                 mapLikes.put("idPost", idPost)
-                 mapLikes.put("idProduct", p.id)
-                 mapLikes.put("idUser", like.id)
-                 mapLikes.put("from", like.name)
-                 tabLikes << mapLikes
-                 }
-                 }
-                 mapPosts.put("likes", tabLikes)
-                 */
-                tabPosts << mapPosts
-            }
-
-            map.put("posts", tabPosts);
-        }
-        return map;
-    }
 
     /**
      * This method create a ListePagine with the parameters
@@ -403,129 +271,6 @@ class IperUtil {
         return null;
     }
 
-    public static Calendar getStartPeriodeDate(Product product, Calendar date) {
-        def result
-
-        switch (product.calendarType) {
-            case ProductCalendar.NO_DATE:
-                break
-            case ProductCalendar.DATE_ONLY:
-                result = IperUtil.resetCalendarTime(date)
-                break
-            case ProductCalendar.DATE_TIME:
-                def listIncluded = IntraDayPeriod.createCriteria().list {
-                    eq('product', product)
-                    le('startDate', date)
-                    ge('endDate', date)
-                }
-                for (item in listIncluded) {
-                    if (item.startDate.get(Calendar.HOUR) == date.get(Calendar.HOUR) &&
-                            item.startDate.get(Calendar.MINUTE) == date.get(Calendar.MINUTE)) {
-                        result = item.startDate
-                    }
-                    if (result) {
-                        break
-                    }
-                }
-                break
-        }
-        return result
-    }
-
-    /**
-     * Cette méthode permet de récupérer la date de début et de fin d'utilisation d'un ticket à partir de la date
-     * choisie par le client et de la configuration du produit et du TicketType.
-     * Si la date n'est pas valide, la méthode renvoie null sinon elle renvoie un tableau de 2 dates, la première étant
-     * la date de début et la seconde étant la date de fin
-     * @param product
-     * @param ticketType : Facultatif (si non fourni, la date n'est pas controllée au niveau du ticketType)
-     * @param date
-     * @return
-     */
-    public static Calendar[] verifyAndExtractStartEndDate(TicketType ticketType, Calendar date) {
-        Product product = ticketType.product;
-        // Si le ticketType est renseigné, la date doit être valide par rapport au dates du ticketType
-        boolean dateValidForTicketType = false;
-        if (ticketType && date) {
-            dateValidForTicketType = (date.compareTo(ticketType.startDate) >= 0 && date.compareTo(ticketType.stopDate) <= 0)
-        }
-
-        // On controle maintenant la date avec le calendrier du produit
-        switch (product.calendarType) {
-            case ProductCalendar.NO_DATE:
-                // Pas de calendrier donc pas de date
-                return [null, null];
-            case ProductCalendar.DATE_ONLY:
-                if (dateValidForTicketType) {
-                    // Calendrier jour seulement, la date doit être comprise entres les dates du produits
-                    Calendar startDate = IperUtil.resetCalendarTime(date);
-                    if (startDate.compareTo(product.startDate) < 0 || startDate.compareTo(product.stopDate) > 0) {
-                        return null;
-                    }
-                    return [startDate, startDate];
-                }
-                break;
-            case ProductCalendar.DATE_TIME:
-                if (dateValidForTicketType) {
-                    def listIncluded = IntraDayPeriod.createCriteria().list {
-                        eq('product', product)
-                        le('startDate', date)
-                        ge('endDate', date)
-                    }
-                    for (IntraDayPeriod intraDayPeriod in listIncluded) {
-                        // On vérifie que l'heure demandé correspond à la place horaire du calendrier
-                        String patternComparaisonHeure = "HHmm";
-                        if (DateUtilitaire.isBeforeOrEqual(intraDayPeriod.startDate, date, patternComparaisonHeure)
-                                && DateUtilitaire.isAfterOrEqual(intraDayPeriod.endDate, date, patternComparaisonHeure)) {
-                            Calendar endDate = DateUtilitaire.copy(intraDayPeriod.startDate);
-                            endDate.set(Calendar.HOUR, intraDayPeriod.endDate.get(Calendar.HOUR))
-                            endDate.set(Calendar.MINUTE, intraDayPeriod.endDate.get(Calendar.MINUTE))
-                            return [
-                                    intraDayPeriod.startDate,
-                                    endDate
-                            ]
-                        }
-                    }
-                }
-                break
-        }
-        return null
-    }
-
-    public static Map getFromToEvent(Product product, Calendar date) {
-        def result = [:]
-
-        switch (product.calendarType) {
-            case ProductCalendar.NO_DATE:
-                result.put("startDate", null)
-                result.put("stopDate", null)
-                break
-            case ProductCalendar.DATE_ONLY:
-                result.put("startDate", date)
-                result.put("stopDate", date)
-                break
-            case ProductCalendar.DATE_TIME:
-                def listIncluded = IntraDayPeriod.createCriteria().list {
-                    eq('product', product)
-                    le('startDate', date)
-                    ge('endDate', date)
-                }
-                for (item in listIncluded) {
-                    if (item.startDate.get(Calendar.HOUR) == date.get(Calendar.HOUR) &&
-                            item.startDate.get(Calendar.MINUTE) == date.get(Calendar.MINUTE)) {
-                        result.put("startDate", item.startDate)
-                        result.put("stopDate", item.endDate)
-                    }
-                    if (result) {
-                        break
-                    }
-                }
-                break
-        }
-        return result
-    }
-
-
     static public boolean isDateIncluded(List<IntraDayPeriod> periodesList, Calendar day) {
         def included = false
         for (item in periodesList) {
@@ -558,30 +303,30 @@ class IperUtil {
         }
         return excluded
     }
-    static DatabaseReader geoService
-
-    static DatabaseReader getGeoService() {
-        if (geoService == null) {
-            File layoutFolder = Holders.grailsApplication.parentContext.getResource("WEB-INF/geoip").file
-            File ipdbfile = new File(layoutFolder, "GeoLite2-City.mmdb")
-            geoService = new DatabaseReader.Builder(ipdbfile).build()
-        }
-        return geoService
-    }
-
-    public static String getCountryFromIP(String ip) {
-        CityResponse city = getGeoService().city(InetAddress.getByName(ip))
-        String c = null
-        if (city) {
-            c = city.getCountry().getIsoCode()
-        } else {
-            c = "N/A"
-        }
-        return c;
-    }
     public static String normalizeName(String companyName) {
         return Normalizer.normalize(companyName, Normalizer.Form.NFD)
                 .replaceAll("\\s", "-").replaceAll("\\p{IsM}+", "").replaceAll("[^a-zA-Z0-9-]", "");
     }
+
+    public static def withAutoTimestampSuppression(entity, closure) {
+        toggleAutoTimestamp(entity, false)
+        def result = closure()
+        toggleAutoTimestamp(entity, true)
+        result
+    }
+
+    private static def toggleAutoTimestamp(target, enabled) {
+        def applicationContext = (ServletContextHolder.getServletContext()
+                .getAttribute(ApplicationAttributes.APPLICATION_CONTEXT))
+
+        def closureInterceptor = applicationContext.getBean("eventTriggeringInterceptor")
+        def datastore = closureInterceptor.datastores.values().iterator().next()
+        def interceptor = datastore.getEventTriggeringInterceptor()
+
+        def listener = interceptor.findEventListener(target)
+        listener.shouldTimestamp = enabled
+        null
+    }
+
 
 }

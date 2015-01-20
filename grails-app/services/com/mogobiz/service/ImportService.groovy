@@ -18,6 +18,7 @@ import com.mogobiz.store.domain.Tag
 import com.mogobiz.store.domain.TicketType
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
+import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.ZipFileUtil
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellReference
@@ -360,6 +361,8 @@ class ImportService {
                     String tags = row.getCell(18, Row.CREATE_NULL_AS_BLANK).toString()
                     String keywords = row.getCell(19, Row.CREATE_NULL_AS_BLANK).toString()
                     String brandName = row.getCell(20, Row.CREATE_NULL_AS_BLANK).toString()
+                    String dateCreated = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
+                    String lastUpdated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
 
                     Product p = new Product()
                     p.category = getCategoryFromPath(catpath, catalog)
@@ -382,6 +385,8 @@ class ImportService {
                     p.stopFeatureDate = getCalendar(stopFeatDate)
                     p.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(name) : seo
                     p.keywords = keywords
+                    p.dateCreated = new SimpleDateFormat("yyyy-MM-dd").parse(dateCreated)
+                    p.lastUpdated = new SimpleDateFormat("yyyy-MM-dd").parse(lastUpdated)
                     if (brandName.length() > 0)
                         p.brand = Brand.findByNameAndCompany(brandName, catalog.company)
 
@@ -396,7 +401,9 @@ class ImportService {
                         }
                     }
                     if (p.validate()) {
-                        p.save(flush: true)
+                        IperUtil.withAutoTimestampSuppression(p) {
+                            p.save(flush: true)
+                        }
                         File resDir = new File(dateDir, p.sanitizedName)
                         if (resDir.exists() && resDir.list().size() > 0) {
                             File[] files = resDir.listFiles()
