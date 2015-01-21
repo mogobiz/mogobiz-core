@@ -38,11 +38,6 @@ class SellerService {
         String owneremail = data.get("owneremail")
         String ownerfirstname = data.get("ownerfirstname")
         String ownerlastname = data.get("ownerlastname")
-//        String storename =" coucou"
-//        String storecode = "coucou"
-//        String owneremail ="hayssam@saleh.fr"
-//        String ownerfirstname = "hayssam"
-//        String ownerlastname = "saleh"
 
         Company company = Company.findByCode(storecode)
         if (company == null) {
@@ -55,7 +50,7 @@ class SellerService {
             String password = new Sha256Hash(clearPassword)
             seller = new Seller(password: password, firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, login: owneremail, admin: true, sell: true, validator: true, active: true)
             seller.company = company
-            this.save(seller, false)
+            this.save(seller, clearPassword, false)
         }
         if (!seller.companies?.contains(company)) {
             seller.addToCompanies(company)

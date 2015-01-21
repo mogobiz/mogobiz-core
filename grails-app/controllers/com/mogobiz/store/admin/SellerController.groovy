@@ -163,7 +163,7 @@ class SellerController {
     def save() {
         def seller = new Seller(params['seller'])
 
-        def clearPassword = RandomPassword.getRandomPassword(10)
+        String clearPassword = RandomPassword.getRandomPassword(10)
         seller.password = new Sha256Hash(clearPassword)
         seller.login = seller.email
         seller.active = false
