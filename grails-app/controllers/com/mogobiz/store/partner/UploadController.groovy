@@ -14,6 +14,7 @@ import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.transaction.Transactional
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import static com.mogobiz.constant.IperConstant.QUEUE_NS
 import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
@@ -176,7 +177,7 @@ class UploadController {
     }
 
     def uploadResource = {
-        def file = request.getFile('file')
+        def file = (request as MultipartHttpServletRequest).getFile('file')
         if (file && !file.empty) {
             def resource = processUploadResource(request, params, file)
             if (params["product.id"]) {
@@ -208,7 +209,7 @@ class UploadController {
         def company = seller?.company
         Resource resource = params['resource']?.id ? Resource.get(params['resource']?.id) : null
         if (resource == null) {
-            resource = new Resource(params['resource'])
+            resource = new Resource(params['resource'] as Map)
         } else {
             resource.properties = params['resource']
         }
@@ -219,6 +220,25 @@ class UploadController {
         // TODO should be sent by the client
         resource.active = true
         resource.deleted = false
+
+        def variations = []
+        variations << params['variation1']?.id ? VariationValue.get(params['variation1']?.id)?.value : "x"
+        variations << params['variation2']?.id ? VariationValue.get(params['variation2']?.id)?.value : "x"
+        variations << params['variation3']?.id ? VariationValue.get(params['variation3']?.id)?.value : "x"
+        if(!variations.join("").equals("xxx")){
+            def productId = params.product?.id as Long
+            def category = productId ? Product.get(productId)?.category : null
+            def nbVariations = category ? Variation.findAllByCategory(category)?.size() : 0
+            if(nbVariations > 0){
+                def sb = new StringBuilder("__")
+                (0..nbVariations-1).each {
+                    sb.append(variations.get(it) as String).append("_")
+                }
+                sb.append("_")
+                resource.name = sb.toString()
+                log.info("variation -> ${resource.name}")
+            }
+        }
 
         resService.uploadResource(seller.company, resource, tmpFile, contentType)
 
