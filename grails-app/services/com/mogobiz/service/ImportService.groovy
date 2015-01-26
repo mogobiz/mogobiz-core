@@ -284,7 +284,7 @@ class ImportService {
                     v.name = name
                     v.googleVariationType = google
                     v.position = row.getRowNum()
-                    v.hide = hide
+                    v.hide = hide.equalsIgnoreCase("true")
                     if (v.validate())
                         v.save(flush: true)
                     else {
