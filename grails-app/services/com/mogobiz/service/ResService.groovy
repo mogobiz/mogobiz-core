@@ -5,7 +5,9 @@ import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.utils.ImageSize
+import com.mogobiz.utils.ImageTools
 import com.mogobiz.utils.ImageUtil
+import com.mogobiz.utils.MimeTypeTools
 
 
 class ResService {
@@ -19,7 +21,7 @@ class ResService {
 
         log.debug("Processing Upload resource name = " + resource.name)
         resource.sanitizedName = sanitizeUrlService.sanitizeWithDashes(resource.name)
-        resource.contentType = contentType
+        resource.contentType = contentType ?: MimeTypeTools.detectMimeType(file)
         if (contentType != null) {
             if (contentType.toLowerCase().contains('audio')) {
                 resource.xtype = ResourceType.AUDIO
@@ -54,6 +56,7 @@ class ResService {
             }
         }
         resource.album = album
+        resource.content = ImageTools.encodeBase64(file)
         if (resource.validate()) {
             resource.save()
             log.debug("Processing Upload resource validated = " + resource)

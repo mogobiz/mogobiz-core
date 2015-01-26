@@ -4,6 +4,7 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.utils.MimeTypeTools
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -56,7 +57,7 @@ class ResourceController {
 				else {
 					file = new File(resource.url)
 				}
-				response.contentType = resource.contentType
+				response.contentType = resource.contentType ?: MimeTypeTools.detectMimeType(file)
 				// response.outputStream << file.path
 				def out = response.outputStream
 				def bytes = new byte[BUFFER_SIZE]

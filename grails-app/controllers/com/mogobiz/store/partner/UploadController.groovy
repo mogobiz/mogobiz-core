@@ -221,11 +221,14 @@ class UploadController {
         resource.active = true
         resource.deleted = false
 
-        def variations = []
+        List<String> variations = []
         variations << params['variation1']?.id ? VariationValue.get(params['variation1']?.id)?.value : "x"
         variations << params['variation2']?.id ? VariationValue.get(params['variation2']?.id)?.value : "x"
         variations << params['variation3']?.id ? VariationValue.get(params['variation3']?.id)?.value : "x"
-        if(!variations.join("").equals("xxx")){
+
+        final variationsAsString = variations.join("")
+        if(!variationsAsString.equals("xxx")){
+            log.info(variationsAsString)
             def productId = params.product?.id as Long
             def category = productId ? Product.get(productId)?.category : null
             def nbVariations = category ? Variation.findAllByCategory(category)?.size() : 0
