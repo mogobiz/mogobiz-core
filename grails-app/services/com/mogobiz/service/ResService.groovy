@@ -56,7 +56,7 @@ class ResService {
             }
         }
         resource.album = album
-        resource.content = ImageTools.encodeBase64(file)
+        // FIXME JAHIAC-208 resource.content = ImageTools.encodeBase64(file)
         if (resource.validate()) {
             resource.save()
             log.debug("Processing Upload resource validated = " + resource)
