@@ -8,14 +8,11 @@ import org.apache.shiro.crypto.hash.Sha256Hash
 
 class PerfCommerceService {
 
-    public static final int LEVEL_ONE_CATEGORY = 10
-    public static final int LEVEL_TWO_CATEGORY = 5
-    public static final int MAX_PRODUCTS_PER_CATEGORY = 10
     CommonService commonService
 
     def destroy() {}
 
-    void init() {
+    void init(int level1, int level2, int maxProducts) {
         log.info("Begin Performance catalog creation")
         // création de l'adresse de la compagnie
         Location adresseMogobiz = Location.findByPostalCodeAndCity("92800", "Puteaux")
@@ -130,9 +127,9 @@ class PerfCommerceService {
         commonService.createBrand("Hide brand", "http://www.google.fr", company, true);
 
         // création des categories
-        for (int i = 1; i <= LEVEL_ONE_CATEGORY; i++) {
+        for (int i = 1; i <= level1; i++) {
             Category cat = commonService.createCategory("Main $i", null, mogobiz, mogobizCatalog, 1, "hello, I am category Main $i from catalog ${mogobizCatalog.name}");
-            for (int j = 1; j <= LEVEL_TWO_CATEGORY; j++) {
+            for (int j = 1; j <= level2; j++) {
                 log.info("Begin Performance Sub category creation $i$j")
                 Category subcat = commonService.createCategory("Sub $i$j", cat, mogobiz, mogobizCatalog, 1, "hello, I am category Sub $i$j from catalog ${mogobizCatalog.name}");
 
@@ -145,7 +142,7 @@ class PerfCommerceService {
                 commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for de $i$j"}', "CATEGORY");
 
                 // Création des produits
-                for (int k = 1; k < MAX_PRODUCTS_PER_CATEGORY; k++) {
+                for (int k = 1; k < maxProducts; k++) {
                     Shipping shipping = commonService.createShipping(25 + k, 120, 110, 15)
                     Product product = commonService.createProduct("PRODUCT_$i$j$k", "Product of sub cat $i$j with id $k", 28000 + (k * 100), ProductType.PRODUCT, ProductCalendar.NO_DATE, company, samsung, subcat, taxRate, "Product $i$j$k", null, shipping)
                     commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, null, null, null, 10000 + (k * 100))
