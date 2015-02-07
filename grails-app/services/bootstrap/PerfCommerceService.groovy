@@ -145,7 +145,7 @@ class PerfCommerceService {
                 for (int k = 1; k < maxProducts; k++) {
                     Shipping shipping = commonService.createShipping(25 + k, 120, 110, 15)
                     Product product = commonService.createProduct("PRODUCT_$i$j$k", "Product of sub cat $i$j with id $k", 28000 + (k * 100), ProductType.PRODUCT, ProductCalendar.NO_DATE, company, samsung, subcat, taxRate, "Product $i$j$k", null, shipping)
-                    commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, null, null, null, 10000 + (k * 100))
+                    commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, k % 2 == 0 ? "Blanc" : "Rouge", k % 2 == 0 ? "M" : "L", null, 10000 + (k * 100))
                     Feature feature = commonService.createFeature("Frabriqué en ", "Country $k", product, 0)
                     commonService.createTranslation(company, 'en', feature.id, [name: "Made in", value: "China"])
                     commonService.createTranslation(company, 'es', feature.id, [name: "Fabricado :)", value: "China"])
