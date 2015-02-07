@@ -21,23 +21,21 @@ class CatalogController {
     def show() {
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         Long id = params['catalog']?.id?.toLong()
-        if(id != null){
+        if (id != null) {
             def catalog = Catalog.get(id)
-            if(catalog && catalog.company == seller.company){
+            if (catalog && catalog.company == seller.company) {
                 withFormat {
-                    html catalog:catalog
+                    html catalog: catalog
                     xml { render catalog as XML }
                     json { render catalog as JSON }
                 }
-            }
-            else{
+            } else {
                 response.sendError 404
             }
-        }
-        else {
+        } else {
             List<Catalog> catalogs = Catalog.findAllByCompanyAndDeleted(seller.company, false)
             withFormat {
-                html catalogs:catalogs
+                html catalogs: catalogs
                 xml { render catalogs as XML }
                 json { render catalogs as JSON }
             }
@@ -46,14 +44,14 @@ class CatalogController {
 
     @Transactional
     def save() {
-        def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-        if(!seller){
+        def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
+        if (!seller) {
             response.sendError 401
             return
         }
         def name = params['catalog']?.name
         Company company = seller.company
-        if(name){
+        if (name) {
             def catalog = Catalog.withCriteria {
                 eq('name', name)
                 eq('deleted', false)
@@ -61,22 +59,20 @@ class CatalogController {
                     eq('id', company.id)
                 }
             }
-            if(!catalog){
+            if (!catalog) {
                 catalog = new Catalog(params['catalog'])
                 catalog.company = company
                 catalog.uuid = UUID.randomUUID().toString()
-                if(catalog.validate()){
-                    catalog.save(flush:true)
-                }
-                else {
+                if (catalog.validate()) {
+                    catalog.save(flush: true)
+                } else {
                     System.out.println(catalog.errors)
                 }
                 withFormat {
                     xml { render catalog as XML }
                     json { render catalog as JSON }
                 }
-            }
-            else{
+            } else {
                 response.sendError 404
             }
         }
@@ -84,20 +80,20 @@ class CatalogController {
 
     @Transactional
     def update() {
-        def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-        if(!seller){
+        def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
+        if (!seller) {
             response.sendError 401
             return
         }
         def company = seller.company
-        def catalog = params['catalog']?.id ? Catalog.get(params['catalog']?.id):null
+        def catalog = params['catalog']?.id ? Catalog.get(params['catalog']?.id) : null
         def parent = params['catalog']?.parent
-        if(catalog && catalog.company == company){
+        if (catalog && catalog.company == company) {
             catalog.properties = params['catalog']
-            catalog.activationDate = new Date(params.int("catalog.activationDate_year")-1900, params.int("catalog.activationDate_month")-1, params.int("catalog.activationDate_day"), 12, 0, 0)
-            if(catalog.validate()){
-                catalog.save()
-            }
+            catalog.activationDate = new Date(params.int("catalog.activationDate_year") - 1900, params.int("catalog.activationDate_month") - 1, params.int("catalog.activationDate_day"), 12, 0, 0)
+        }
+        if (catalog.validate()) {
+            catalog.save()
         }
         withFormat {
             xml { render catalog as XML }
@@ -107,19 +103,18 @@ class CatalogController {
 
     @Transactional
     def delete() {
-        def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-        if(!seller){
+        def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
+        if (!seller) {
             response.sendError 401
             return
         }
         def company = seller.company
-        Catalog catalog = params['catalog']?.id ? Catalog.get(params['catalog']?.id):null
-        if(catalog && catalog.company == company){
-            List<Category> categories = Category.executeQuery('FROM Category c JOIN c.catalog d WHERE d=:catalog', [catalog:catalog])
-            if(categories.isEmpty()) {
+        Catalog catalog = params['catalog']?.id ? Catalog.get(params['catalog']?.id) : null
+        if (catalog && catalog.company == company) {
+            List<Category> categories = Category.executeQuery('FROM Category c JOIN c.catalog d WHERE d=:catalog', [catalog: catalog])
+            if (categories.isEmpty()) {
                 catalog.delete()
-            }
-            else{
+            } else {
                 response.sendError 401
                 return
             }
