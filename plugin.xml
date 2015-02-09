@@ -126,6 +126,7 @@
     <resource>com.mogobiz.auth.AuthRealm</resource>
     <resource>bootstrap.CommerceService</resource>
     <resource>bootstrap.CommonService</resource>
+    <resource>bootstrap.PerfCommerceService</resource>
     <resource>com.mogobiz.ajax.AjaxResponseService</resource>
     <resource>com.mogobiz.authentication.AuthenticationService</resource>
     <resource>com.mogobiz.geolocation.partner.PoiService</resource>
