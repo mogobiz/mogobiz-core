@@ -94,7 +94,7 @@ class User
      */
     com.mogobiz.store.domain.Company company 
 
-    static hasMany = [ roles:com.mogobiz.store.domain.Role ]
+    static hasMany = [ roles:com.mogobiz.store.domain.Role , profiles:com.mogobiz.store.domain.Profile ]
 
     static transients = [ 'userValidation', 'userRender' ]
 
@@ -137,6 +137,8 @@ class User
         roles column:"roles_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        profiles column:"profiles_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {

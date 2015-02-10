@@ -28,7 +28,7 @@ class Permission
     /**
      * 
      */
-    java.lang.String type 
+    java.lang.String type  = "org.apache.shiro.authz.permission.WildcardPermission" 
     /**
      * 
      */
