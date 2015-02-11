@@ -9,6 +9,7 @@
     <resource>com.mogobiz.auth.AuthController</resource>
     <resource>com.mogobiz.auth.ExternalAuthController</resource>
     <resource>com.mogobiz.auth.OAuthController</resource>
+    <resource>com.mogobiz.auth.ProfileController</resource>
     <resource>com.mogobiz.auth.ResController</resource>
     <resource>com.mogobiz.facebook.FBCreditController</resource>
     <resource>com.mogobiz.geolocation.CountryController</resource>
@@ -101,6 +102,8 @@
     <resource>com.mogobiz.store.domain.Product</resource>
     <resource>com.mogobiz.store.domain.Product2Resource</resource>
     <resource>com.mogobiz.store.domain.ProductProperty</resource>
+    <resource>com.mogobiz.store.domain.Profile</resource>
+    <resource>com.mogobiz.store.domain.ProfilePermission</resource>
     <resource>com.mogobiz.store.domain.ReductionRule</resource>
     <resource>com.mogobiz.store.domain.Resource</resource>
     <resource>com.mogobiz.store.domain.Role</resource>

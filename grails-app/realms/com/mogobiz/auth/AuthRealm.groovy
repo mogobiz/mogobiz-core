@@ -3,11 +3,16 @@
  */
 package com.mogobiz.auth
 
+import com.mogobiz.store.domain.ProfilePermission
 import com.mogobiz.store.domain.RoleName
 import com.mogobiz.store.domain.RolePermission
 import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.UserPermission
 import org.apache.shiro.authc.*
+import org.apache.shiro.authc.credential.*
+import org.apache.shiro.authz.Permission
+
+import java.lang.reflect.Constructor
 
 /**
  * @version $Id $
@@ -24,7 +29,7 @@ class AuthRealm {
      * If this property does not exist, the realm does not take
      * part in authentication, even if {{authenticate()}} exists.
      */
-    static authTokenClass = org.apache.shiro.authc.UsernamePasswordToken
+    static authTokenClass = UsernamePasswordToken
 
     /**
      * The credentialMatcher property is injected by Spring at runtime.
@@ -32,7 +37,7 @@ class AuthRealm {
      * org.apache.shiro.authc.credential.Sha1CredentialsMatcher, which expects that credentials
      * that are stored are SHA hashed.
      */
-    org.apache.shiro.authc.credential.CredentialsMatcher credentialMatcher
+    CredentialsMatcher credentialMatcher
 
     /**
      * Authenticates a user via the given authentication token. The
@@ -44,7 +49,7 @@ class AuthRealm {
      * If this method is not present, the realm does not take part
      * in authentication.
      */
-    def authenticate(authToken) {
+    def authenticate(UsernamePasswordToken authToken) {
         def username = authToken.username
         // Null username is invalid
         if (username == null) {
@@ -81,18 +86,19 @@ class AuthRealm {
      *{{authenticate()}} method, while {{roleName}} is simply a
      * string.
      */
-    def hasRole(principal, roleName) {
+    def hasRole(String principal, String roleName) {
         def user = User.findByLogin(principal, [fetch: [roles: 'join']])
         return user.roles.any { it.name == RoleName.valueOf(roleName) }
     }
 
     /**
      * Determines whether a user has a set of particular roles or not. It
-     * should return {{true}} if the user has been granted the roles, or {{false}}* otherwise. {{principal}} is the principal returned by the
+     * should return {{true}} if the user has been granted the roles, or {{false}}
+     * otherwise. {{principal}} is the principal returned by the
      *{{authenticate()}} method, while {{roles}} is simply an array of
      * string.
      */
-    def hasAllRoles(principal, roles) {
+    def hasAllRoles(String principal, String[] roles) {
         def user = User.findByLogin(principal, [fetch: [roles: 'join']])
         return roles.every { roleName -> user.roles.any { it.name == RoleName.valueOf(roleName) } };
     }
@@ -100,7 +106,9 @@ class AuthRealm {
     /**
      * Determines whether a user has a particular permission or not.
      */
-    def isPermitted(principal, requiredPermission) {
+    def isPermitted(String principal, Permission requiredPermission) {
+        log.debug("looking for ${requiredPermission.toString()} for $principal")
+
         // Does the user have the given permission directly associated
         // with himself?
         //
@@ -118,8 +126,8 @@ class AuthRealm {
         def retval = permissions?.find { rel ->
             // Create a real permission instance from the database
             // permission.
-            def perm = null
-            def constructor = findConstructor(rel.permission.type)
+            Permission perm
+            Constructor<Permission> constructor = findConstructor(rel.permission.type)
             if (constructor.parameterTypes.size() == 2) {
                 perm = constructor.newInstance(rel.target, rel.actions)
             } else if (constructor.parameterTypes.size() == 1) {
@@ -131,12 +139,7 @@ class AuthRealm {
 
             // Now check whether this permission implies the required
             // one.
-            if (perm.implies(requiredPermission)) {
-                // User has the permission!
-                return true
-            } else {
-                return false
-            }
+            return perm?.implies(requiredPermission)
         }
 
         if (retval != null) {
@@ -144,18 +147,19 @@ class AuthRealm {
             return true
         }
 
-        // If not, does he gain it through a role?
+        // If not, does he gain it through a role or a profile ?
         //
-        // First, find the roles that the user has.
-        def user = User.findByLogin(principal, [fetch: [roles: 'join']])
+        // First, find the roles and profiles that the user has.
+        def user = User.findByLogin(principal, [fetch: [roles: 'join', profiles: 'join']])
         def roles = user.roles
+        def profiles = user.profiles
 
-        // If the user has no roles, then he obviously has no permissions
-        // via roles.
-        if (roles.isEmpty()) return false
+        // If the user has no roles nor profiles, then he obviously has no permissions
+        // via roles or profiles.
+        if (roles.isEmpty() && profiles.isEmpty()) return false
 
         // Get the permissions from the roles that the user does have.
-        def results = RolePermission.createCriteria().list {
+        def rolePermissions = RolePermission.createCriteria().list {
             'in'('role', roles)
             permission {
                 eq('type', requiredPermission.class.name)
@@ -166,9 +170,9 @@ class AuthRealm {
         // at this stage it is not worth trying to remove them. Now,
         // create a real permission from each result and check it
         // against the required one.
-        retval = results.find { rel ->
-            def perm = null
-            def constructor = findConstructor(rel.permission.type)
+        retval = rolePermissions.find { rel ->
+            Permission perm
+            Constructor<Permission> constructor = findConstructor(rel.permission.type)
             if (constructor.parameterTypes.size() == 2) {
                 perm = constructor.newInstance(rel.target, rel.actions)
             } else if (constructor.parameterTypes.size() == 1) {
@@ -180,23 +184,49 @@ class AuthRealm {
 
             // Now check whether this permission implies the required
             // one.
-            if (perm.implies(requiredPermission)) {
-                // User has the permission!
-                return true
-            } else {
-                return false
+            return perm.implies(requiredPermission)
+        }
+
+        if(retval != null){
+            return true
+        }
+
+        // Get the permissions from the profiles that the user does have.
+        def profilePermissions = ProfilePermission.createCriteria().list {
+            'in'('profile', profiles)
+            permission {
+                eq('type', requiredPermission.class.name)
             }
         }
 
-        if (retval != null) {
-            // Found a matching permission!
-            return true
-        } else {
-            return false
+        retval = profilePermissions.find { rel ->
+            Permission perm
+            Constructor<Permission> constructor = findConstructor(rel.permission.type)
+            if (constructor.parameterTypes.size() == 2) {
+                perm = constructor.newInstance(rel.target, rel.actions)
+            } else if (constructor.parameterTypes.size() == 1) {
+                perm = constructor.newInstance(rel.target)
+            } else {
+                log.error "Unusable permission: ${rel.permission.type}"
+                return false
+            }
+
+            // Now check whether this permission implies the required
+            // one.
+            return perm.implies(requiredPermission)
         }
+
+        return retval != null
     }
 
-    def findConstructor(className) {
+    /**
+     * Determines whether a user has all the required permissions or not.
+     */
+    boolean isPermittedAll(String principal, Collection<Permission> requiredPermissions) {
+        requiredPermissions.every {isPermitted(principal, it)}
+    }
+
+    Constructor findConstructor(String className) {
         // Load the required permission class.
         def clazz = this.class.classLoader.loadClass(className)
 
@@ -222,5 +252,6 @@ class AuthRealm {
 
         return (preferredConstructor != null ? preferredConstructor : fallbackConstructor)
     }
+
 }
 

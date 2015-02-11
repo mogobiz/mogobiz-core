@@ -72,7 +72,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for all stores
 	 */
 	boolean canAdminAllStores() {
-		return SecurityUtils.getSubject().isPermitted('company:*:admin')
+		return isPermitted('company:*:admin')
 	}
 
 	/**
@@ -80,7 +80,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for this store
 	 */
 	boolean canAdminStore(long idStore) {
-		return SecurityUtils.getSubject().isPermitted('company:'+idStore+':admin')
+		return isPermitted('company:'+idStore+':admin')
 	}
 
 	/**
@@ -156,4 +156,9 @@ class AuthenticationService {
             throw ex
         }
     }
+
+    boolean isPermitted(String... permissions){
+        permissions ? SecurityUtils.getSubject().isPermitted(permissions) : true
+    }
+
 }
