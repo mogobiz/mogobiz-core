@@ -4,7 +4,8 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.utils.MimeTypeTools
+import com.mogobiz.tools.ImageTools
+import com.mogobiz.tools.MimeTypeTools
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -16,8 +17,7 @@ import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.constant.IperConstant
-import com.mogobiz.utils.ImageSize
-import com.mogobiz.utils.ImageUtil
+import com.mogobiz.tools.ImageSize
 import com.mogobiz.utils.IperUtil
 
 /**
@@ -52,7 +52,7 @@ class ResourceController {
 			if(resource.uploaded) {
 				File file
 				if (size) {
-					file = ImageUtil.getFile(new File(resource.url), ImageSize.valueOf(size), true);
+					file = ImageTools.getFile(new File(resource.url), ImageSize.valueOf(size), true);
 				}
 				else {
 					file = new File(resource.url)

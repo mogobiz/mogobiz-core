@@ -6,7 +6,7 @@ package com.mogobiz.store.admin
 import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.User
-import com.mogobiz.utils.RandomPassword
+import com.mogobiz.tools.RandomPassword
 import com.mogobiz.utils.SymmetricCrypt
 import grails.plugin.mail.MailService
 import grails.transaction.Transactional

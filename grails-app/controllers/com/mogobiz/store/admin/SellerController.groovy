@@ -6,7 +6,7 @@ import com.mogobiz.service.SellerService
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.UserProperty
-import com.mogobiz.utils.RandomPassword
+import com.mogobiz.tools.RandomPassword
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional

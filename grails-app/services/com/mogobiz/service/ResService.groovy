@@ -4,10 +4,9 @@ import com.mogobiz.store.domain.Album
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
-import com.mogobiz.utils.ImageSize
-import com.mogobiz.utils.ImageTools
-import com.mogobiz.utils.ImageUtil
-import com.mogobiz.utils.MimeTypeTools
+import com.mogobiz.tools.ImageSize
+import com.mogobiz.tools.ImageTools
+import com.mogobiz.tools.MimeTypeTools
 
 
 class ResService {
@@ -67,7 +66,7 @@ class ResService {
         final resourceFile = new File(resource.url)
         file.renameTo(resourceFile)
         if (resource.xtype == ResourceType.PICTURE) {
-            resource.smallPicture = ImageUtil.getFile(resourceFile, ImageSize.SMALL, true)
+            resource.smallPicture = ImageTools.getFile(resourceFile, ImageSize.SMALL, true)
         }
         resource.uploaded = true
         if (resource.validate()) {

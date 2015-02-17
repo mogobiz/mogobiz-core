@@ -3,14 +3,13 @@
  */
 package com.mogobiz.store.partner
 
-
+import com.mogobiz.tools.ImageTools
 import grails.converters.JSON
 
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
-import com.mogobiz.utils.ImageUtil
 import grails.transaction.Transactional
 
 /**
@@ -140,7 +139,7 @@ class ProductResourceController {
 					product.removeFromProduct2Resources(product2Resource)
 					product2Resource.delete()
 					if (params['delete']) {
-						ImageUtil.deleteAll(new File(resource.url))
+						ImageTools.deleteAll(new File(resource.url))
 						resource.delete();
 					}
 				}
