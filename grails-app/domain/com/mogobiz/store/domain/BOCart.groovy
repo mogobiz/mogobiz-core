@@ -93,7 +93,7 @@ class BOCart
     static constraints = {
     uuid (nullable:false, unique:false)
 
-        transactionUuid ( blank:false, nullable:false, unique:true)
+        transactionUuid (nullable:true, unique:false)
         buyer ( blank:false, nullable:false, unique:false)
         date ( blank:false, nullable:false, unique:false)
         price ( blank:false, nullable:false, unique:false)
