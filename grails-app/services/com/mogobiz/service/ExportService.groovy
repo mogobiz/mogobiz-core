@@ -260,6 +260,7 @@ class ExportService {
 
 
     void doExport(long catalogId, XSSFWorkbook workbook, Category parent, boolean deleted, ArrayList<Integer> rownums, File exportDir) {
+        String resourcesPath = grailsApplication.config.resources.path
         int catRownum = rownums[0]
         int catfeatRownum = rownums[1]
         int varRownum = rownums[2]
@@ -366,7 +367,7 @@ class ExportService {
                 (new File(exportDir, prd.sanitizedName)).mkdirs()
                 List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
                 prdres.each {
-                    Path resUrl = Paths.get(it.resource.url)
+                    Path resUrl = Paths.get(resourcesPath + (it.resource.url - resourcesPath))
                     try {
                         Files.copy(resUrl, Paths.get(exportDir.getAbsolutePath(), prd.sanitizedName, it.resource.name))
                     }

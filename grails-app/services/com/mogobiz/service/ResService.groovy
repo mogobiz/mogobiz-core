@@ -14,7 +14,8 @@ class ResService {
     SanitizeUrlService sanitizeUrlService
 
     def uploadResource(Company company, Resource resource, File file, String contentType) {
-        String dir = grailsApplication.config.resources.path + File.separator + 'resources' + File.separator
+        String resourcesPath = grailsApplication.config.resources.path
+        String dir = File.separator + 'resources' + File.separator
         resource.company = company
         dir += company.code + '/'
 
@@ -60,13 +61,13 @@ class ResService {
             resource.save()
             log.debug("Processing Upload resource validated = " + resource)
         }
-        def d = new File(dir)
+        def d = new File(resourcesPath + dir)
         d.mkdirs()
         resource.url = dir + resource.id
-        final resourceFile = new File(resource.url)
+        final resourceFile = new File(resourcesPath + (resource.url - resourcesPath))
         file.renameTo(resourceFile)
         if (resource.xtype == ResourceType.PICTURE) {
-            resource.smallPicture = ImageTools.getFile(resourceFile, ImageSize.SMALL, true)
+            resource.smallPicture = ImageTools.getFile(resourceFile, ImageSize.SMALL, true).path - resourcesPath
         }
         resource.uploaded = true
         if (resource.validate()) {
