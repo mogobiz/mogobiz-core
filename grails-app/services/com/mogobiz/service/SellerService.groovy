@@ -2,7 +2,7 @@ package com.mogobiz.service
 
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.*
-import com.mogobiz.utils.RandomPassword
+import com.mogobiz.tools.RandomPassword
 import com.mogobiz.utils.SymmetricCrypt
 import grails.converters.JSON
 import grails.util.Holders

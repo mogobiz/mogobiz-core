@@ -4,12 +4,11 @@ import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.vo.RegisteredCartItemVO
 import com.mogobiz.utils.DateUtilitaire
 import com.mogobiz.utils.IperUtil
-import com.mogobiz.utils.QRCodeUtils
+import com.mogobiz.tools.QRCodeUtils
 import com.mogobiz.utils.SecureCodec
 import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.util.Holders
 import groovy.json.JsonBuilder
-import org.apache.shiro.crypto.hash.Sha256Hash
 
 public class CommonService {
 

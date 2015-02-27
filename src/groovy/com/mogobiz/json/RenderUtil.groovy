@@ -1,5 +1,6 @@
 package com.mogobiz.json
 
+import com.mogobiz.tools.ImageSize
 import grails.util.Holders
 import org.hibernate.collection.AbstractPersistentCollection
 
@@ -218,8 +219,8 @@ class RenderUtil {
 		def smallPicture = null
 		if(ResourceType.PICTURE.equals (resource?.xtype)){
 			smallPicture = resource?.smallPicture
-			if (!smallPicture && resource?.uploaded) {
-				smallPicture = '/resource/display/'+resource.id
+			if (resource?.uploaded) {
+				smallPicture = '/resource/display/'+resource.id + '/' + ImageSize.SMALL.name()
 			}
 			smallPicture = completerUrl(smallPicture);
 		}

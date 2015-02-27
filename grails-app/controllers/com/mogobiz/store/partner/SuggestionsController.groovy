@@ -83,7 +83,7 @@ class SuggestionsController {
     @Transactional(readOnly = true)
     def listProductsForSuggestions() {
         def products = []
-        Company company = params['company']?.id ? Company.get(params['company']?.id) : null
+        Company company = params['company']?.id ? Company.get(params['company'].id as long) : null
         long cid = params.long("catalog.id")
         if (!authenticationService.canAdminAllStores()) {
             def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()

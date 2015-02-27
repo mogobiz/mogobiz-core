@@ -192,28 +192,30 @@ class AuthRealm {
         }
 
         // Get the permissions from the profiles that the user does have.
-        def profilePermissions = ProfilePermission.createCriteria().list {
-            'in'('profile', profiles)
-            permission {
-                eq('type', requiredPermission.class.name)
-            }
-        }
-
-        retval = profilePermissions.find { rel ->
-            Permission perm
-            Constructor<Permission> constructor = findConstructor(rel.permission.type)
-            if (constructor.parameterTypes.size() == 2) {
-                perm = constructor.newInstance(rel.target, rel.actions)
-            } else if (constructor.parameterTypes.size() == 1) {
-                perm = constructor.newInstance(rel.target)
-            } else {
-                log.error "Unusable permission: ${rel.permission.type}"
-                return false
+        if(!profiles.isEmpty()){
+            def profilePermissions = ProfilePermission.createCriteria().list {
+                'in'('profile', profiles)
+                permission {
+                    eq('type', requiredPermission.class.name)
+                }
             }
 
-            // Now check whether this permission implies the required
-            // one.
-            return perm.implies(requiredPermission)
+            retval = profilePermissions.find { rel ->
+                Permission perm
+                Constructor<Permission> constructor = findConstructor(rel.permission.type)
+                if (constructor.parameterTypes.size() == 2) {
+                    perm = constructor.newInstance(rel.target, rel.actions)
+                } else if (constructor.parameterTypes.size() == 1) {
+                    perm = constructor.newInstance(rel.target)
+                } else {
+                    log.error "Unusable permission: ${rel.permission.type}"
+                    return false
+                }
+
+                // Now check whether this permission implies the required
+                // one.
+                return perm.implies(requiredPermission)
+            }
         }
 
         return retval != null

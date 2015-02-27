@@ -1,3 +1,2 @@
-DROP TABLE bo_returned_item;
 
-ALTER TABLE b_o_delivery DROP destination;
+ALTER TABLE b_o_cart ALTER COLUMN transaction_uuid DROP NOT NULL
