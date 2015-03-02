@@ -50,8 +50,8 @@ grails.project.dependency.resolution = {
 
         compile 'org.scala-lang:scala-library:2.11.2'
 
-        runtime 'com.typesafe.akka:akka-actor_2.11:2.3.3'
-        runtime 'com.typesafe.akka:akka-stream-experimental_2.11:0.4'
+        runtime 'com.typesafe.akka:akka-actor_2.11:2.3.9'
+        runtime 'com.typesafe.akka:akka-stream-experimental_2.11:1.0-M3'
         runtime ('com.netflix.rxjava:rxjava-groovy:0.16.1') {excludes "groovy-all"}
 
         //oltu
