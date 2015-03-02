@@ -52,9 +52,8 @@ grails.project.dependency.resolution = {
 
         runtime 'com.typesafe.akka:akka-actor_2.11:2.3.9'
         runtime 'com.typesafe.akka:akka-stream-experimental_2.11:1.0-M3'
-        runtime 'io.reactivex:rxjava:1.0.7'
-        runtime 'io.reactivex:rxjava-reactive-streams:0.3.0'
-        runtime ('com.netflix.rxjava:rxjava-groovy:0.20.7') {excludes "groovy-all", "rxjava"}
+        runtime ('io.reactivex:rxjava-reactive-streams:0.3.0') {excludes "rxjava"}
+        runtime ('com.netflix.rxjava:rxjava-groovy:0.20.7') {excludes "groovy-all"}
 
         //oltu
         compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.common:0.31'
