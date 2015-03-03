@@ -9,12 +9,14 @@ import grails.validation.Validateable
 @Validateable
 class ProfileCommand {
 
-    Long id
+    Long idProfile
+    Long idCompany
     String name
     boolean updateUsers = false
 
     static constraints = {
-        id nullable: true
+        idProfile nullable: true
+        idCompany blank: false
         name blank: false
     }
 }

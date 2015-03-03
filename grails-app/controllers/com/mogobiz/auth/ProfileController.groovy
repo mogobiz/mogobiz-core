@@ -1,5 +1,6 @@
 package com.mogobiz.auth
 
+import com.mogobiz.store.cmd.ProfileCommand
 import com.mogobiz.store.domain.Profile
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
@@ -7,6 +8,8 @@ import grails.converters.XML
 import grails.transaction.Transactional
 
 import javax.servlet.http.HttpServletResponse
+
+import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  *
@@ -16,13 +19,11 @@ class ProfileController {
 
     def authenticationService
 
-    public static final String WILDCARD_PERMISSION = 'org.apache.shiro.authz.permission.WildcardPermission'
-    public static final String ALL = '*'
-
     @Transactional
     def index(Long idStore){
-        def store = idStore ? idStore.toString() : authenticationService.ALL
-        if(authenticationService.isPermitted("company:$store:profile:show")){
+        if(authenticationService.isPermitted(
+                computeStorePermission(
+                        PermissionType.ADMIN_PROFILES, idStore))){
             def profiles = idStore ? Profile.where {
                 company.id == idStore
             }.list() : Profile.findAll()
@@ -38,10 +39,12 @@ class ProfileController {
     }
 
     @Transactional
-    def show(Long idProfile){
-        def profile = Profile.load(idProfile)
+    def show(Long id){
+        def profile = Profile.load(id)
         if(profile){
-            if(authenticationService.isPermitted("company:${profile.company.id}:profile:show"))
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_PROFILES, profile.company.id)))
             withFormat {
                 html profiles: profile
                 xml { render profile as XML }
@@ -56,8 +59,45 @@ class ProfileController {
         }
     }
 
-    private String updateUsersPermission(Long idStore){
-        authenticationService.computeStorePermission(PermissionType.UPDATE_USERS, idStore)
+    @Transactional
+    def save(ProfileCommand cmd){
+        cmd.validate()
+        if(!cmd.hasErrors()){
+            def idCompany = cmd.idCompany
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_PROFILES, idCompany))) {
+                def idProfile = cmd.idProfile
+                def profile = idProfile ? Profile.load(idProfile) : new Profile()
+                profile.name = cmd.name
+                profile.validate()
+                // TODO
+                if(!profile.hasErrors()){
+                    profile.save(flush:true)
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+    }
+
+    @Transactional
+    def delete(Long id){
+        def profile = Profile.load(id)
+        if(profile){
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_PROFILES, profile.company.id))){
+                profile.delete(flush:true)
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
     }
 
 }

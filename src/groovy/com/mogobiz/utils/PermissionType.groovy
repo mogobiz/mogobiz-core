@@ -6,7 +6,10 @@ package com.mogobiz.utils
  */
 enum PermissionType {
 
-    ADMIN_COMPANY("company:{0}:admin"), UPDATE_USERS("company:{0}:users:update"), UPDATE_SHIPPING("company:{0}:shipping:update")
+    ADMIN_COMPANY("company:{0}:admin"),
+    ADMIN_PROFILES("company:{0}:profiles:admin"),
+    ADMIN_USERS("company:{0}:users:admin"),
+    ADMIN_SHIPPING("company:{0}:shipping:admin")
 
     private String value
 

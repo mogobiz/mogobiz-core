@@ -6,9 +6,8 @@ import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.subject.Subject
-import grails.gorm.DetachedCriteria
 
-import java.text.MessageFormat
+import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -18,8 +17,7 @@ class AuthenticationService {
 
     def grailsApplication
 
-    public static final String WILDCARD_PERMISSION = 'org.apache.shiro.authz.permission.WildcardPermission'
-    public static final String ALL = '*'
+    def profileService
 
     Seller retrieveAuthenticatedSeller(){
 		def seller = null
@@ -89,7 +87,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for this store
 	 */
 	boolean canAdminStore(long idStore) {
-		return isPermitted(computePermission(PermissionType.ADMIN_COMPANY, idStore as String))
+		return isPermitted(computePermission(PermissionType.ADMIN_COMPANY, idStore as String ?: ALL))
 	}
 
 	/**
@@ -170,35 +168,4 @@ class AuthenticationService {
         permissions ? SecurityUtils.getSubject().isPermitted(permissions) : true
     }
 
-    String computeStorePermission(PermissionType type, Long idStore){
-       computePermission(type, idStore ? idStore.toString() : ALL)
-    }
-
-    String computePermission(PermissionType type, String ... args){
-        MessageFormat.format(type.name(), args)
-    }
-
-    ProfilePermission getProfilePermission(PermissionType type, String ... args){
-        DetachedCriteria<ProfilePermission> query = ProfilePermission.where {
-            (target == computePermission(type, args)) && profile.company.id == idStore
-        }
-        query.get()
-    }
-
-    Permission getWilcardPermission(){
-        Permission permission = Permission.findByTypeAndPossibleActions(WILDCARD_PERMISSION, ALL);
-        if (!permission) {
-            permission = new Permission(type:WILDCARD_PERMISSION, possibleActions:ALL)
-            permission.validate()
-            if (permission.hasErrors())
-            {
-                permission.errors.allErrors.each { log.error(it) }
-            }
-            else
-            {
-                permission.save(flush:true)
-            }
-        }
-        permission
-    }
 }

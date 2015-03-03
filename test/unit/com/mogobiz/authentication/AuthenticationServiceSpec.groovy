@@ -27,6 +27,8 @@ import org.codehaus.groovy.grails.plugins.codecs.HexCodec
 import org.codehaus.groovy.grails.plugins.codecs.SHA256BytesCodec
 import spock.lang.Specification
 
+import static com.mogobiz.utils.ProfileUtils.*
+
 /**
  *
  * Created by smanciot on 03/03/15.
@@ -58,13 +60,18 @@ class AuthenticationServiceSpec extends Specification{
             MockSubject.getInstance()
         }
         SecurityUtils.getSubject().logout()
+
+//        defineBeans {
+//            profileService (ProfileService)
+//        }
+
         commonService = new CommonService()
 
         Role.metaClass.getRoleValidation = {new RoleValidation()}
         Role admin = commonService.createRole(RoleName.ADMINISTRATOR)
 
         Permission.metaClass.getPermissionValidation = {new PermissionValidation()}
-        Permission permission = new Permission(type: service.WILDCARD_PERMISSION, possibleActions: service.ALL)
+        Permission permission = new Permission(type: WILDCARD_PERMISSION, possibleActions: ALL)
         commonService.saveEntity(permission)
 
         RolePermission.metaClass.getRolePermissionValidation = {new RolePermissionValidation()}
@@ -76,6 +83,7 @@ class AuthenticationServiceSpec extends Specification{
         User userAdmin = new User(login:Holders.config.superadmin.login, email:Holders.config.superadmin.email, password:Holders.config.superadmin.password, active:true)
         userAdmin.addToRoles(admin)
         commonService.saveEntity(userAdmin)
+
     }
 
     def "authentication should fail when no user matches the login provided" (){
