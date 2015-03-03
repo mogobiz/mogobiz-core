@@ -1,11 +1,14 @@
 package com.mogobiz.authentication
 
 import com.mogobiz.store.domain.*
+import com.mogobiz.utils.PermissionType
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
-import org.apache.shiro.authc.IncorrectCredentialsException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.subject.Subject
+import grails.gorm.DetachedCriteria
+
+import java.text.MessageFormat
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -13,7 +16,12 @@ import org.apache.shiro.subject.Subject
  */
 class AuthenticationService {
 
-	Seller retrieveAuthenticatedSeller(){
+    def grailsApplication
+
+    public static final String WILDCARD_PERMISSION = 'org.apache.shiro.authz.permission.WildcardPermission'
+    public static final String ALL = '*'
+
+    Seller retrieveAuthenticatedSeller(){
 		def seller = null
 		Subject subject = SecurityUtils.getSubject()
 		Object principal = subject?.getPrincipal()
@@ -36,13 +44,14 @@ class AuthenticationService {
 	}
 
     ExternalAccount retrieveExternalAccount(long userId, AccountType accountType){
-        def externalAccount
+        def externalAccount = null
         def externalAccounts = ExternalAccount.findByUserAndAccountType(User.findById(userId), accountType)
         if(externalAccounts && externalAccounts.iterator().hasNext()){
             externalAccount = externalAccounts.iterator().next()
         }
-        return externalAccount
+        externalAccount as ExternalAccount
     }
+
 	String retrieveExternalAccountToken(AccountType accountType){
 		ExternalAccount account = null
 		def user = retrieveAuthenticatedUser()
@@ -140,19 +149,19 @@ class AuthenticationService {
             User.findByLogin(username)
         }
         catch (AuthenticationException ex){
-            def error = ex.message//"Invalid username and/or password"
-            def incorrectCredentials = ex instanceof IncorrectCredentialsException
-            if(incorrectCredentials){
-                def maxTries = grailsApplication.config.securisation?.essai?.auth ?
-                        grailsApplication.config.securisation?.essai?.auth : 5
-                User user = User.findByLogin(username)
-                def nbFailures = user.nbFailures + 1
-                user.nbFailures = nbFailures
-                if(nbFailures > maxTries){
-                    user.blocked = true
-                }
-                user.save(flush : true)
-            }
+//            def error = ex.message//"Invalid username and/or password"
+//            def incorrectCredentials = ex instanceof IncorrectCredentialsException
+//            if(incorrectCredentials){
+//                def maxTries = grailsApplication.config.securisation?.essai?.auth ?
+//                        grailsApplication.config.securisation?.essai?.auth : 5
+//                User user = User.findByLogin(username)
+//                def nbFailures = user.nbFailures + 1
+//                user.nbFailures = nbFailures
+//                if(nbFailures > maxTries){
+//                    user.blocked = true
+//                }
+//                user.save(flush : true)
+//            }
             throw ex
         }
     }
@@ -161,4 +170,35 @@ class AuthenticationService {
         permissions ? SecurityUtils.getSubject().isPermitted(permissions) : true
     }
 
+    String computeStorePermission(PermissionType type, Long idStore){
+       computePermission(type, idStore ? idStore.toString() : ALL)
+    }
+
+    String computePermission(PermissionType type, String ... args){
+        MessageFormat.format(type.name(), args)
+    }
+
+    ProfilePermission getProfilePermission(PermissionType type, String ... args){
+        DetachedCriteria<ProfilePermission> query = ProfilePermission.where {
+            (target == computePermission(type, args)) && profile.company.id == idStore
+        }
+        query.get()
+    }
+
+    Permission getWilcardPermission(){
+        Permission permission = Permission.findByTypeAndPossibleActions(WILDCARD_PERMISSION, ALL);
+        if (!permission) {
+            permission = new Permission(type:WILDCARD_PERMISSION, possibleActions:ALL)
+            permission.validate()
+            if (permission.hasErrors())
+            {
+                permission.errors.allErrors.each { log.error(it) }
+            }
+            else
+            {
+                permission.save(flush:true)
+            }
+        }
+        permission
+    }
 }

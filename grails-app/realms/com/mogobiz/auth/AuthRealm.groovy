@@ -192,7 +192,7 @@ class AuthRealm {
         }
 
         // Get the permissions from the profiles that the user does have.
-        if(!profiles.isEmpty()){
+        if(profiles && !profiles.isEmpty()){
             def profilePermissions = ProfilePermission.createCriteria().list {
                 'in'('profile', profiles)
                 permission {

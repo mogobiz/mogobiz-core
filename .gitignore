@@ -3,3 +3,5 @@ plugins/*
 target/*
 *.log
 *.iml
+.idea
+out
