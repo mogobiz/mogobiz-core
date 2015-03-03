@@ -81,7 +81,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for all stores
 	 */
 	boolean canAdminAllStores() {
-		return isPermitted('company:*:admin')
+		return isPermitted(computePermission(PermissionType.ADMIN_COMPANY, ALL))
 	}
 
 	/**
@@ -89,7 +89,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for this store
 	 */
 	boolean canAdminStore(long idStore) {
-		return isPermitted('company:'+idStore+':admin')
+		return isPermitted(computePermission(PermissionType.ADMIN_COMPANY, idStore as String))
 	}
 
 	/**

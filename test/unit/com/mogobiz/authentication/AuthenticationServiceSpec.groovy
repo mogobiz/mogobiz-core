@@ -113,7 +113,7 @@ class AuthenticationServiceSpec extends Specification{
         assertTrue(SecurityUtils.getSubject().isAuthenticated())
         assertEquals(Holders.config.superadmin.login, SecurityUtils.getSubject().principal as String)
         assertTrue(service.isAdministrator())
-        assertTrue(service.isPermitted("company:*:admin"))
+        assertTrue(service.canAdminAllStores())
         def user = service.retrieveAuthenticatedUser()
         assertNotNull(user)
         assertEquals(Holders.config.superadmin.login, user.login)

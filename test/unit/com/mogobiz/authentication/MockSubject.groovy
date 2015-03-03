@@ -4,6 +4,7 @@
 package com.mogobiz.authentication
 
 import com.mogobiz.auth.AuthRealm
+import groovy.util.logging.Log4j
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.AuthenticationToken
 import org.apache.shiro.authc.SimpleAccount
@@ -23,6 +24,7 @@ import java.util.concurrent.Callable
  * @version $Id $
  *
  */
+@Log4j
 final class MockSubject implements Subject{
 
     private SimpleAccount account = null
@@ -94,8 +96,10 @@ final class MockSubject implements Subject{
     }
 
     @Override
-    void checkRoles(String... strings) throws AuthorizationException {
-        // TODO Auto-generated method stub
+    void checkRoles(String... roles) throws AuthorizationException {
+        roles.each {role ->
+            checkRole(role)
+        }
     }
 
     @Override
@@ -153,17 +157,18 @@ final class MockSubject implements Subject{
     }
 
     @Override
-    public boolean[] isPermitted(String... arg0) {
-        boolean[] permissions = new boolean[arg0.length]
-        arg0.eachWithIndex {permission, index ->
-            permissions[index] = isPermitted(permission)
+    public boolean[] isPermitted(String... permissions) {
+        boolean[] ret = new boolean[permissions.length]
+        permissions.eachWithIndex {permission, index ->
+            ret[index] = isPermitted(permission)
         }
-        permissions
+        ret
     }
 
     @Override
-    public boolean isPermitted(String arg0) {
-        return realm.isPermitted(principal as String, new WildcardPermission(arg0))
+    public boolean isPermitted(String permission) {
+        log.info("$principal isPermitted($permission)")
+        return realm.isPermitted(principal as String, new WildcardPermission(permission))
     }
 
     @Override
