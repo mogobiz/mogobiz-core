@@ -1,6 +1,7 @@
 package com.mogobiz.authentication
 
 import com.mogobiz.store.domain.Permission
+import com.mogobiz.store.domain.Profile
 import com.mogobiz.store.domain.ProfilePermission
 import com.mogobiz.utils.PermissionType
 import grails.gorm.DetachedCriteria
@@ -11,9 +12,9 @@ import static com.mogobiz.utils.ProfileUtils.*
 @Transactional
 class ProfileService {
 
-    ProfilePermission getProfilePermission(PermissionType type, Long idStore, String ... args){
+    ProfilePermission getProfilePermission(Profile p, PermissionType type, String ... args){
         DetachedCriteria<ProfilePermission> query = ProfilePermission.where {
-            (target == computePermission(type, args)) && profile.company.id == idStore
+            (target == computePermission(type, args)) && profile.id == p.id
         }
         query.get()
     }
@@ -33,5 +34,16 @@ class ProfileService {
             }
         }
         permission
+    }
+
+    void saveProfilePermission(Profile p, boolean add, PermissionType type, String ... args){
+        ProfilePermission pp = getProfilePermission(p, type, args)
+        if(!pp && add){
+            pp = new ProfilePermission(target: computePermission(type, args), profile: p, permission: getWilcardPermission())
+            pp.save(flush: true)
+        }
+        else if(pp && !add){
+            pp.delete(flush: true)
+        }
     }
 }

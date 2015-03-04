@@ -19,6 +19,8 @@ class ProfileController {
 
     def authenticationService
 
+    def profileService
+
     @Transactional
     def index(Long idStore){
         if(authenticationService.isPermitted(
@@ -71,9 +73,9 @@ class ProfileController {
                 def profile = idProfile ? Profile.load(idProfile) : new Profile()
                 profile.name = cmd.name
                 profile.validate()
-                // TODO
                 if(!profile.hasErrors()){
                     profile.save(flush:true)
+                    profileService.saveProfilePermission(profile, cmd.updateUsers, PermissionType.ADMIN_USERS, idCompany as String)
                 }
             }
             else{

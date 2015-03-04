@@ -16,4 +16,8 @@ enum PermissionType {
     private PermissionType(String value){
         this.value = value
     }
+
+    public String getValue(){
+        value
+    }
 }
