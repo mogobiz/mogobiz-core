@@ -78,8 +78,9 @@ class ProfileService {
         }
     }
 
-    void updateProfile(Profile parent){
-        if(!parent.company){
+    void upgradeChildProfiles(Long idProfile){
+        Profile parent = Profile.load(idProfile)
+        if(parent && !parent.company){
             Profile.findAllByParent(parent).each {child ->
                 upgradeProfile(child, parent)
             }
