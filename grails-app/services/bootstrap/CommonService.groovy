@@ -13,6 +13,8 @@ import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.util.Holders
 import groovy.json.JsonBuilder
 
+import static com.mogobiz.utils.ProfileUtils.*
+
 public class CommonService {
 
 	SanitizeUrlService sanitizeUrlService
@@ -137,9 +139,32 @@ public class CommonService {
                 child = profileService.applyProfile(parent.id, company.id)
                 Seller.findAllByCompanyAndSell(company, true).each {seller ->
                     profileService.applyUserProfile(seller.id, child?.id)
-                }
-                Catalog.findAllByCompany(company).each {catalog ->
-                    // TODO
+                    Catalog.findAllByCompany(company).each {catalog ->
+                        profileService.saveUserPermission(
+                                seller,
+                                true,
+                                PermissionType.UPDATE_STORE_CATALOG,
+                                company.id as String,
+                                catalog.id as String
+                        )
+                        profileService.saveUserPermission(
+                                seller,
+                                true,
+                                PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                                company.id as String,
+                                catalog.id as String,
+                                ALL
+                        )
+                    }
+                    EsEnv.findAll().each {env ->
+                        profileService.saveUserPermission(
+                                seller,
+                                true,
+                                PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                                company.id as String,
+                                env.id as String
+                        )
+                    }
                 }
             }
             else{

@@ -5,6 +5,7 @@ import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Profile
 import com.mogobiz.store.domain.ProfilePermission
 import com.mogobiz.store.domain.User
+import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.utils.PermissionType
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -25,7 +26,7 @@ class ProfileService {
      */
     ProfilePermission getProfilePermission(Profile p, PermissionType type, String ... args){
         DetachedCriteria<ProfilePermission> query = ProfilePermission.where {
-            (target == computePermission(type, args)) && profile.id == p.id
+            (target == computePermission(type, args)) && profile.id == p.id && permission.id == getWilcardPermission().id
         }
         query.get()
     }
@@ -140,6 +141,30 @@ class ProfileService {
             user.addToProfiles(profile)
             user.save(flush: true)
         }
+    }
+
+    UserPermission getUserPermission(User u, PermissionType type, String ... args){
+        DetachedCriteria<UserPermission> query = UserPermission.where {
+            (target == computePermission(type, args)) && user.id == u.id && permission.id == getWilcardPermission().id
+        }
+        query.get()
+
+    }
+
+    UserPermission saveUserPermission(User user, boolean add, PermissionType type, String ... args){
+        String target = computePermission(type, args)
+        def wildCardPermission = getWilcardPermission()
+        def userPermission = getUserPermission(user, type, args)
+        if(!userPermission && add){
+            userPermission = new UserPermission(
+                    permission: wildCardPermission,
+                    target: target,
+                    user: user).save(flush:true)
+        }
+        else if(userPermission && !add){
+            userPermission.delete(flush: true)
+        }
+        userPermission
     }
 
     /**
