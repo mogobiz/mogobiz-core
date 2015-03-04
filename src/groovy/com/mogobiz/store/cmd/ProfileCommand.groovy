@@ -12,7 +12,7 @@ class ProfileCommand {
     Long idProfile
     Long idCompany
     String name
-    boolean updateUsers = false
+    boolean users = false
 
     static constraints = {
         idProfile nullable: true

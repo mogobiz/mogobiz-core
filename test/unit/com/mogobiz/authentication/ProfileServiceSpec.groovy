@@ -109,14 +109,8 @@ class ProfileServiceSpec extends Specification {
         def name = "parent"
         def parent = new Profile(name: name)
         commonService.saveEntity(parent)
-        PermissionType.values().each {pt ->
-            if(!(pt in [
-                    PermissionType.PUBLISH_STORE_CATALOGS,
-                    PermissionType.UPDATE_CATALOG,
-                    PermissionType.UPDATE_CATALOG_CATEGORY
-            ])){
-               service.saveProfilePermission(parent, true, pt)
-            }
+        PermissionType.admin().each {pt ->
+            service.saveProfilePermission(parent, true, pt)
         }
         when:
         service.applyProfile(parent.id, idStore)
@@ -124,16 +118,10 @@ class ProfileServiceSpec extends Specification {
         def child = Profile.findByCompanyAndParent(company, parent)
         assertNotNull(child)
         assertEquals(parent.name, child.name)
-        PermissionType.values().each {pt ->
-            if(!(pt in [
-                    PermissionType.PUBLISH_STORE_CATALOGS,
-                    PermissionType.UPDATE_CATALOG,
-                    PermissionType.UPDATE_CATALOG_CATEGORY
-            ])){
-                def pp = service.getProfilePermission(child, pt, idStore as String)
-                assertNotNull(pp)
-                assertEquals(computePermission(pt, idStore as String), pp.target)
-            }
+        PermissionType.admin().each {pt ->
+            def pp = service.getProfilePermission(child, pt, idStore as String)
+            assertNotNull(pp)
+            assertEquals(computePermission(pt, idStore as String), pp.target)
         }
     }
 
@@ -144,36 +132,49 @@ class ProfileServiceSpec extends Specification {
         def name = "parent"
         def parent = new Profile(name: name)
         commonService.saveEntity(parent)
-        PermissionType.values().each {pt ->
-            if(!(pt in [
-                    PermissionType.PUBLISH_STORE_CATALOGS,
-                    PermissionType.UPDATE_CATALOG,
-                    PermissionType.UPDATE_CATALOG_CATEGORY
-            ])){
-                service.saveProfilePermission(parent, true, pt)
-            }
+        PermissionType.admin().each {pt ->
+            service.saveProfilePermission(parent, true, pt)
         }
         service.applyProfile(parent.id, idStore)
-        service.saveProfilePermission(parent, false, PermissionType.ACCESS_STORE_BO)
+        service.saveProfilePermission(parent, false, PermissionType.ADMIN_COMPANY)
         when:
         service.upgradeChildProfiles(parent.id)
         then:
         def child = Profile.findByCompanyAndParent(company, parent)
         assertNotNull(child)
         assertEquals(parent.name, child.name)
-        def pp = service.getProfilePermission(child, PermissionType.ACCESS_STORE_BO, idStore as String)
+        def pp = service.getProfilePermission(child, PermissionType.ADMIN_COMPANY, idStore as String)
         assertNull(pp)
-        PermissionType.values().each {pt ->
-            if(!(pt in [
-                    PermissionType.PUBLISH_STORE_CATALOGS,
-                    PermissionType.UPDATE_CATALOG,
-                    PermissionType.UPDATE_CATALOG_CATEGORY,
-                    PermissionType.ACCESS_STORE_BO
-            ])){
+        PermissionType.admin().each {pt ->
+            if(!(pt in [PermissionType.ADMIN_COMPANY])){
                 pp = service.getProfilePermission(child, pt, idStore as String)
                 assertNotNull(pp)
                 assertEquals(computePermission(pt, idStore as String), pp.target)
             }
         }
     }
+
+    void "when copying a profile to a store, a child profile with the matching store permissions should have been created"() {
+        given:
+        Company company = Company.findByCode("mogobiz")
+        def idStore = company.id
+        def name = "copy"
+        def parent = new Profile(name: "parent")
+        commonService.saveEntity(parent)
+        PermissionType.admin().each {pt ->
+            service.saveProfilePermission(parent, true, pt)
+        }
+        when:
+        service.copyProfile(parent.id, idStore, name)
+        then:
+        def child = Profile.findByCompanyAndName(company, name)
+        assertNotNull(child)
+        assertEquals(name, child.name)
+        PermissionType.admin().each {pt ->
+            def pp = service.getProfilePermission(child, pt, idStore as String)
+            assertNotNull(pp)
+            assertEquals(computePermission(pt, idStore as String), pp.target)
+        }
+    }
+
 }

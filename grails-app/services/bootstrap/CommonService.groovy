@@ -1,10 +1,13 @@
 package bootstrap
+
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.*
 import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.vo.RegisteredCartItemVO
 import com.mogobiz.utils.DateUtilitaire
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.tools.QRCodeUtils
+import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.util.Holders
@@ -13,6 +16,8 @@ import groovy.json.JsonBuilder
 public class CommonService {
 
 	SanitizeUrlService sanitizeUrlService
+
+    ProfileService profileService
 
     def destroy() {}
 	def init() {
@@ -97,6 +102,49 @@ public class CommonService {
         EsEnv.findAll().each {env ->
             env.running = false
             env.save()
+        }
+
+        def name = "admin"
+        def parent = Profile.findByNameAndCompany(name, null) ?: new Profile(name: name).save(flush:true)
+        def oldPermissions = ProfilePermission.findAllByProfile(parent)
+        oldPermissions.each { it.delete(flush: true) }
+        PermissionType.admin().each {pt ->
+            profileService.saveProfilePermission(parent, true, pt)
+        }
+        Company.findAll().each {company ->
+            def child = Profile.findByCompanyAndParent(company, parent)
+            if(!child){
+                child = profileService.applyProfile(parent.id, company.id)
+                Seller.findAllByCompanyAndAdmin(company, true).each {
+                    profileService.applyUserProfile(it.id, child?.id)
+                }
+            }
+            else{
+                profileService.upgradeProfile(child, parent)
+            }
+        }
+
+        name = "seller"
+        parent = Profile.findByNameAndCompany(name, null) ?: new Profile(name: name).save(flush:true)
+        oldPermissions = ProfilePermission.findAllByProfile(parent)
+        oldPermissions.each { it.delete(flush: true) }
+        PermissionType.seller().each {pt ->
+            profileService.saveProfilePermission(parent, true, pt)
+        }
+        Company.findAll().each {company ->
+            def child = Profile.findByCompanyAndParent(company, parent)
+            if(!child){
+                child = profileService.applyProfile(parent.id, company.id)
+                Seller.findAllByCompanyAndSell(company, true).each {seller ->
+                    profileService.applyUserProfile(seller.id, child?.id)
+                }
+                Catalog.findAllByCompany(company).each {catalog ->
+                    // TODO
+                }
+            }
+            else{
+                profileService.upgradeProfile(child, parent)
+            }
         }
 	}
 

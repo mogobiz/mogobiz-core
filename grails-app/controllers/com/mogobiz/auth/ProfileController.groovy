@@ -25,7 +25,7 @@ class ProfileController {
     def index(Long idStore){
         if(authenticationService.isPermitted(
                 computeStorePermission(
-                        PermissionType.ADMIN_PROFILES, idStore))){
+                        PermissionType.ADMIN_STORE_PROFILES, idStore))){
             def profiles = idStore ? Profile.where {
                 company.id == idStore
             }.list() : Profile.findAll()
@@ -46,9 +46,9 @@ class ProfileController {
         if(profile){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_PROFILES, profile.company.id)))
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company.id)))
             withFormat {
-                html profiles: profile
+                html profile: profile
                 xml { render profile as XML }
                 json { render profile as JSON }
             }
@@ -68,14 +68,18 @@ class ProfileController {
             def idCompany = cmd.idCompany
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_PROFILES, idCompany))) {
+                            PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
                 def idProfile = cmd.idProfile
                 def profile = idProfile ? Profile.load(idProfile) : new Profile()
                 profile.name = cmd.name
                 profile.validate()
                 if(!profile.hasErrors()){
                     profile.save(flush:true)
-                    profileService.saveProfilePermission(profile, cmd.updateUsers, PermissionType.ADMIN_USERS, idCompany as String)
+                    profileService.saveProfilePermission(
+                            profile,
+                            cmd.users,
+                            PermissionType.ADMIN_STORE_USERS,
+                            idCompany as String)
                 }
             }
             else{
@@ -90,11 +94,27 @@ class ProfileController {
         if(profile){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_PROFILES, profile.company.id))){
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company.id))){
                 profile.delete(flush:true)
             }
             else{
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
+    }
+
+    def copy(Long idProfile, Long idStore, String name){
+        if(authenticationService.isPermitted(
+                computeStorePermission(
+                        PermissionType.ADMIN_STORE_PROFILES, idStore))){
+            def profile = profileService.copyProfile(idProfile, idStore, name)
+            withFormat {
+                html profile: profile
+                xml { render profile as XML }
+                json { render profile as JSON }
             }
         }
         else{
