@@ -32,12 +32,12 @@ class Profile
     /**
      * 
      */
-    com.mogobiz.store.domain.Company company
+    com.mogobiz.store.domain.Company company 
 
     /**
-     *
+     * 
      */
-    com.mogobiz.store.domain.Profile parent
+    com.mogobiz.store.domain.Profile parent 
 
     static transients = [ 'profileValidation', 'profileRender' ]
 
@@ -63,6 +63,7 @@ class Profile
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
         parent column:"parent_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
