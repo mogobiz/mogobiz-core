@@ -26,6 +26,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
@@ -37,6 +38,8 @@ class ImportService {
     SanitizeUrlService sanitizeUrlService
     ResService resService
     def grailsApplication
+    SessionFactory sessionFactory
+    ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     private String getFormulaCell(String cellValue, Map<String, XSSFSheet> sheets) {
         String[] tab = cellValue.split('!')
@@ -103,6 +106,7 @@ class ImportService {
 
 
     Map ximport(Catalog catalog, ZipFile zipFile) {
+        log.info("IMPORT STARTED")
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File impexDir = getImportDir(now)
         ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
@@ -111,7 +115,7 @@ class ImportService {
         }
         File inputFile = new File(dateDir, "mogobiz.xlsx")
 
-        XSSFWorkbook workbook = new XSSFWorkbook(XSSFWorkbook.openPackage(inputFile.getAbsolutePath()))
+        XSSFWorkbook workbook = new XSSFWorkbook(inputFile.getAbsolutePath())
         XSSFSheet brandSheet = workbook.getSheet("brand");
         XSSFSheet catSheet = workbook.getSheet("category");
         XSSFSheet catFeatSheet = workbook.getSheet("cat-feature");
@@ -333,6 +337,7 @@ class ImportService {
             }
         }
 
+        int countInserts = 0;
         // Products
         for (int rownum = 1; rownum < prdSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = prdSheet.getRow(rownum)
@@ -402,7 +407,7 @@ class ImportService {
                     }
                     if (p.validate()) {
                         IperUtil.withAutoTimestampSuppression(p) {
-                            p.save(flush: true)
+                            p.save(flush: false)
                         }
                         File resDir = new File(dateDir, p.sanitizedName)
                         if (resDir.exists() && resDir.list().size() > 0) {
@@ -428,9 +433,14 @@ class ImportService {
                                         position: countRes++
                                 )
                                 if (product2Resource.validate()) {
-                                    product2Resource.save(flush: true)
+                                    product2Resource.save(flush: false)
                                 }
                             }
+                        }
+                        countInserts++;
+                        if (countInserts % 100 == 0) {
+                            log.info(countInserts)
+                            this.cleanUpGorm()
                         }
                     } else {
                         p.errors.allErrors.each { println(it) }
@@ -460,7 +470,7 @@ class ImportService {
                         Feature feat = Feature.findByUuid(uuid)
                         if (feat?.category != null) {
                             FeatureValue featVal = new FeatureValue(value:value, product: product, feature: feat)
-                            featVal.save(flush: true)
+                            featVal.save(flush: false)
                             created = true
                         }
                     }
@@ -473,12 +483,18 @@ class ImportService {
                         f.name = name
                         f.value = value
                         f.hide = hide
-                        if (f.validate())
-                            f.save(flush: true)
+                        if (f.validate()) {
+                            f.save(flush: false)
+                        }
                         else {
                             f.errors.allErrors.each { println(it) }
                             return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
                         }
+                    }
+                    countInserts++;
+                    if (countInserts % 100 == 0) {
+                        log.info(countInserts)
+                        this.cleanUpGorm()
                     }
                 }
             }
@@ -506,12 +522,16 @@ class ImportService {
                     pp.name = name
                     pp.value = value
                     if (pp.validate())
-                        pp.save(flush: true)
+                        pp.save(flush: false)
                     else {
                         pp.errors.allErrors.each { println(it) }
                         return [errors: pp.errors.allErrors, sheet: "product-property", line: rownum]
                     }
-
+                    countInserts++;
+                    if (countInserts % 100 == 0) {
+                        log.info(countInserts)
+                        this.cleanUpGorm()
+                    }
                 }
             }
         }
@@ -589,16 +609,28 @@ class ImportService {
 
 
                     if (t.validate())
-                        t.save(flush: true)
+                        t.save(flush: false)
                     else {
                         t.errors.allErrors.each { println(it) }
                         return [errors: t.errors.allErrors, sheet: "sku", line: rownum]
+                    }
+                    countInserts++;
+                    if (countInserts % 100 == 0) {
+                        log.info(countInserts)
+                        this.cleanUpGorm()
                     }
                 }
             }
         }
         impexDir.deleteDir()
+        log.info("IMPORT FINISHED")
         return [errors: [], sheet: "", line: -1]
+    }
+    def cleanUpGorm() {
+        def session = sessionFactory.currentSession
+        session.flush()
+        session.clear()
+        propertyInstanceMap.get().clear()
     }
 
 }

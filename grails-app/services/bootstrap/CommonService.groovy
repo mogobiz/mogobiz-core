@@ -173,12 +173,12 @@ public class CommonService {
         }
 	}
 
-	public Feature createFeature(String name, String value, Product product, int position)
+	public Feature createFeature(String name, String value, Product product, int position, boolean flush = true)
 	{
 		Feature feature = Feature.findByNameAndValueAndProduct(name, value, product)
 		if (feature == null) {
 			feature = new Feature(name : name, position: position, uuid:UUID.randomUUID().toString(), value:value, product:product)
-			saveEntity(feature)
+			saveEntity(feature, flush)
 		}
 		return feature
 	}
@@ -205,14 +205,14 @@ public class CommonService {
         return tag;
     }
 
-    public Translation createTranslation(Company company, String lang, long target, Map translations){
+    public Translation createTranslation(Company company, String lang, long target, Map translations, boolean flush = true){
         Translation tr = new Translation(companyId: company?.id, lang: lang, target: target)
         JsonBuilder builder = new JsonBuilder()
         builder.call(translations)
         tr.value = builder.toString()
         tr.validate()
         if(!tr.hasErrors()){
-            saveEntity(tr)
+            saveEntity(tr, false)
         }
         else{
             tr.errors.allErrors.each {
@@ -266,7 +266,7 @@ public class CommonService {
         return shipping
     }
 
-	public Product createProduct(String code, String name, long montant, ProductType xtype, ProductCalendar calendarType, Company company, Brand brand, Category category, TaxRate taxRate, String description, Collection<Tag> tags = [], Shipping shipping = null, String keywords = null)
+	public Product createProduct(String code, String name, long montant, ProductType xtype, ProductCalendar calendarType, Company company, Brand brand, Category category, TaxRate taxRate, String description, Collection<Tag> tags = [], Shipping shipping = null, String keywords = null, boolean flush = true)
 	{
 		Product product = Product.findByCode(code);
 		if (product == null)
@@ -295,7 +295,7 @@ public class CommonService {
                 taxRate: taxRate,
                 keywords: keywords
 			);
-			saveEntity(product);
+			saveEntity(product, flush);
 
             if(!tags?.isEmpty()){
                 tags.each {
@@ -307,13 +307,13 @@ public class CommonService {
 		return product;
 	}
 
-	public Translation createTranslation(Company company, long target, String lang, String value, String type)
+	public Translation createTranslation(Company company, long target, String lang, String value, String type, boolean flush = true)
 	{
 		Translation translation = Translation.findByTargetAndLang(target, lang);
 		if (translation == null)
 		{
 			translation = new Translation(companyId: company.id, target: target, lang: lang, value: value, type: type);
-			saveEntity(translation);
+			saveEntity(translation, flush);
 		}
 		return translation;
 	}
@@ -330,7 +330,7 @@ public class CommonService {
 		return period
 	}
 
-	public TicketType createSKU(String name, long montant, Product produit, String variation1, String variation2, String variation3, long nombreEnStock)
+	public TicketType createSKU(String name, long montant, Product produit, String variation1, String variation2, String variation3, long nombreEnStock, boolean flush = true)
 	{
 		TicketType sku = TicketType.findByNameAndProduct(name, produit);
 		if (sku == null)
@@ -351,7 +351,7 @@ public class CommonService {
 			{
 				sku.variation3 = VariationValue.findByValue(variation3);
 			}
-			saveEntity(sku);
+			saveEntity(sku, flush);
 		}
 		return sku;
 	}
@@ -516,12 +516,12 @@ public class CommonService {
         shippingRule
     }
 
-	public void saveEntity(def entite)
+	public void saveEntity(def entite, boolean flush = true)
 	{
 		String msg = "";
 		if (entite.validate())
 		{
-			entite.save(flush: true)
+			entite.save(flush: flush)
 		}
 		else
 		{

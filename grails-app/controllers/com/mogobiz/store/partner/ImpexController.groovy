@@ -7,9 +7,14 @@ import com.mogobiz.service.ImportService
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
+import com.sun.corba.se.spi.orbutil.threadpool.Work
 import grails.converters.JSON
 import grails.transaction.Transactional
+import groovy.sql.Sql
+import org.hibernate.SessionFactory
 
+import java.sql.Connection
+import java.sql.SQLException
 import java.util.zip.ZipFile
 
 class ImpexController {
@@ -18,6 +23,7 @@ class ImpexController {
     CatalogService catalogService
     AuthenticationService authenticationService
     ImportService importService
+    SessionFactory sessionFactory
 
     @Transactional
     def purge() {
@@ -54,6 +60,7 @@ class ImpexController {
 
     @Transactional
     def ximport() {
+        Date start = new Date()
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -93,5 +100,7 @@ class ImpexController {
         } else {
             response.sendError(401, "Missing file")
         }
+        Date end = new Date()
+        println("IMPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
     }
 }

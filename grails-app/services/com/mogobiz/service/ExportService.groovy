@@ -387,7 +387,7 @@ class ExportService {
                             prdFeatCell.setCellFormula(it)
                         else {
                             prdFeatCell.setCellValue(it)
-                            prdFeatCell.setCellStyle(unlockedCellStyle)
+                            //prdFeatCell.setCellStyle(unlockedCellStyle)
                         }
                     }
                 }
