@@ -118,7 +118,7 @@ public class CommonService {
             if(!child){
                 child = profileService.applyProfile(parent.id, company.id)
                 Seller.findAllByCompanyAndAdmin(company, true).each {
-                    profileService.applyUserProfile(it.id, child?.id)
+                    profileService.addUserProfile(it, child)
                 }
             }
             else{
@@ -137,8 +137,8 @@ public class CommonService {
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child){
                 child = profileService.applyProfile(parent.id, company.id)
-                Seller.findAllByCompanyAndSell(company, true).each {seller ->
-                    profileService.applyUserProfile(seller.id, child?.id)
+                Seller.findAllByCompanyAndAgent(company, true).each {seller ->
+                    profileService.addUserProfile(seller, child)
                     Catalog.findAllByCompany(company).each {catalog ->
                         profileService.saveUserPermission(
                                 seller,

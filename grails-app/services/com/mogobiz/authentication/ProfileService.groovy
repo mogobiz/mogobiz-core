@@ -94,6 +94,21 @@ class ProfileService {
         child
     }
 
+    void removeProfile(Profile profile){
+        User.findAllByProfilesInList([profile]).each {user ->
+            user.removeFromProfiles(profile)
+            user.save(flush: true)
+        }
+        Profile.findAllByParent(profile).each{child ->
+            User.findAllByProfilesInList([child]).each {user ->
+                user.removeFromProfiles(profile)
+                user.save(flush: true)
+            }
+            child.delete(flush: true)
+        }
+        profile.delete(flush: true)
+    }
+
     /**
      * copy profile permissions
      * @param child - the child profile to upgrade
@@ -131,14 +146,24 @@ class ProfileService {
 
     /**
      * add a user profile
-     * @param idUser - id user
-     * @param idProfile - id profile
+     * @param user - user
+     * @param profile - profile
      */
-    void applyUserProfile(Long idUser, Long idProfile){
-        Profile profile = Profile.load(idProfile)
-        User user = User.load(idUser)
+    void addUserProfile(User user, Profile profile){
         if(profile && user && profile.company.id == user.company.id){
             user.addToProfiles(profile)
+            user.save(flush: true)
+        }
+    }
+
+    /**
+     * remove a user profile
+     * @param user - user
+     * @param profile - profile
+     */
+    void removeUserProfile(User user, Profile profile ){
+        if(profile && user && profile in user.profiles){
+            user.removeFromProfiles(profile)
             user.save(flush: true)
         }
     }

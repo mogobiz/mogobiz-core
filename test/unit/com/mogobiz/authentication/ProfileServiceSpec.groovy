@@ -11,6 +11,12 @@ import com.mogobiz.store.domain.Profile
 import com.mogobiz.store.domain.ProfilePermission
 import com.mogobiz.store.domain.ProfilePermissionValidation
 import com.mogobiz.store.domain.ProfileValidation
+import com.mogobiz.store.domain.Role
+import com.mogobiz.store.domain.RoleName
+import com.mogobiz.store.domain.RolePermission
+import com.mogobiz.store.domain.RoleValidation
+import com.mogobiz.store.domain.User
+import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.utils.PermissionType
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -24,7 +30,7 @@ import static com.mogobiz.utils.ProfileUtils.computePermission
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(ProfileService)
-@Mock([Company, Location, Permission, Profile, ProfilePermission])
+@Mock([Company, Location, Role, RolePermission, User, Permission, UserPermission, Profile, ProfilePermission])
 class ProfileServiceSpec extends Specification {
 
     CommonService commonService
@@ -43,6 +49,9 @@ class ProfileServiceSpec extends Specification {
         Company.metaClass.getCompanyValidation = {new CompanyValidation()}
         Company company = new Company(code: "mogobiz", name: "Mogobiz", location: location, website: "http://www.ebiznext.com", aesPassword:"5c3f3da15cae1bf2bc736b95bda10c78", email:"contact@mogobiz.com")
         commonService.saveEntity(company)
+
+        Role.metaClass.getRoleValidation = {new RoleValidation()}
+        Role admin = commonService.createRole(RoleName.SALESAGENT)
 
         Profile.metaClass.getProfileValidation = {new ProfileValidation()}
 
@@ -169,6 +178,7 @@ class ProfileServiceSpec extends Specification {
         then:
         def child = Profile.findByCompanyAndName(company, name)
         assertNotNull(child)
+        assertNull(child.parent)
         assertEquals(name, child.name)
         PermissionType.admin().each {pt ->
             def pp = service.getProfilePermission(child, pt, idStore as String)

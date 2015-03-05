@@ -1,8 +1,10 @@
 package com.mogobiz.service
 
 import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.*
 import com.mogobiz.tools.RandomPassword
+import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SymmetricCrypt
 import grails.converters.JSON
 import grails.util.Holders
@@ -18,6 +20,7 @@ class SellerService {
     def emailConfirmationService
     AuthenticationService authenticationService
     CompanyService companyService
+    ProfileService profileService
 
 
     def setActiveCompany(Seller seller, Company company) {
@@ -32,7 +35,7 @@ class SellerService {
 //        String decodedData = RSA.decrypt(paramData, Environment.currentEnvironment == Environment.PRODUCTION ? new FileInputStream(Holders.config.rsa.key.dir, "private.key") : ServletContextHolder.servletContext.getResourceAsStream("/WEB-INF/secretkeys/private.key"))
 //        String decodedData = RSA.decrypt(paramData, new FileInputStream("/Users/hayssams/git/mogobiz/mogobiz-core/grails-app/conf/secretkeys/private.key"))
         String decodedData = SymmetricCrypt.decrypt(paramData, Holders.config.application.secret, "AES")
-        JSONObject data = JSON.parse(decodedData)
+        JSONObject data = JSON.parse(decodedData) as JSONObject
         String storename = data.get("storename")
         String storecode = data.get("storecode")
         String owneremail = data.get("owneremail")
@@ -118,30 +121,8 @@ class SellerService {
             seller.addToCompanies(seller.company)
             seller.save()
 
-            def permission = Permission.findByTypeAndPossibleActions(
-                    'org.apache.shiro.authz.permission.WildcardPermission',
-                    '*')
-            if (permission) {
-                UserPermission userPermission = UserPermission.createCriteria().get {
-                    eq('permission.id', permission?.id)
-                    eq('user.id', seller.id)
-                    eq('target', 'company:' + seller.company.id + ':admin')
-                    eq('actions', '*')
-                }
-                if (seller.admin) {
-                    if (!userPermission) {
-                        userPermission = new UserPermission(
-                                permission: permission,
-                                user: seller,
-                                target: 'company:' + seller.company.id + ':admin',
-                                actions: '*'
-                        )
-                        userPermission.save()
-                    }
-                } else if (userPermission) {
-                    userPermission.delete()
-                }
-            }
+            profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
+
             return seller
         } else {
             throw new Exception(seller.errors.allErrors.toListString())
@@ -173,20 +154,8 @@ class SellerService {
                 }
                 seller.save()
 
-                if (seller.admin) {
-                    def permission = Permission.findByTypeAndPossibleActions(
-                            'org.apache.shiro.authz.permission.WildcardPermission',
-                            '*')
-                    if (permission) {
-                        UserPermission userPermission = new UserPermission(
-                                permission: permission,
-                                user: seller,
-                                target: 'company:' + seller.company.id + ':admin',
-                                actions: '*'
-                        )
-                        userPermission.save()
-                    }
-                }
+                profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
+
                 String targetUri = grailsApplication.config.grails.serverURL;
                 // email confirmation
                 if (sendConfirmation) {

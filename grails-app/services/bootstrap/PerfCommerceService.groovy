@@ -1,14 +1,17 @@
 package bootstrap
 
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.store.domain.*
-import com.mogobiz.store.vo.RegisteredCartItemVO
+import com.mogobiz.utils.PermissionType
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
 
 class PerfCommerceService {
 
     CommonService commonService
+
+    ProfileService profileService
 
     def destroy() {}
 
@@ -75,21 +78,7 @@ class PerfCommerceService {
             commonService.saveEntity(seller)
         }
 
-        Permission permission = Permission.findByTypeAndPossibleActions('org.apache.shiro.authz.permission.WildcardPermission', '*');
-        UserPermission userPermission = UserPermission.createCriteria().get {
-            eq('permission.id', permission?.id)
-            eq('user.id', seller.id)
-            eq('target', 'company:' + seller.company.id + ':admin')
-            eq('actions', '*')
-        }
-        if (seller.admin) {
-            if (!userPermission) {
-                userPermission = new UserPermission(permission: permission, user: seller, target: 'company:' + seller.company.id + ':admin', actions: '*')
-                commonService.saveEntity(userPermission)
-            }
-        } else if (userPermission) {
-            userPermission.delete()
-        }
+        profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
 
         // création du valideur
         Seller userValidator = Seller.findByLogin("validator@mogobiz.com")
@@ -110,7 +99,7 @@ class PerfCommerceService {
         commonService.createTranslation(company, 'es', samsung.id, [website: 'http://www.samsung.com/es'])
         commonService.createTranslation(company, 'fr', samsung.id, [website: 'http://www.samsung.com/fr'])
 
-        Brand philips = commonService.createBrand("Philips", "http://www.philips.com", company);
+        commonService.createBrand("Philips", "http://www.philips.com", company);
 
         Brand nike = commonService.createBrand("Nike", "http://www.nike.com/fr/fr_fr/", company)
         commonService.createTranslation(company, 'de', nike.id, [website: 'http://www.nike.com/de/de_de/'])
