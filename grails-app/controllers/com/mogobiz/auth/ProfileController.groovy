@@ -77,30 +77,41 @@ class ProfileController {
                 if(authenticationService.isPermitted(
                         computeStorePermission(
                                 PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
-                    def profile = cmd.idProfile ? Profile.load(cmd.idProfile) : new Profile()
-                    profile.name = cmd.name
-                    profile.validate()
-                    if(!profile.hasErrors()){
-                        profile.save(flush:true)
-                        cmd.permissions.each {
-                            profileService.saveProfilePermission(
-                                    profile,
-                                    true,
-                                    it,
-                                    idCompany as String)
+                    def profile = cmd.idProfile ? Profile.load(cmd.idProfile) : null
+                    if(!profile){
+                        profile = new Profile(company: company)
+                    }
+                    if(profile.company.id == company.id){
+                        profile.name = cmd.name
+                        profile.validate()
+                        if(!profile.hasErrors()){
+                            profile.save(flush:true)
+                            cmd.permissions.each {
+                                profileService.saveProfilePermission(
+                                        profile,
+                                        true,
+                                        it,
+                                        idCompany as String)
+                            }
+                            PermissionType.minus(cmd.permissions).each {
+                                profileService.saveProfilePermission(
+                                        profile,
+                                        false,
+                                        it,
+                                        idCompany as String)
+                            }
+                            withFormat {
+                                html profile: profile.asMapForJSON()
+                                xml { render profile.asMapForJSON() as XML }
+                                json { render profile.asMapForJSON() as JSON }
+                            }
                         }
-                        PermissionType.minus(cmd.permissions).each {
-                            profileService.saveProfilePermission(
-                                    profile,
-                                    false,
-                                    it,
-                                    idCompany as String)
+                        else{
+                            response.sendError(HttpServletResponse.SC_BAD_REQUEST)
                         }
-                        withFormat {
-                            html profile: profile.asMapForJSON()
-                            xml { render profile.asMapForJSON() as XML }
-                            json { render profile.asMapForJSON() as JSON }
-                        }
+                    }
+                    else{
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST)
                     }
                 }
                 else{
