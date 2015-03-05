@@ -6,6 +6,7 @@
   <documentation>http://grails.org/plugin/mogobiz-core</documentation>
   <type>MogobizCoreGrailsPlugin</type>
   <resources>
+    <resource>spring.resources</resource>
     <resource>com.mogobiz.auth.AuthController</resource>
     <resource>com.mogobiz.auth.ExternalAuthController</resource>
     <resource>com.mogobiz.auth.OAuthController</resource>
@@ -132,6 +133,7 @@
     <resource>bootstrap.PerfCommerceService</resource>
     <resource>com.mogobiz.ajax.AjaxResponseService</resource>
     <resource>com.mogobiz.authentication.AuthenticationService</resource>
+    <resource>com.mogobiz.authentication.ProfileService</resource>
     <resource>com.mogobiz.geolocation.partner.PoiService</resource>
     <resource>com.mogobiz.service.BrandService</resource>
     <resource>com.mogobiz.service.CatalogService</resource>
