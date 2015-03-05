@@ -20,7 +20,7 @@ final class ProfileUtils {
     }
 
     static String computePermission(PermissionType type, String ... args){
-        MessageFormat.format(type.getValue(), args)
+        MessageFormat.format(type?.getValue(), args)
     }
 
     static PermissionType retrievePermissionFrom(String target){

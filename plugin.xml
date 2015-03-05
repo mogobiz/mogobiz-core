@@ -6,7 +6,6 @@
   <documentation>http://grails.org/plugin/mogobiz-core</documentation>
   <type>MogobizCoreGrailsPlugin</type>
   <resources>
-    <resource>spring.resources</resource>
     <resource>com.mogobiz.auth.AuthController</resource>
     <resource>com.mogobiz.auth.ExternalAuthController</resource>
     <resource>com.mogobiz.auth.OAuthController</resource>

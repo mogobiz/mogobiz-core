@@ -61,8 +61,8 @@ class ProfileService {
      * @return added/removed ProfilePermission
      */
     ProfilePermission saveProfilePermission(Profile p, boolean add, PermissionType type, String ... args){
-        ProfilePermission pp = getProfilePermission(p, type, args)
-        if(!pp && add){
+        ProfilePermission pp = type ? getProfilePermission(p, type, args) : null
+        if(!pp && type && add){
             pp = new ProfilePermission(target: computePermission(type, args), profile: p, permission: getWilcardPermission())
             pp.save(flush: true)
         }
@@ -177,10 +177,10 @@ class ProfileService {
     }
 
     UserPermission saveUserPermission(User user, boolean add, PermissionType type, String ... args){
-        String target = computePermission(type, args)
+        String target = type ? computePermission(type, args) : null
         def wildCardPermission = getWilcardPermission()
-        def userPermission = getUserPermission(user, type, args)
-        if(!userPermission && add){
+        def userPermission = type && user ? getUserPermission(user, type, args) : null
+        if(!userPermission && user && target && add){
             userPermission = new UserPermission(
                     permission: wildCardPermission,
                     target: target,
