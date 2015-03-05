@@ -2,13 +2,15 @@ package bootstrap
 
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.store.domain.*
-import com.mogobiz.store.vo.RegisteredCartItemVO
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
+import org.hibernate.SessionFactory
 
 class PerfCommerceService {
 
     CommonService commonService
+    SessionFactory sessionFactory
+    ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     def destroy() {}
 
@@ -126,6 +128,7 @@ class PerfCommerceService {
 
         commonService.createBrand("Hide brand", "http://www.google.fr", company, true);
 
+        int countInserts = 0;
         // création des categories
         for (int i = 1; i <= level1; i++) {
             Category cat = commonService.createCategory("Main $i", null, mogobiz, mogobizCatalog, 1, "hello, I am category Main $i from catalog ${mogobizCatalog.name}");
@@ -144,13 +147,18 @@ class PerfCommerceService {
                 // Création des produits
                 for (int k = 1; k < maxProducts; k++) {
                     Shipping shipping = commonService.createShipping(25 + k, 120, 110, 15)
-                    Product product = commonService.createProduct("PRODUCT_$i$j$k", "Product of sub cat $i$j with id $k", 28000 + (k * 100), ProductType.PRODUCT, ProductCalendar.NO_DATE, company, samsung, subcat, taxRate, "Product $i$j$k", null, shipping)
-                    commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, k % 2 == 0 ? "Blanc" : "Rouge", k % 2 == 0 ? "M" : "L", null, 10000 + (k * 100))
-                    Feature feature = commonService.createFeature("Frabriqué en ", "Country $k", product, 0)
-                    commonService.createTranslation(company, 'en', feature.id, [name: "Made in", value: "China"])
-                    commonService.createTranslation(company, 'es', feature.id, [name: "Fabricado :)", value: "China"])
-                    commonService.createFeature("Size", "100\"", product, 0)
-                    commonService.createFeature("Resulution", "Full HD", product, 1)
+                    Product product = commonService.createProduct("PRODUCT_$i$j$k", "Product of sub cat $i$j with id $k", 28000 + (k * 100), ProductType.PRODUCT, ProductCalendar.NO_DATE, company, samsung, subcat, taxRate, "Product $i$j$k", null, shipping, null, false)
+                    commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, k % 2 == 0 ? "Blanc" : "Rouge", k % 2 == 0 ? "M" : "L", null, 10000 + (k * 100), false)
+                    Feature feature = commonService.createFeature("Frabriqué en ", "Country $k", product, 0, false)
+                    commonService.createTranslation(company, 'en', feature.id, [name: "Made in", value: "China"], false)
+                    commonService.createTranslation(company, 'es', feature.id, [name: "Fabricado :)", value: "China"], false)
+                    commonService.createFeature("Size", "100\"", product, 0, false)
+                    commonService.createFeature("Resulution", "Full HD", product, 1, false)
+                    countInserts++;
+                    if (countInserts % 100 == 0) {
+                        log.info(countInserts)
+                        this.cleanUpGorm()
+                    }
                 }
                 log.info("End Performance Sub category creation $i$j")
             }
@@ -160,4 +168,11 @@ class PerfCommerceService {
         commonService.createShippingRule(company, "fr", 10001L, 10000L, "-10%")
         log.info("End Performance catalog creation")
     }
+    def cleanUpGorm() {
+        def session = sessionFactory.currentSession
+        session.flush()
+        session.clear()
+        propertyInstanceMap.get().clear()
+    }
+
 }
