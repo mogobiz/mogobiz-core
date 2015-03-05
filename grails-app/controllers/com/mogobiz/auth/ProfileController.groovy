@@ -35,8 +35,8 @@ class ProfileController {
             }.list() : Profile.findAllByCompanyIsNull()
             withFormat {
                 html profiles: profiles
-                xml { render profiles as XML }
-                json { render profiles as JSON }
+                xml { render profiles.collect {it.asMapForJSON()} as XML }
+                json { render profiles.collect {it.asMapForJSON()} as JSON }
             }
         }
         else{
@@ -50,11 +50,11 @@ class ProfileController {
         if(profile){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, profile.company.id)))
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id)))
             withFormat {
-                html profile: profile
-                xml { render profile as XML }
-                json { render profile as JSON }
+                html profile: profile.asMapForJSON()
+                xml { render profile.asMapForJSON() as XML }
+                json { render profile.asMapForJSON() as JSON }
             }
             else{
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
@@ -93,9 +93,9 @@ class ProfileController {
                                 idCompany as String)
                     }
                     withFormat {
-                        html profile: profile
-                        xml { render profile as XML }
-                        json { render profile as JSON }
+                        html profile: profile.asMapForJSON()
+                        xml { render profile.asMapForJSON() as XML }
+                        json { render profile.asMapForJSON() as JSON }
                     }
                 }
             }
@@ -107,7 +107,7 @@ class ProfileController {
 
     @Transactional
     def update(ProfileCommand cmd){
-        forward(action: "save")
+        forward(action: "save", params: [cmd: cmd])
     }
 
     @Transactional
@@ -139,9 +139,9 @@ class ProfileController {
                         PermissionType.ADMIN_STORE_PROFILES, idStore))){
             def profile = profileService.applyProfile(idProfile, idStore, name)
             withFormat {
-                html profile: profile
-                xml { render profile as XML }
-                json { render profile as JSON }
+                html profile: profile.asMapForJSON()
+                xml { render profile.asMapForJSON() as XML }
+                json { render profile.asMapForJSON() as JSON }
             }
         }
         else{
@@ -156,9 +156,9 @@ class ProfileController {
                         PermissionType.ADMIN_STORE_PROFILES, idStore))){
             def profile = profileService.copyProfile(idProfile, idStore, name)
             withFormat {
-                html profile: profile
-                xml { render profile as XML }
-                json { render profile as JSON }
+                html profile: profile.asMapForJSON()
+                xml { render profile.asMapForJSON() as XML }
+                json { render profile.asMapForJSON() as JSON }
             }
         }
         else{
@@ -175,6 +175,10 @@ class ProfileController {
                     computeStorePermission(
                             PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
                 profileService.addUserProfile(user, cmd.profile)
+                withFormat {
+                    xml { render [:] as XML }
+                    json { render [:] as JSON }
+                }
             }
             else{
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
@@ -215,9 +219,9 @@ class ProfileController {
                 def args = cmd.args
                 def permission = profileService.saveUserPermission(user, true, cmd.permission, args.toArray(new String[args.size()]))
                 withFormat {
-                    html permission: permission
-                    xml { render permission as XML }
-                    json { render permission as JSON }
+                    html permission: permission.asMapForJSON()
+                    xml { render permission.asMapForJSON() as XML }
+                    json { render permission.asMapForJSON() as JSON }
                 }
             }
             else{
@@ -238,11 +242,10 @@ class ProfileController {
                     computeStorePermission(
                             PermissionType.ADMIN_STORE_USERS, user.company?.id))){
                 def args = cmd.args
-                def permission = profileService.saveUserPermission(user, false, cmd.permission, args.toArray(new String[args.size()]))
+                profileService.saveUserPermission(user, false, cmd.permission, args.toArray(new String[args.size()]))
                 withFormat {
-                    html permission: permission
-                    xml { render permission as XML }
-                    json { render permission as JSON }
+                    xml { render [:] as XML }
+                    json { render [:] as JSON }
                 }
             }
             else{
