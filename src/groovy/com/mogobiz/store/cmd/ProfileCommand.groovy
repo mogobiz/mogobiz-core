@@ -1,7 +1,5 @@
 package com.mogobiz.store.cmd
 
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Profile
 import com.mogobiz.utils.PermissionType
 import grails.validation.Validateable
 
@@ -12,14 +10,15 @@ import grails.validation.Validateable
 @Validateable
 class ProfileCommand {
 
-    Profile profile
-    Company company
+    Long idProfile
+    Long idCompany
     String name
-    Collection<PermissionType> permissions = []
+    List<PermissionType> permissions = []
 
     static constraints = {
-        profile nullable: true
-        company blank: false
+        idProfile nullable: true
+        idCompany nullable: false
         name blank: false
+        permissions minSize: 1
     }
 }

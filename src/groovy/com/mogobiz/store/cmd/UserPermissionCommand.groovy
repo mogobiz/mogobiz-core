@@ -1,6 +1,5 @@
 package com.mogobiz.store.cmd
 
-import com.mogobiz.store.domain.User
 import com.mogobiz.utils.PermissionType
 import grails.validation.Validateable
 
@@ -11,14 +10,14 @@ import grails.validation.Validateable
 @Validateable
 class UserPermissionCommand {
 
-    User user
+    Long idUser
 
     PermissionType permission
 
     Collection<String> args = []
 
     static constraints = {
-        user (nullable: false)
+        idUser (nullable: false)
         permission (nullable: false)
         args (nullable: false)
     }

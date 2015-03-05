@@ -1,7 +1,5 @@
 package com.mogobiz.store.cmd
 
-import com.mogobiz.store.domain.Profile
-import com.mogobiz.store.domain.User
 import grails.validation.Validateable
 
 /**
@@ -10,12 +8,12 @@ import grails.validation.Validateable
  */
 @Validateable
 class UserProfileCommand {
-    User user
+    Long idUser
 
-    Profile profile
+    Long idProfile
 
     static constraints = {
-        user (nullable: false)
-        profile (nullable: false)
+        idUser (nullable: false)
+        idProfile (nullable: false)
     }
 }

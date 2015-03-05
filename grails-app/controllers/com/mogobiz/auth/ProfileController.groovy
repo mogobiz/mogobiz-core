@@ -5,7 +5,9 @@ import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.cmd.ProfileCommand
 import com.mogobiz.store.cmd.UserPermissionCommand
 import com.mogobiz.store.cmd.UserProfileCommand
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Profile
+import com.mogobiz.store.domain.User
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
@@ -69,38 +71,44 @@ class ProfileController {
     def save(ProfileCommand cmd){
         cmd.validate()
         if(!cmd.hasErrors()){
-            def idCompany = cmd.company.id
-            if(authenticationService.isPermitted(
-                    computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
-                def profile = cmd.profile ?: new Profile()
-                profile.name = cmd.name
-                profile.validate()
-                if(!profile.hasErrors()){
-                    profile.save(flush:true)
-                    cmd.permissions.each {
-                        profileService.saveProfilePermission(
-                                profile,
-                                true,
-                                it,
-                                idCompany as String)
+            def idCompany = cmd.idCompany
+            def company = Company.load(idCompany)
+            if(company){
+                if(authenticationService.isPermitted(
+                        computeStorePermission(
+                                PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
+                    def profile = cmd.idProfile ? Profile.load(cmd.idProfile) : new Profile()
+                    profile.name = cmd.name
+                    profile.validate()
+                    if(!profile.hasErrors()){
+                        profile.save(flush:true)
+                        cmd.permissions.each {
+                            profileService.saveProfilePermission(
+                                    profile,
+                                    true,
+                                    it,
+                                    idCompany as String)
+                        }
+                        PermissionType.minus(cmd.permissions).each {
+                            profileService.saveProfilePermission(
+                                    profile,
+                                    false,
+                                    it,
+                                    idCompany as String)
+                        }
+                        withFormat {
+                            html profile: profile.asMapForJSON()
+                            xml { render profile.asMapForJSON() as XML }
+                            json { render profile.asMapForJSON() as JSON }
+                        }
                     }
-                    PermissionType.minus(cmd.permissions).each {
-                        profileService.saveProfilePermission(
-                                profile,
-                                false,
-                                it,
-                                idCompany as String)
-                    }
-                    withFormat {
-                        html profile: profile.asMapForJSON()
-                        xml { render profile.asMapForJSON() as XML }
-                        json { render profile.asMapForJSON() as JSON }
-                    }
+                }
+                else{
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 }
             }
             else{
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
             }
         }
     }
@@ -113,8 +121,11 @@ class ProfileController {
     @Transactional
     def delete(Long id){
         def profile = Profile.load(id)
-        if(profile && profile.company){
-            if(authenticationService.isPermitted(
+        if(profile){
+            if(!profile.company){
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST)
+            }
+            else if(authenticationService.isPermitted(
                     computeStorePermission(
                             PermissionType.ADMIN_STORE_PROFILES, profile.company.id))){
                 profileService.removeProfile(profile)
@@ -170,18 +181,24 @@ class ProfileController {
     def addUserProfile(UserProfileCommand cmd){
         cmd.validate()
         if(!cmd.hasErrors()){
-            def user = cmd.user
-            if(authenticationService.isPermitted(
-                    computeStorePermission(
-                            PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
-                profileService.addUserProfile(user, cmd.profile)
-                withFormat {
-                    xml { render [:] as XML }
-                    json { render [:] as JSON }
+            def user = User.load(cmd.idUser)
+            def profile = Profile.load(cmd.idProfile)
+            if(user && profile){
+                if(authenticationService.isPermitted(
+                        computeStorePermission(
+                                PermissionType.ADMIN_STORE_USERS, user?.company?.id))) {
+                    profileService.addUserProfile(user, profile)
+                    withFormat {
+                        xml { render [:] as XML }
+                        json { render [:] as JSON }
+                    }
+                }
+                else{
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 }
             }
             else{
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
             }
         }
         else{
@@ -193,14 +210,19 @@ class ProfileController {
     def removeUserProfile(UserProfileCommand cmd){
         cmd.validate()
         if(!cmd.hasErrors()){
-            def user = cmd.user
-            if(authenticationService.isPermitted(
-                    computeStorePermission(
-                            PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
-                profileService.removeUserProfile(user, cmd.profile)
+            def user = User.load(cmd.idUser)
+            def profile = Profile.load(cmd.idProfile)
+            if(user && profile) {
+                if (authenticationService.isPermitted(
+                        computeStorePermission(
+                                PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+                    profileService.removeUserProfile(user, profile)
+                } else {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                }
             }
             else{
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
             }
         }
         else{
@@ -212,20 +234,25 @@ class ProfileController {
     def addUserPermission(UserPermissionCommand cmd){
         cmd.validate()
         if(!cmd.hasErrors()){
-            def user = cmd.user
-            if(authenticationService.isPermitted(
-                    computeStorePermission(
-                            PermissionType.ADMIN_STORE_USERS, user.company?.id))){
-                def args = cmd.args
-                def permission = profileService.saveUserPermission(user, true, cmd.permission, args.toArray(new String[args.size()]))
-                withFormat {
-                    html permission: permission.asMapForJSON()
-                    xml { render permission.asMapForJSON() as XML }
-                    json { render permission.asMapForJSON() as JSON }
+            def user = User.load(cmd.idUser)
+            if(user){
+                if(authenticationService.isPermitted(
+                        computeStorePermission(
+                                PermissionType.ADMIN_STORE_USERS, user.company?.id))){
+                    def args = cmd.args
+                    def permission = profileService.saveUserPermission(user, true, cmd.permission, args.toArray(new String[args.size()]))
+                    withFormat {
+                        html permission: permission.asMapForJSON()
+                        xml { render permission.asMapForJSON() as XML }
+                        json { render permission.asMapForJSON() as JSON }
+                    }
+                }
+                else{
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 }
             }
             else{
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
             }
         }
         else{
@@ -237,19 +264,23 @@ class ProfileController {
     def removeUserPermission(UserPermissionCommand cmd){
         cmd.validate()
         if(!cmd.hasErrors()){
-            def user = cmd.user
-            if(authenticationService.isPermitted(
-                    computeStorePermission(
-                            PermissionType.ADMIN_STORE_USERS, user.company?.id))){
-                def args = cmd.args
-                profileService.saveUserPermission(user, false, cmd.permission, args.toArray(new String[args.size()]))
-                withFormat {
-                    xml { render [:] as XML }
-                    json { render [:] as JSON }
+            def user = User.load(cmd.idUser)
+            if(user) {
+                if (authenticationService.isPermitted(
+                        computeStorePermission(
+                                PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+                    def args = cmd.args
+                    profileService.saveUserPermission(user, false, cmd.permission, args.toArray(new String[args.size()]))
+                    withFormat {
+                        xml { render [:] as XML }
+                        json { render [:] as JSON }
+                    }
+                } else {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 }
             }
             else{
-                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                response.sendError(HttpServletResponse.SC_NOT_FOUND)
             }
         }
         else{
