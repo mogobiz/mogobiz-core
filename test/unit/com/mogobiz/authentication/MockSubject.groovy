@@ -167,8 +167,9 @@ final class MockSubject implements Subject{
 
     @Override
     public boolean isPermitted(String permission) {
-        log.info("$principal isPermitted($permission)")
-        return realm.isPermitted(principal as String, new WildcardPermission(permission))
+        def ret = realm.isPermitted(principal as String, new WildcardPermission(permission))
+        log.info("$principal isPermitted($permission) -> $ret")
+        ret
     }
 
     @Override

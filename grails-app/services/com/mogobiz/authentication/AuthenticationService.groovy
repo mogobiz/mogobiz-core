@@ -165,7 +165,7 @@ class AuthenticationService {
     }
 
     boolean isPermitted(String... permissions){
-        permissions ? SecurityUtils.getSubject().isPermitted(permissions) : true
+        permissions ? SecurityUtils.getSubject().isPermitted(permissions).any {it} : true
     }
 
 }

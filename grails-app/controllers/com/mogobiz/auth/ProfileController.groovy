@@ -1,5 +1,7 @@
 package com.mogobiz.auth
 
+import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.cmd.ProfileCommand
 import com.mogobiz.store.cmd.UserPermissionCommand
 import com.mogobiz.store.cmd.UserProfileCommand
@@ -19,9 +21,9 @@ import static com.mogobiz.utils.ProfileUtils.*
  */
 class ProfileController {
 
-    def authenticationService
+    AuthenticationService authenticationService
 
-    def profileService
+    ProfileService profileService
 
     @Transactional
     def index(Long idStore){
@@ -30,7 +32,7 @@ class ProfileController {
                         PermissionType.ADMIN_STORE_PROFILES, idStore))){
             def profiles = idStore ? Profile.where {
                 company.id == idStore
-            }.list() : Profile.findAll()
+            }.list() : Profile.findAllByCompanyIsNull()
             withFormat {
                 html profiles: profiles
                 xml { render profiles as XML }
@@ -104,6 +106,11 @@ class ProfileController {
     }
 
     @Transactional
+    def update(ProfileCommand cmd){
+        forward(action: "save")
+    }
+
+    @Transactional
     def delete(Long id){
         def profile = Profile.load(id)
         if(profile && profile.company){
@@ -111,6 +118,10 @@ class ProfileController {
                     computeStorePermission(
                             PermissionType.ADMIN_STORE_PROFILES, profile.company.id))){
                 profileService.removeProfile(profile)
+                withFormat {
+                    xml { render [:] as XML }
+                    json { render [:] as JSON }
+                }
             }
             else{
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
