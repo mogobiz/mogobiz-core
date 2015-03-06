@@ -4,6 +4,8 @@ import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Profile
 import com.mogobiz.store.domain.ProfilePermission
+import com.mogobiz.store.domain.Role
+import com.mogobiz.store.domain.RolePermission
 import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.utils.PermissionType
@@ -136,6 +138,7 @@ class ProfileService {
                 def pp = new ProfilePermission(
                         profile: child,
                         permission: wildCard,
+                        key: parentPermission.key,
                         target: MessageFormat.format(parentPermission.target, child.company?.id as String)
                 )
                 pp.save(flush: true)
@@ -184,7 +187,6 @@ class ProfileService {
             (target == computePermission(type, args)) && user.id == u.id && permission.id == getWilcardPermission().id
         }
         query.get()
-
     }
 
     UserPermission saveUserPermission(User user, boolean add, PermissionType type, String ... args){
@@ -195,12 +197,37 @@ class ProfileService {
             userPermission = new UserPermission(
                     permission: wildCardPermission,
                     target: target,
+                    key: type.key,
                     user: user).save(flush:true)
         }
         else if(userPermission && !add){
             userPermission.delete(flush: true)
         }
         userPermission
+    }
+
+    RolePermission getRolePermission(Role r, PermissionType type, String ... args){
+        DetachedCriteria<RolePermission> query = RolePermission.where {
+            (target == computePermission(type, args)) && role.id == r.id && permission.id == getWilcardPermission().id
+        }
+        query.get()
+    }
+
+    RolePermission saveRolePermission(Role role, boolean add, PermissionType type, String ... args){
+        String target = type ? computePermission(type, args) : null
+        def wildCardPermission = getWilcardPermission()
+        def rolePermission = type && role ? getRolePermission(role, type, args) : null
+        if(!rolePermission && role && target && add){
+            rolePermission = new RolePermission(
+                    permission: wildCardPermission,
+                    target: target,
+                    key: type.key,
+                    role: role).save(flush:true)
+        }
+        else if(rolePermission && !add){
+            rolePermission.delete(flush: true)
+        }
+        rolePermission
     }
 
     /**

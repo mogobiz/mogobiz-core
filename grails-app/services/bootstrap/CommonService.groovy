@@ -36,16 +36,7 @@ public class CommonService {
 			saveEntity(permission)
 		}
 
-		RolePermission adminCompanyRolePermission = RolePermission.createCriteria().get {
-			eq('permission.id', permission?.id)
-			eq('role.id', admin.id)
-			eq('target', 'company:*:admin')
-			eq('actions', '*')
-		}
-		if (!adminCompanyRolePermission) {
-			adminCompanyRolePermission = new RolePermission(permission : permission, role : admin, target : 'company:*:admin');
-			saveEntity(adminCompanyRolePermission)
-		}
+        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_COMPANY, ALL)
 
         // création de l'admin
         User userAdmin = User.findByLogin(Holders.config.superadmin.login)
