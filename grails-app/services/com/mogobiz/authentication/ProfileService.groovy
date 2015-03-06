@@ -74,13 +74,12 @@ class ProfileService {
 
     /**
      * create/upgrade a profile within a particular store linked to the profile whose id has been passed as parameter
-     * @param idProfile - id profile
+     * @param parent - parent profile
      * @param idStore - id store
      * @param name - profile name
      * @return created/upgraded Profile
      */
-    Profile applyProfile(Long idProfile, Long idStore, String name = null){
-        Profile parent = Profile.load(idProfile)
+    Profile applyProfile(Profile parent, Long idStore, String name = null){
         Company company = Company.load(idStore)
         Profile child = null
         if(company && parent && !parent.company){
@@ -89,7 +88,20 @@ class ProfileService {
                     parent: parent,
                     company: company
             ).save(flush:true)
-            upgradeProfile(child, parent)
+            upgradeProfile(child)
+        }
+        child
+    }
+
+    /**
+     * unbind a profile from its parent
+     * @param idProfile - id profile
+     * @return Profile
+     */
+    Profile unbindProfile(Profile child){
+        if(child && child.parent){
+            child.parent = null
+            child.save(flush: true)
         }
         child
     }
@@ -110,12 +122,12 @@ class ProfileService {
     }
 
     /**
-     * copy profile permissions
+     * upgrade profile permissions
      * @param child - the child profile to upgrade
      * @param parent - the parent profile from whom the permissions will be copied
      */
-    void upgradeProfile(Profile child, Profile parent) {
-        if(!parent.company || child.company?.id == parent.company?.id){
+    void upgradeProfile(Profile child, Profile parent = child?.parent) {
+        if(parent && !parent.company || child.company?.id == parent.company?.id){
             def wildCard = getWilcardPermission()
             def oldPermissions = ProfilePermission.findAllByProfile(child)
             oldPermissions.each { it.delete(flush: true) }
@@ -133,13 +145,12 @@ class ProfileService {
 
     /**
      * upgrade all profiles which are linked to the profile whose id has been passed as parameter
-     * @param idProfile - id profile
+     * @param parent - parent profile
      */
-    void upgradeChildProfiles(Long idProfile){
-        Profile parent = Profile.load(idProfile)
+    void upgradeChildProfiles(Profile parent){
         if(parent && !parent.company){
             Profile.findAllByParent(parent).each {child ->
-                upgradeProfile(child, parent)
+                upgradeProfile(child)
             }
         }
     }
@@ -195,13 +206,12 @@ class ProfileService {
     /**
      * allows a copied from an existing profile
      * no link is created between the existing profile and the copied profile
-     * @param idProfile - the profile to copy
+     * @param parent - the profile to copy
      * @param idStore - the store in which the profile will be copied
      * @param name - the profile name
      * @return id of the copied profile
      */
-    Profile copyProfile(Long idProfile, Long idStore, String name = null){
-        Profile parent = Profile.load(idProfile)
+    Profile copyProfile(Profile parent, Long idStore, String name = null){
         Company company = Company.load(idStore)
         Profile child = null
         if(company && parent && (!parent.company || parent.company.id == idStore)){

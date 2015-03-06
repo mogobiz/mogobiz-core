@@ -122,7 +122,7 @@ class ProfileServiceSpec extends Specification {
             service.saveProfilePermission(parent, true, pt)
         }
         when:
-        service.applyProfile(parent.id, idStore)
+        service.applyProfile(parent, idStore)
         then:
         def child = Profile.findByCompanyAndParent(company, parent)
         assertNotNull(child)
@@ -144,10 +144,10 @@ class ProfileServiceSpec extends Specification {
         PermissionType.admin().each {pt ->
             service.saveProfilePermission(parent, true, pt)
         }
-        service.applyProfile(parent.id, idStore)
+        service.applyProfile(parent, idStore)
         service.saveProfilePermission(parent, false, PermissionType.ADMIN_COMPANY)
         when:
-        service.upgradeChildProfiles(parent.id)
+        service.upgradeChildProfiles(parent)
         then:
         def child = Profile.findByCompanyAndParent(company, parent)
         assertNotNull(child)
@@ -174,7 +174,7 @@ class ProfileServiceSpec extends Specification {
             service.saveProfilePermission(parent, true, pt)
         }
         when:
-        service.copyProfile(parent.id, idStore, name)
+        service.copyProfile(parent, idStore, name)
         then:
         def child = Profile.findByCompanyAndName(company, name)
         assertNotNull(child)

@@ -17,7 +17,7 @@ class ProfileCommand {
 
     static constraints = {
         idProfile nullable: true
-        idCompany nullable: false
+        idCompany nullable: true
         name blank: false
         permissions minSize: 1
     }

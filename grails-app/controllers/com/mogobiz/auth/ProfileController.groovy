@@ -73,7 +73,7 @@ class ProfileController {
         if(!cmd.hasErrors()){
             def idCompany = cmd.idCompany
             def company = Company.load(idCompany)
-            if(company){
+//            if(company){
                 if(authenticationService.isPermitted(
                         computeStorePermission(
                                 PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
@@ -81,7 +81,7 @@ class ProfileController {
                     if(!profile){
                         profile = new Profile(company: company)
                     }
-                    if(profile.company.id == company.id){
+                    if(profile.company?.id == idCompany){
                         profile.name = cmd.name
                         profile.validate()
                         if(!profile.hasErrors()){
@@ -117,16 +117,48 @@ class ProfileController {
                 else{
                     response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 }
-            }
-            else{
-                response.sendError(HttpServletResponse.SC_NOT_FOUND)
-            }
+//            }
+//            else{
+//                response.sendError(HttpServletResponse.SC_NOT_FOUND)
+//            }
         }
     }
 
     @Transactional
     def update(ProfileCommand cmd){
         forward(action: "save", params: [cmd: cmd])
+    }
+
+    @Transactional
+    def upgrade(Long id){
+        def profile = Profile.load(id)
+        if(profile){
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id))){
+                if(!profile.parent){
+                    profileService.upgradeChildProfiles(profile)
+                    withFormat {
+                        xml { render [:] as XML }
+                        json { render [:] as JSON }
+                    }
+                }
+                else{
+                    profile = profileService.upgradeProfile(profile)
+                    withFormat {
+                        html profile: profile.asMapForJSON()
+                        xml { render profile.asMapForJSON() as XML }
+                        json { render profile.asMapForJSON() as JSON }
+                    }
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
     }
 
     @Transactional
@@ -156,35 +188,70 @@ class ProfileController {
 
     @Transactional
     def apply(Long idProfile, Long idStore, String name){
-        if(authenticationService.isPermitted(
-                computeStorePermission(
-                        PermissionType.ADMIN_STORE_PROFILES, idStore))){
-            def profile = profileService.applyProfile(idProfile, idStore, name)
-            withFormat {
-                html profile: profile.asMapForJSON()
-                xml { render profile.asMapForJSON() as XML }
-                json { render profile.asMapForJSON() as JSON }
+        def parent = Profile.load(idProfile)
+        if(parent){
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_PROFILES, idStore))){
+                def child = profileService.applyProfile(parent, idStore, name)
+                withFormat {
+                    html profile: child.asMapForJSON()
+                    xml { render child.asMapForJSON() as XML }
+                    json { render child.asMapForJSON() as JSON }
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
             }
         }
         else{
-            response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
+    }
+
+    @Transactional
+    def unbind(Long idProfile){
+        def profile = Profile.load(idProfile)
+        if(profile){
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id))){
+                profile = profileService.unbindProfile(profile)
+                withFormat {
+                    html profile: profile.asMapForJSON()
+                    xml { render profile.asMapForJSON() as XML }
+                    json { render profile.asMapForJSON() as JSON }
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
         }
     }
 
     @Transactional
     def copy(Long idProfile, Long idStore, String name){
-        if(authenticationService.isPermitted(
-                computeStorePermission(
-                        PermissionType.ADMIN_STORE_PROFILES, idStore))){
-            def profile = profileService.copyProfile(idProfile, idStore, name)
-            withFormat {
-                html profile: profile.asMapForJSON()
-                xml { render profile.asMapForJSON() as XML }
-                json { render profile.asMapForJSON() as JSON }
+        def parent = Profile.load(idProfile)
+        if(parent){
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_PROFILES, idStore))){
+                def profile = profileService.copyProfile(parent, idStore, name)
+                withFormat {
+                    html profile: profile.asMapForJSON()
+                    xml { render profile.asMapForJSON() as XML }
+                    json { render profile.asMapForJSON() as JSON }
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
             }
         }
         else{
-            response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
         }
     }
 

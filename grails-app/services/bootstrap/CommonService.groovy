@@ -107,36 +107,35 @@ public class CommonService {
         }
 
         def name = "admin"
-        def parent = Profile.findByNameAndCompany(name, null) ?: new Profile(name: name).save(flush:true)
+        def parent = Profile.findByNameAndCompanyIsNull(name) ?: new Profile(name: name).save(flush:true)
         def oldPermissions = ProfilePermission.findAllByProfile(parent)
         oldPermissions.each { it.delete(flush: true) }
         PermissionType.admin().each {pt ->
             profileService.saveProfilePermission(parent, true, pt)
         }
+        profileService.upgradeChildProfiles(parent)
         Company.findAll().each {company ->
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child){
-                child = profileService.applyProfile(parent.id, company.id)
+                child = profileService.applyProfile(parent, company.id)
                 Seller.findAllByCompanyAndAdmin(company, true).each {
                     profileService.addUserProfile(it, child)
                 }
             }
-            else{
-                profileService.upgradeProfile(child, parent)
-            }
         }
 
         name = "seller"
-        parent = Profile.findByNameAndCompany(name, null) ?: new Profile(name: name).save(flush:true)
+        parent = Profile.findByNameAndCompanyIsNull(name) ?: new Profile(name: name).save(flush:true)
         oldPermissions = ProfilePermission.findAllByProfile(parent)
         oldPermissions.each { it.delete(flush: true) }
         PermissionType.seller().each {pt ->
             profileService.saveProfilePermission(parent, true, pt)
         }
+        profileService.upgradeChildProfiles(parent)
         Company.findAll().each {company ->
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child){
-                child = profileService.applyProfile(parent.id, company.id)
+                child = profileService.applyProfile(parent, company.id)
                 Seller.findAllByCompanyAndAgent(company, true).each {seller ->
                     profileService.addUserProfile(seller, child)
                     Catalog.findAllByCompany(company).each {catalog ->
@@ -156,7 +155,7 @@ public class CommonService {
                                 ALL
                         )
                     }
-                    EsEnv.findAll().each {env ->
+                    EsEnv.findAllByCompany(company).each {env ->
                         profileService.saveUserPermission(
                                 seller,
                                 true,
@@ -166,9 +165,6 @@ public class CommonService {
                         )
                     }
                 }
-            }
-            else{
-                profileService.upgradeProfile(child, parent)
             }
         }
 	}
