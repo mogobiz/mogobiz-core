@@ -46,9 +46,6 @@ class PerfCommerceService {
             mogobiz.googleEnv = googleEnv
             commonService.saveEntity(mogobiz)
 
-            Catalog catalog = new Catalog(name: "Performance Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: mogobiz)
-            commonService.saveEntity(catalog)
-
             // création des TaxRate
             LocalTaxRate frTaxRate = new LocalTaxRate(rate: 19.6, active: true, countryCode: "FR");
             commonService.saveEntity(frTaxRate)
@@ -69,7 +66,12 @@ class PerfCommerceService {
             )
             commonService.saveEntity(env)
         }
-        Catalog mogobizCatalog = Catalog.findByNameAndCompany("Performance Catalog", mogobiz);
+
+        Catalog mogobizCatalog = Catalog.findByNameAndCompany("Performance Catalog", mogobiz)
+        if(!mogobizCatalog){
+            mogobizCatalog = new Catalog(name: "Performance Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: mogobiz)
+            commonService.saveEntity(mogobizCatalog)
+        }
 
         // création des sellers
         Seller seller = Seller.findByLogin("partner@mogobiz.com")
