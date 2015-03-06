@@ -107,7 +107,7 @@ public class CommonService {
         }
 
         def name = "admin"
-        def parent = Profile.findByNameAndCompanyIsNull(name) ?: new Profile(name: name).save(flush:true)
+        def parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
         def oldPermissions = ProfilePermission.findAllByProfile(parent)
         oldPermissions.each { it.delete(flush: true) }
         PermissionType.admin().each {pt ->
@@ -125,7 +125,7 @@ public class CommonService {
         }
 
         name = "seller"
-        parent = Profile.findByNameAndCompanyIsNull(name) ?: new Profile(name: name).save(flush:true)
+        parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
         oldPermissions = ProfilePermission.findAllByProfile(parent)
         oldPermissions.each { it.delete(flush: true) }
         PermissionType.seller().each {pt ->

@@ -28,7 +28,11 @@ class Profile
     /**
      * 
      */
-    java.lang.String name 
+    java.lang.String name
+    /**
+     *
+     */
+    java.lang.String code
     /**
      * 
      */
@@ -60,6 +64,7 @@ class Profile
 
         id name:'id',column:'id',generator:'native'
         name column:"name",insertable:true,updateable:true,lazy:false,cache:false
+        code column:"code",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -71,6 +76,7 @@ class Profile
     uuid (nullable:false, unique:false)
 
         name ( blank:false, nullable:false, unique:false)
+        code ( blank:false, nullable:false, unique:false)
         company (nullable:true)
         parent (nullable:true)
     }

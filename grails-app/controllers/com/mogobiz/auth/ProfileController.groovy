@@ -2,6 +2,7 @@ package com.mogobiz.auth
 
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.authentication.ProfileService
+import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.cmd.ProfileCommand
 import com.mogobiz.store.cmd.UserPermissionCommand
 import com.mogobiz.store.cmd.UserProfileCommand
@@ -26,6 +27,8 @@ class ProfileController {
     AuthenticationService authenticationService
 
     ProfileService profileService
+
+    SanitizeUrlService sanitizeUrlService
 
     @Transactional
     def index(Long idStore){
@@ -77,12 +80,15 @@ class ProfileController {
                 if(authenticationService.isPermitted(
                         computeStorePermission(
                                 PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
-                    def profile = cmd.idProfile ? Profile.load(cmd.idProfile) : null
+                    def name = cmd.name
+                    def code = sanitizeUrlService.sanitizeWithDashes(name)
+                    def profile = cmd.idProfile ? Profile.load(cmd.idProfile) : Profile.findByCodeAndCompany(code, company)
                     if(!profile){
                         profile = new Profile(company: company)
                     }
                     if(profile.company?.id == idCompany){
-                        profile.name = cmd.name
+                        profile.name = name
+                        profile.code = code
                         profile.validate()
                         if(!profile.hasErrors()){
                             profile.save(flush:true)
