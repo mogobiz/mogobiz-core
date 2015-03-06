@@ -39,6 +39,8 @@ class ImpexController {
 
     @Transactional(readOnly = true)
     def export() {
+        log.info("EXPORT STARTED")
+        Date start = new Date()
         Seller seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
@@ -56,16 +58,21 @@ class ImpexController {
         response.setHeader("Content-Disposition", "Attachment;Filename=\"${zipFile.getName()}\"")
         response.outputStream << zipFile.newInputStream()
         zipFile.delete()
+        log.info("EXPORT FINISHED")
+        Date end = new Date()
+        println("EXPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
     }
 
     @Transactional
     def ximport() {
+        log.info("IMPORT STARTED")
         Date start = new Date()
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (!seller) {
             response.sendError 401
             return
         }
+        log.info("Uploading file ...")
         def file = request.getFile('file')
         if (file && !file.empty) {
             File tmpFile = File.createTempFile("import", ".zip")
@@ -100,6 +107,7 @@ class ImpexController {
         } else {
             response.sendError(401, "Missing file")
         }
+        log.info("IMPORT FINISHED")
         Date end = new Date()
         println("IMPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
     }

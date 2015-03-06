@@ -5,6 +5,7 @@ import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Feature
 import com.mogobiz.store.domain.FeatureValue
+import com.mogobiz.store.domain.LocalTaxRate
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.ProductCalendar
@@ -13,8 +14,10 @@ import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.ProductType
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
+import com.mogobiz.store.domain.ShippingRule
 import com.mogobiz.store.domain.Stock
 import com.mogobiz.store.domain.Tag
+import com.mogobiz.store.domain.TaxRate
 import com.mogobiz.store.domain.TicketType
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
@@ -106,7 +109,6 @@ class ImportService {
 
 
     Map ximport(Catalog catalog, ZipFile zipFile) {
-        log.info("IMPORT STARTED")
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File impexDir = getImportDir(now)
         ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
@@ -114,8 +116,9 @@ class ImportService {
             it.isDirectory()
         }
         File inputFile = new File(dateDir, "mogobiz.xlsx")
-
+        log.info("Loading file ...")
         XSSFWorkbook workbook = new XSSFWorkbook(inputFile.getAbsolutePath())
+        log.info("File loaded")
         XSSFSheet brandSheet = workbook.getSheet("brand");
         XSSFSheet catSheet = workbook.getSheet("category");
         XSSFSheet catFeatSheet = workbook.getSheet("cat-feature");
@@ -125,6 +128,9 @@ class ImportService {
         XSSFSheet prdFeatSheet = workbook.getSheet("product-feature");
         XSSFSheet prdPropSheet = workbook.getSheet("product-property");
         XSSFSheet skuSheet = workbook.getSheet("sku");
+        XSSFSheet taxSheet = workbook.getSheet("taxrate");
+        XSSFSheet shipSheet = workbook.getSheet("shipping");
+
         Map<String, XSSFSheet> sheets = [
                 'category'       : catSheet,
                 'cat-feature'    : catFeatSheet,
@@ -132,9 +138,85 @@ class ImportService {
                 'variation-value': varValSheet,
                 'product'        : prdSheet,
                 'product-feature': prdFeatSheet,
-                'sku'            : skuSheet
+                'sku'            : skuSheet,
         ]
 
+        log.info("Importing tax rates")
+        // Tax Rate
+        for (int rownum = 1; rownum < taxSheet.getPhysicalNumberOfRows(); rownum++) {
+            XSSFRow row = taxSheet.getRow(rownum)
+            if (row != null) {
+                String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell.length() > 0) {
+                    String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                    String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                    String countryCode = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String stateCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String rate = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String active = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    TaxRate t = TaxRate.findByNameAndCompany(name, catalog.company)
+                    if (!t) {
+                        t = new TaxRate()
+                        t.company = catalog.company
+                        t.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        t.name = name
+                        if (t.validate())
+                            t.save(flush: true)
+                        else {
+                            t.errors.allErrors.each { println(it) }
+                            return [errors: t.errors.allErrors, sheet: "taxrate", line: rownum]
+                        }
+                    }
+                    LocalTaxRate l = new LocalTaxRate()
+                    l.uuid = uuid
+                    l.active = active.equalsIgnoreCase("true")
+                    l.countryCode = countryCode ?: null
+                    l.stateCode ?: null
+                    l.rate = rate.toFloat()
+
+                    if (l.validate()) {
+                        l.save(flush: true)
+                    } else {
+                        l.errors.allErrors.each { println(it) }
+                        return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
+                    }
+                }
+            }
+        }
+
+        log.info("Importing shipping")
+        // Shipping
+        for (int rownum = 1; rownum < shipSheet.getPhysicalNumberOfRows(); rownum++) {
+            XSSFRow row = shipSheet.getRow(rownum)
+            if (row != null) {
+                String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell.length() > 0) {
+                    String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                    String countryCode = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                    String minAmount = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String maxAmount = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String price = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    ShippingRule sr = ShippingRule.findByUuid(uuid)
+                    if (!sr) {
+                        sr = new ShippingRule()
+                    }
+                    sr.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                    sr.countryCode = countryCode
+                    sr.minAmount = minAmount.toFloat().toLong()
+                    sr.maxAmount = maxAmount.toFloat().toLong()
+                    sr.price = price
+                    sr.company = catalog.company
+                    if (sr.validate())
+                        sr.save(flush: true)
+                    else {
+                        sr.errors.allErrors.each { println(it) }
+                        return [errors: sr.errors.allErrors, sheet: "shipping", line: rownum]
+                    }
+                }
+            }
+        }
+
+        log.info("Importing brands")
         // Brand
         for (int rownum = 1; rownum < brandSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = brandSheet.getRow(rownum)
@@ -171,6 +253,7 @@ class ImportService {
         }
 
 
+        log.info("Importing categories")
         int maxdepth = 0
         for (int rownum = 1; rownum < catSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = catSheet.getRow(rownum)
@@ -231,6 +314,7 @@ class ImportService {
             }
         }
 
+        log.info("Importing category features")
         // Cat Features
         for (int rownum = 1; rownum < catFeatSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = catFeatSheet.getRow(rownum)
@@ -254,7 +338,7 @@ class ImportService {
                     f.domain = domain
                     f.name = name
                     f.value = value
-                    f.hide = hide
+                    f.hide = hide.equalsIgnoreCase("true")
                     if (f.validate())
                         f.save(flush: true)
                     else {
@@ -266,6 +350,7 @@ class ImportService {
             }
         }
 
+        log.info("Importing variations")
         // Cat Variations
         for (int rownum = 1; rownum < varSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = varSheet.getRow(rownum)
@@ -300,6 +385,8 @@ class ImportService {
             }
         }
 
+        Map<String, VariationValue> variationValues = new HashMap<String, VariationValue>()
+
         // Variation Values
         for (int rownum = 1; rownum < varValSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = varValSheet.getRow(rownum)
@@ -326,8 +413,11 @@ class ImportService {
                     v.value = value
                     v.googleVariationValue = google
                     v.position = row.getRowNum()
-                    if (v.validate())
+                    if (v.validate()) {
                         v.save(flush: true)
+                        variationValues.put(catpath+"*"+varname+"*"+value, v)
+                    }
+
                     else {
                         v.errors.allErrors.each { println(it) }
                         return [errors: v.errors.allErrors, sheet: "variation-value", line: rownum]
@@ -337,7 +427,11 @@ class ImportService {
             }
         }
 
+        Map<String, TaxRate> taxRates = new HashMap<String, TaxRate>()
+
+        log.info("Importing products")
         int countInserts = 0;
+        Map<String, Product> products = new HashMap<String, Product>()
         // Products
         for (int rownum = 1; rownum < prdSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = prdSheet.getRow(rownum)
@@ -366,8 +460,15 @@ class ImportService {
                     String tags = row.getCell(18, Row.CREATE_NULL_AS_BLANK).toString()
                     String keywords = row.getCell(19, Row.CREATE_NULL_AS_BLANK).toString()
                     String brandName = row.getCell(20, Row.CREATE_NULL_AS_BLANK).toString()
-                    String dateCreated = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
-                    String lastUpdated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
+                    String taxRateName = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
+                    String dateCreated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
+                    String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
+
+                    TaxRate tr = taxRates.get(taxRateName)
+                    if (tr == null) {
+                        tr = TaxRate.findByName(taxRateName)
+                        taxRates.put(taxRateName, tr)
+                    }
 
                     Product p = new Product()
                     p.category = getCategoryFromPath(catpath, catalog)
@@ -390,6 +491,7 @@ class ImportService {
                     p.stopFeatureDate = getCalendar(stopFeatDate)
                     p.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(name) : seo
                     p.keywords = keywords
+                    p.taxRate = tr
                     p.dateCreated = new SimpleDateFormat("yyyy-MM-dd").parse(dateCreated)
                     p.lastUpdated = new SimpleDateFormat("yyyy-MM-dd").parse(lastUpdated)
                     if (brandName.length() > 0)
@@ -409,6 +511,7 @@ class ImportService {
                         IperUtil.withAutoTimestampSuppression(p) {
                             p.save(flush: false)
                         }
+                        products.put(p.code, p)
                         File resDir = new File(dateDir, p.sanitizedName)
                         if (resDir.exists() && resDir.list().size() > 0) {
                             File[] files = resDir.listFiles()
@@ -439,7 +542,7 @@ class ImportService {
                         }
                         countInserts++;
                         if (countInserts % 100 == 0) {
-                            log.info(countInserts)
+                            log.info(countInserts + " products")
                             this.cleanUpGorm()
                         }
                     } else {
@@ -450,6 +553,9 @@ class ImportService {
             }
         }
 
+        this.cleanUpGorm()
+        countInserts = 0
+        log.info("Importing product features")
         // Product Features
         for (int rownum = 1; rownum < prdFeatSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = prdFeatSheet.getRow(rownum)
@@ -464,12 +570,12 @@ class ImportService {
                     String name = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
                     String value = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
                     String hide = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
-                    Product product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
+                    Product product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
                     boolean created = false
                     if (uuid) {
                         Feature feat = Feature.findByUuid(uuid)
                         if (feat?.category != null) {
-                            FeatureValue featVal = new FeatureValue(value:value, product: product, feature: feat)
+                            FeatureValue featVal = new FeatureValue(value: value, product: product, feature: feat)
                             featVal.save(flush: false)
                             created = true
                         }
@@ -485,22 +591,24 @@ class ImportService {
                         f.hide = hide
                         if (f.validate()) {
                             f.save(flush: false)
-                        }
-                        else {
+                        } else {
                             f.errors.allErrors.each { println(it) }
                             return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
                         }
                     }
                     countInserts++;
                     if (countInserts % 100 == 0) {
-                        log.info(countInserts)
+                        log.info(countInserts + " product features")
                         this.cleanUpGorm()
                     }
                 }
             }
         }
 
+        log.info("Importing product properties")
         // Product Properties
+        this.cleanUpGorm()
+        countInserts = 0
         for (int rownum = 1; rownum < prdPropSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = prdPropSheet.getRow(rownum)
             if (row != null) {
@@ -518,7 +626,7 @@ class ImportService {
                     ProductProperty pp = new ProductProperty()
                     Category category = getCategoryFromPath(catpath, catalog)
                     pp.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    pp.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog: catalog.id, code: prdcode, category: category.id]).get(0)
+                    pp.product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog: catalog.id, code: prdcode, category: category.id]).get(0)
                     pp.name = name
                     pp.value = value
                     if (pp.validate())
@@ -529,13 +637,16 @@ class ImportService {
                     }
                     countInserts++;
                     if (countInserts % 100 == 0) {
-                        log.info(countInserts)
+                        log.info(countInserts+ " product properties")
                         this.cleanUpGorm()
                     }
                 }
             }
         }
 
+        this.cleanUpGorm()
+        countInserts = 0
+        log.info("Importing SKUs")
         // SKU
         for (int rownum = 1; rownum < skuSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = skuSheet.getRow(rownum)
@@ -571,10 +682,10 @@ class ImportService {
                     String variationName3 = row.getCell(26, Row.CREATE_NULL_AS_BLANK).toString()
                     String variationValue3 = row.getCell(27, Row.CREATE_NULL_AS_BLANK).toString()
 
-
+                    Product prod = products.get(prdcode)
                     TicketType t = new TicketType()
                     t.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    t.product = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
+                    t.product = prod ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
                     t.externalCode = externalCode
                     t.sku = sku
                     t.name = name
@@ -595,15 +706,15 @@ class ImportService {
                     t.availabilityDate = getCalendar(availability)
                     t.gtin = googleGtin
                     t.mpn = googleMpn
-                    VariationValue vv1 = getVariationValue(variationName1, variationValue1, catpath, catalog)
+                    VariationValue vv1 = variationValues.get(catpath+"*"+variationName1+"*"+variationValue1) ?: getVariationValue(variationName1, variationValue1, catpath, catalog)
                     if (vv1)
                         t.variation1 = vv1
 
-                    VariationValue vv2 = getVariationValue(variationName2, variationValue2, catpath, catalog)
+                    VariationValue vv2 = variationValues.get(catpath+"*"+variationName2+"*"+variationValue2) ?: getVariationValue(variationName2, variationValue2, catpath, catalog)
                     if (vv2)
                         t.variation2 = vv2
 
-                    VariationValue vv3 = getVariationValue(variationName3, variationValue3, catpath, catalog)
+                    VariationValue vv3 = variationValues.get(catpath+"*"+variationName3+"*"+variationValue3) ?: getVariationValue(variationName3, variationValue3, catpath, catalog)
                     if (vv3)
                         t.variation3 = vv3
 
@@ -616,16 +727,16 @@ class ImportService {
                     }
                     countInserts++;
                     if (countInserts % 100 == 0) {
-                        log.info(countInserts)
+                        log.info(countInserts + " SKUs")
                         this.cleanUpGorm()
                     }
                 }
             }
         }
         impexDir.deleteDir()
-        log.info("IMPORT FINISHED")
         return [errors: [], sheet: "", line: -1]
     }
+
     def cleanUpGorm() {
         def session = sessionFactory.currentSession
         session.flush()
