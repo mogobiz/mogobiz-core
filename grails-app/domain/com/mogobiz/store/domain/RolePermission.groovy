@@ -36,6 +36,10 @@ class RolePermission
     /**
      * 
      */
+    java.lang.String key 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Role role 
 
     /**
@@ -65,6 +69,7 @@ class RolePermission
         id name:'id',column:'id',generator:'native'
         target column:"target",insertable:true,updateable:true,lazy:false,cache:false
         actions column:"actions",insertable:true,updateable:true,lazy:false,cache:false
+        key column:"key",insertable:true,updateable:true,lazy:false,cache:false
 
 
         role column:"role_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -77,6 +82,7 @@ class RolePermission
 
         target ( blank:false, nullable:false, unique:false, validator:com.mogobiz.store.domain.RolePermissionValidation.rolePermissionTargetValidator)
         actions ( blank:false, nullable:false, unique:false)
+        key (nullable:true, unique:false)
         role ( blank:false, nullable:false)
         permission ( blank:false, nullable:false)
     }

@@ -36,6 +36,10 @@ class UserPermission
     /**
      * 
      */
+    java.lang.String key 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Permission permission 
 
     /**
@@ -65,6 +69,7 @@ class UserPermission
         id name:'id',column:'id',generator:'native'
         target column:"target",insertable:true,updateable:true,lazy:false,cache:false
         actions column:"actions",insertable:true,updateable:true,lazy:false,cache:false
+        key column:"key",insertable:true,updateable:true,lazy:false,cache:false
 
 
         permission column:"permission_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -77,6 +82,7 @@ class UserPermission
 
         target ( blank:false, nullable:false, unique:false, validator:com.mogobiz.store.domain.UserPermissionValidation.userPermissionTargetValidator)
         actions ( blank:false, nullable:false, unique:false)
+        key (nullable:true, unique:false)
         permission ( blank:false, nullable:false)
         user ( blank:false, nullable:false)
     }
