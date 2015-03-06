@@ -3,6 +3,7 @@ package com.mogobiz.authentication
 import bootstrap.CommonService
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.geolocation.domain.LocationValidation
+import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.CompanyValidation
 import com.mogobiz.store.domain.Permission
@@ -36,6 +37,10 @@ class ProfileServiceSpec extends Specification {
     CommonService commonService
 
     def setup() {
+        defineBeans {
+            sanitizeUrlService(SanitizeUrlService)
+        }
+
         commonService = new CommonService()
 
         Permission.metaClass.getPermissionValidation = {new PermissionValidation()}
@@ -76,7 +81,7 @@ class ProfileServiceSpec extends Specification {
         given:
         Company company = Company.findByCode("mogobiz")
         def idStore = company.id
-        def profile = new Profile(name: "profile", company: company)
+        def profile = new Profile(name: "profile", code: "profile", company: company)
         commonService.saveEntity(profile)
         def target = computePermission(PermissionType.ADMIN_COMPANY, idStore as String)
         log.info(target)
@@ -99,7 +104,7 @@ class ProfileServiceSpec extends Specification {
         given:
         Company company = Company.findByCode("mogobiz")
         def idStore = company.id
-        def profile = new Profile(name: "profile", company: company)
+        def profile = new Profile(name: "profile", code: "profile", company: company)
         commonService.saveEntity(profile)
         def target = computePermission(PermissionType.ADMIN_COMPANY, idStore as String)
         log.info(target)
@@ -116,7 +121,7 @@ class ProfileServiceSpec extends Specification {
         Company company = Company.findByCode("mogobiz")
         def idStore = company.id
         def name = "parent"
-        def parent = new Profile(name: name)
+        def parent = new Profile(name: name, code: name)
         commonService.saveEntity(parent)
         PermissionType.admin().each {pt ->
             service.saveProfilePermission(parent, true, pt)
@@ -139,7 +144,7 @@ class ProfileServiceSpec extends Specification {
         Company company = Company.findByCode("mogobiz")
         def idStore = company.id
         def name = "parent"
-        def parent = new Profile(name: name)
+        def parent = new Profile(name: name, code: name)
         commonService.saveEntity(parent)
         PermissionType.admin().each {pt ->
             service.saveProfilePermission(parent, true, pt)
@@ -168,7 +173,7 @@ class ProfileServiceSpec extends Specification {
         Company company = Company.findByCode("mogobiz")
         def idStore = company.id
         def name = "copy"
-        def parent = new Profile(name: "parent")
+        def parent = new Profile(name: "parent", code: "parent")
         commonService.saveEntity(parent)
         PermissionType.admin().each {pt ->
             service.saveProfilePermission(parent, true, pt)

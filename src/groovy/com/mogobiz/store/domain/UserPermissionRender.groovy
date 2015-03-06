@@ -14,8 +14,8 @@ class UserPermissionRender extends RenderBase<UserPermission>
 {
 
     Map asMap(List<String> included = [], List<String> excluded = [], UserPermission entity, String lang = 'fr') {
-        def map = super.asMap(included && !included.isEmpty() ? included : ['id', 'user', 'user.id'], excluded, entity, lang)
-        map << [key: ProfileUtils.retrievePermissionFrom(entity.target)?.key]
+        def map = super.asMap(included && !included.isEmpty() ? included : ['id', 'user', 'user.id', 'target'], excluded, entity, lang)
+        map << [key: entity.key ?: ProfileUtils.retrievePermissionFrom(entity.target)?.key]
         map
     }
 

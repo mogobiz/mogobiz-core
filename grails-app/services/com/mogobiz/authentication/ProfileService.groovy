@@ -1,5 +1,6 @@
 package com.mogobiz.authentication
 
+import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Profile
@@ -18,6 +19,8 @@ import static com.mogobiz.utils.ProfileUtils.*
 
 @Transactional
 class ProfileService {
+
+    SanitizeUrlService sanitizeUrlService
 
     /**
      *
@@ -65,8 +68,11 @@ class ProfileService {
     ProfilePermission saveProfilePermission(Profile p, boolean add, PermissionType type, String ... args){
         ProfilePermission pp = type ? getProfilePermission(p, type, args) : null
         if(!pp && type && add){
-            pp = new ProfilePermission(target: computePermission(type, args), profile: p, permission: getWilcardPermission())
-            pp.save(flush: true)
+            pp = new ProfilePermission(target: computePermission(type, args), key: type.key, profile: p, permission: getWilcardPermission())
+            pp.validate()
+            if(!pp.hasErrors()){
+                pp.save(flush: true)
+            }
         }
         else if(pp && !add){
             pp.delete(flush: true)
@@ -81,16 +87,21 @@ class ProfileService {
      * @param name - profile name
      * @return created/upgraded Profile
      */
-    Profile applyProfile(Profile parent, Long idStore, String name = null){
+    Profile applyProfile(Profile parent, Long idStore, String name = parent.name){
         Company company = Company.load(idStore)
         Profile child = null
         if(company && parent && !parent.company){
             child = Profile.findByCompanyAndParent(company, parent) ?: new Profile(
-                    name: name ?: parent.name,
+                    name: name,
+                    code: sanitizeUrlService.sanitizeWithDashes(name),
                     parent: parent,
                     company: company
-            ).save(flush:true)
-            upgradeProfile(child)
+            )
+            child.validate()
+            if(!child.hasErrors()){
+                child.save(flush:true)
+                upgradeProfile(child)
+            }
         }
         child
     }
@@ -141,7 +152,10 @@ class ProfileService {
                         key: parentPermission.key,
                         target: MessageFormat.format(parentPermission.target, child.company?.id as String)
                 )
-                pp.save(flush: true)
+                pp.validate()
+                if(!pp.hasErrors()){
+                    pp.save(flush: true)
+                }
             }
         }
     }
@@ -222,7 +236,11 @@ class ProfileService {
                     permission: wildCardPermission,
                     target: target,
                     key: type.key,
-                    role: role).save(flush:true)
+                    role: role)
+            rolePermission.validate()
+            if(!rolePermission.hasErrors()){
+                rolePermission.save(flush: true)
+            }
         }
         else if(rolePermission && !add){
             rolePermission.delete(flush: true)
@@ -238,15 +256,20 @@ class ProfileService {
      * @param name - the profile name
      * @return id of the copied profile
      */
-    Profile copyProfile(Profile parent, Long idStore, String name = null){
+    Profile copyProfile(Profile parent, Long idStore, String name = parent.name){
         Company company = Company.load(idStore)
         Profile child = null
         if(company && parent && (!parent.company || parent.company.id == idStore)){
             child = new Profile(
-                    name: name ?: parent.name,
+                    name: name,
+                    code: sanitizeUrlService.sanitizeWithDashes(name),
                     company: company
-            ).save(flush:true)
-            upgradeProfile(child, parent)
+            )
+            child.validate()
+            if(!child.hasErrors()){
+                child.save(flush: true)
+                upgradeProfile(child, parent)
+            }
         }
         child
     }

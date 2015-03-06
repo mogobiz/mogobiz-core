@@ -13,8 +13,8 @@ import com.mogobiz.utils.ProfileUtils
 class ProfilePermissionRender extends RenderBase<ProfilePermission> {
 
     Map asMap(List<String> included = [], List<String> excluded = [], ProfilePermission entity, String lang = 'fr') {
-        def map = super.asMap(included && !included.isEmpty() ? included : ['id', 'profile', 'profile.id', 'profile.name'], excluded, entity, lang)
-        map << [key: ProfileUtils.retrievePermissionFrom(entity.target)?.key]
+        def map = super.asMap(included && !included.isEmpty() ? included : ['id', 'profile', 'profile.id', 'profile.name', 'target'], excluded, entity, lang)
+        map << [key: entity.key ?: ProfileUtils.retrievePermissionFrom(entity.target)?.key]
         map
     }
 
