@@ -174,7 +174,22 @@ class Product
      */
     com.mogobiz.store.domain.Ibeacon ibeacon 
 
-    static hasMany = [ tags:com.mogobiz.store.domain.Tag ,  product2Resources:com.mogobiz.store.domain.Product2Resource ]
+    static hasMany = [
+            tags:Tag,
+            product2Resources:Product2Resource,
+            ticketTypes: TicketType ,
+            features: Feature,
+            featureValues: FeatureValue,
+            productProperties: ProductProperty
+    ]
+
+    static mappedBy = [
+            ticketTypes: "product",
+            features: "product",
+            featureValues: "product",
+            productProperties: "product",
+            product2Resources: "product"
+    ]
 
     static transients = [ 'productValidation', 'productRender' ]
 
