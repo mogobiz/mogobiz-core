@@ -3,6 +3,7 @@ package com.mogobiz.service
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Coupon
 import com.mogobiz.store.domain.Feature
 import com.mogobiz.store.domain.FeatureValue
 import com.mogobiz.store.domain.LocalTaxRate
@@ -12,6 +13,8 @@ import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.ProductProperty
 import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.ProductType
+import com.mogobiz.store.domain.ReductionRule
+import com.mogobiz.store.domain.ReductionRuleType
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.store.domain.ShippingRule
@@ -33,6 +36,7 @@ import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
+import java.util.concurrent.Future
 import java.util.zip.ZipFile
 
 @Transactional
@@ -42,6 +46,7 @@ class ImportService {
     ResService resService
     def grailsApplication
     SessionFactory sessionFactory
+
     ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     private String getFormulaCell(String cellValue, Map<String, XSSFSheet> sheets) {
@@ -130,6 +135,9 @@ class ImportService {
         XSSFSheet skuSheet = workbook.getSheet("sku");
         XSSFSheet taxSheet = workbook.getSheet("taxrate");
         XSSFSheet shipSheet = workbook.getSheet("shipping");
+        XSSFSheet couponSheet = workbook.getSheet("coupon");
+        XSSFSheet couponRuleSheet = workbook.getSheet("coupon-rule");
+        XSSFSheet couponUseSheet = workbook.getSheet("coupon-use");
 
         Map<String, XSSFSheet> sheets = [
                 'category'       : catSheet,
@@ -216,6 +224,128 @@ class ImportService {
             }
         }
 
+        log.info("Importing Coupons")
+        for (int rownum = 1; rownum < couponSheet.getPhysicalNumberOfRows(); rownum++) {
+            XSSFRow row = couponSheet.getRow(rownum)
+            if (row != null) {
+                String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell.length() > 0) {
+                    String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                    String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                    String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String active = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String numberOfUses = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String startDate = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    String endDate = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                    String catalogWise = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                    String forSale = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                    String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                    String anonymous = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+                    String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
+                    String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
+                    Coupon coupon = Coupon.findByUuid(uuid)
+                    if (!coupon) {
+                        coupon = new Coupon()
+                    }
+                    coupon.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                    coupon.name = name
+                    coupon.code = code
+                    coupon.active = active.equalsIgnoreCase("true")
+                    coupon.numberOfUses = numberOfUses.length() > 0 ? numberOfUses.toFloat().toLong() : null
+                    coupon.startDate = getCalendar(startDate)
+                    coupon.endDate = getCalendar(endDate)
+                    coupon.catalogWise = catalogWise.equalsIgnoreCase("true")
+                    coupon.forSale = forSale.equalsIgnoreCase("true")
+                    coupon.description = description
+                    coupon.anonymous = anonymous.equalsIgnoreCase("true")
+                    coupon.pastille = pastille
+                    coupon.consumed = consumed.length() > 0 ? consumed.toFloat().toLong() : null
+                    coupon.company = catalog.company
+                    if (coupon.validate()) {
+                        coupon.save(flush: true)
+
+                    } else {
+                        coupon.errors.allErrors.each { println(it) }
+                        return [errors: coupon.errors.allErrors, sheet: "coupon", line: rownum]
+                    }
+                }
+            }
+        }
+
+        log.info("Importing Reduction rules")
+        //TODO improve inserts
+        for (int rownum = 1; rownum < couponRuleSheet.getPhysicalNumberOfRows(); rownum++) {
+            XSSFRow row = couponRuleSheet.getRow(rownum)
+            if (row != null) {
+                String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell.length() > 0) {
+                    String couponCode = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                    String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                    String xtype = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String qMin = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String qMax = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String discount = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    String xpurchased = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                    String yoffered = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                    Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, couponCode)
+                    if (coupon) {
+                        ReductionRule rr = ReductionRule.findByUuid(uuid)
+                        if (!rr) {
+                            rr = new ReductionRule()
+                        }
+                        rr.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        rr.xtype = ReductionRuleType.valueOf(xtype)
+                        rr.quantityMin == qMin.length() > 0 ? qMin.toFloat().toLong() : null
+                        rr.quantityMax = qMax.length() > 0 ? qMax.toFloat().toLong() : null
+                        rr.discount = discount.length() > 0 ? discount : null
+                        rr.xPurchased = xpurchased.length() > 0 ? xpurchased.toFloat().toLong() : null
+                        rr.yOffered = yoffered.length() > 0 ? yoffered.toFloat().toLong() : null
+                        coupon.addToRules(rr)
+                        if (coupon.validate()) {
+                            coupon.save(flush: true)
+
+                        } else {
+                            coupon.errors.allErrors.each { println(it) }
+                            return [errors: coupon.errors.allErrors, sheet: "coupon-rule", line: rownum]
+                        }
+                    }
+                }
+            }
+        }
+
+        log.info("Importing Coupon Uses")
+        //TODO improve Coupon Use
+        for (int rownum = 1; rownum < couponUseSheet.getPhysicalNumberOfRows(); rownum++) {
+            XSSFRow row = couponUseSheet.getRow(rownum)
+            if (row != null) {
+                String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell.length() > 0) {
+                    String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                    String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    Coupon coupon = Coupon.findByUuid(uuid)
+                    if (coupon) {
+                        if (catUuid.length() > 0) {
+                            coupon.addToCategories(Category.findByUuid(catUuid))
+                        } else if (prodUuid.length() > 0) {
+                            coupon.addToProducts(Product.findByUuid(prodUuid))
+                        } else if (skuUuid.length() > 0) {
+                            coupon.addToTicketTypes(TicketType.findByUuid(skuUuid))
+                        }
+                        if (coupon.validate()) {
+                            coupon.save(flush: true)
+
+                        } else {
+                            coupon.errors.allErrors.each { println(it) }
+                            return [errors: coupon.errors.allErrors, sheet: "coupon-use", line: rownum]
+                        }
+                    }
+                }
+            }
+        }
+
         log.info("Importing brands")
         // Brand
         for (int rownum = 1; rownum < brandSheet.getPhysicalNumberOfRows(); rownum++) {
@@ -254,6 +384,7 @@ class ImportService {
 
 
         log.info("Importing categories")
+        Map<String, Category> categories = new HashMap<>()
         int maxdepth = 0
         for (int rownum = 1; rownum < catSheet.getPhysicalNumberOfRows(); rownum++) {
             XSSFRow row = catSheet.getRow(rownum)
@@ -302,9 +433,10 @@ class ImportService {
                             cat.catalog = catalog
                             cat.company = catalog.company
                             cat.parent = parent
-                            if (cat.validate())
+                            if (cat.validate()) {
                                 cat.save(flush: true)
-                            else {
+                                categories.put(path, cat)
+                            } else {
                                 cat.errors.allErrors.each { println(it) }
                                 return [errors: cat.errors.allErrors, sheet: "category", line: rownum]
                             }
@@ -415,10 +547,8 @@ class ImportService {
                     v.position = row.getRowNum()
                     if (v.validate()) {
                         v.save(flush: true)
-                        variationValues.put(catpath+"*"+varname+"*"+value, v)
-                    }
-
-                    else {
+                        variationValues.put(catpath + "*" + varname + "*" + value, v)
+                    } else {
                         v.errors.allErrors.each { println(it) }
                         return [errors: v.errors.allErrors, sheet: "variation-value", line: rownum]
                     }
@@ -430,131 +560,11 @@ class ImportService {
         Map<String, TaxRate> taxRates = new HashMap<String, TaxRate>()
 
         log.info("Importing products")
-        int countInserts = 0;
         Map<String, Product> products = new HashMap<String, Product>()
-        // Products
-        for (int rownum = 1; rownum < prdSheet.getPhysicalNumberOfRows(); rownum++) {
-            XSSFRow row = prdSheet.getRow(rownum)
-            if (row != null) {
-                String cell = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                if (cell.length() > 0) {
-                    String catuuid = getFormulaCell(row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
-                    String catpath = getFormulaCell(row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
-                    String uuid = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                    String externalCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                    String code = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                    String name = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                    String xtype = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                    String price = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                    String state = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
-                    String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
-                    String descriptionAsText = Jsoup.parse(description).text()
-                    String sales = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
-                    String displayStock = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
-                    String calendar = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
-                    String startDate = row.getCell(13, Row.CREATE_NULL_AS_BLANK).toString()
-                    String stopDate = row.getCell(14, Row.CREATE_NULL_AS_BLANK).toString()
-                    String startFeatDate = row.getCell(15, Row.CREATE_NULL_AS_BLANK).toString()
-                    String stopFeatDate = row.getCell(16, Row.CREATE_NULL_AS_BLANK).toString()
-                    String seo = row.getCell(17, Row.CREATE_NULL_AS_BLANK).toString()
-                    String tags = row.getCell(18, Row.CREATE_NULL_AS_BLANK).toString()
-                    String keywords = row.getCell(19, Row.CREATE_NULL_AS_BLANK).toString()
-                    String brandName = row.getCell(20, Row.CREATE_NULL_AS_BLANK).toString()
-                    String taxRateName = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
-                    String dateCreated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
-                    String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
+        int countRows = prdSheet.getPhysicalNumberOfRows()
+        importProducts(categories, sheets, prdSheet, taxRates, catalog, dateDir, products, 1, countRows)
 
-                    TaxRate tr = taxRates.get(taxRateName)
-                    if (tr == null) {
-                        tr = TaxRate.findByName(taxRateName)
-                        taxRates.put(taxRateName, tr)
-                    }
-
-                    Product p = new Product()
-                    p.category = getCategoryFromPath(catpath, catalog)
-                    p.company = catalog.company
-                    p.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                    p.externalCode = externalCode
-                    p.code = code
-                    p.name = name
-                    p.xtype = ProductType.valueOf(xtype)
-                    p.price = price.toDouble().toLong()
-                    p.state = ProductState.valueOf(state)
-                    p.description = description
-                    p.descriptionAsText = descriptionAsText
-                    p.nbSales = sales.toDouble().toLong()
-                    p.stockDisplay = displayStock.toLowerCase().equals("false") ? false : true
-                    p.calendarType = ProductCalendar.valueOf(calendar)
-                    p.startDate = getCalendar(startDate)
-                    p.stopDate = getCalendar(stopDate)
-                    p.startFeatureDate = getCalendar(startFeatDate)
-                    p.stopFeatureDate = getCalendar(stopFeatDate)
-                    p.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(name) : seo
-                    p.keywords = keywords
-                    p.taxRate = tr
-                    p.dateCreated = new SimpleDateFormat("yyyy-MM-dd").parse(dateCreated)
-                    p.lastUpdated = new SimpleDateFormat("yyyy-MM-dd").parse(lastUpdated)
-                    if (brandName.length() > 0)
-                        p.brand = Brand.findByNameAndCompany(brandName, catalog.company)
-
-                    if (tags.size() > 0) {
-                        tags.split(',').each {
-                            Tag tag = Tag.findByNameAndCompany(it, catalog.company)
-                            if (tag == null) {
-                                tag = new Tag(name: it, company: catalog.company)
-                                tag.save()
-                            }
-                            p.addToTags(tag)
-                        }
-                    }
-                    if (p.validate()) {
-                        IperUtil.withAutoTimestampSuppression(p) {
-                            p.save(flush: false)
-                        }
-                        products.put(p.code, p)
-                        File resDir = new File(dateDir, p.sanitizedName)
-                        if (resDir.exists() && resDir.list().size() > 0) {
-                            File[] files = resDir.listFiles()
-                            int countRes = 1
-                            files.each { file ->
-                                Resource res = new Resource()
-                                res.code = ""
-                                res.description = ""
-                                res.name = file.getName()
-                                String ext = file.getName().substring(file.getName().lastIndexOf('.') + 1)
-                                res.content = ""
-                                res.contentType = "image/$ext"
-                                res.deleted = false
-                                res.uploaded = true
-                                res.xtype = ResourceType.PICTURE
-                                res.active = true
-                                resService.uploadResource(catalog.company, res, file, res.contentType)
-                                Product2Resource product2Resource = new Product2Resource(
-                                        montant: 0,
-                                        product: p,
-                                        resource: res,
-                                        position: countRes++
-                                )
-                                if (product2Resource.validate()) {
-                                    product2Resource.save(flush: false)
-                                }
-                            }
-                        }
-                        countInserts++;
-                        if (countInserts % 100 == 0) {
-                            log.info(countInserts + " products")
-                            this.cleanUpGorm()
-                        }
-                    } else {
-                        p.errors.allErrors.each { println(it) }
-                        return [errors: p.errors.allErrors, sheet: "product", line: rownum]
-                    }
-                }
-            }
-        }
-
-        this.cleanUpGorm()
-        countInserts = 0
+        int countInserts = 0;
         log.info("Importing product features")
         // Product Features
         for (int rownum = 1; rownum < prdFeatSheet.getPhysicalNumberOfRows(); rownum++) {
@@ -637,7 +647,7 @@ class ImportService {
                     }
                     countInserts++;
                     if (countInserts % 100 == 0) {
-                        log.info(countInserts+ " product properties")
+                        log.info(countInserts + " product properties")
                         this.cleanUpGorm()
                     }
                 }
@@ -706,15 +716,15 @@ class ImportService {
                     t.availabilityDate = getCalendar(availability)
                     t.gtin = googleGtin
                     t.mpn = googleMpn
-                    VariationValue vv1 = variationValues.get(catpath+"*"+variationName1+"*"+variationValue1) ?: getVariationValue(variationName1, variationValue1, catpath, catalog)
+                    VariationValue vv1 = variationValues.get(catpath + "*" + variationName1 + "*" + variationValue1) ?: getVariationValue(variationName1, variationValue1, catpath, catalog)
                     if (vv1)
                         t.variation1 = vv1
 
-                    VariationValue vv2 = variationValues.get(catpath+"*"+variationName2+"*"+variationValue2) ?: getVariationValue(variationName2, variationValue2, catpath, catalog)
+                    VariationValue vv2 = variationValues.get(catpath + "*" + variationName2 + "*" + variationValue2) ?: getVariationValue(variationName2, variationValue2, catpath, catalog)
                     if (vv2)
                         t.variation2 = vv2
 
-                    VariationValue vv3 = variationValues.get(catpath+"*"+variationName3+"*"+variationValue3) ?: getVariationValue(variationName3, variationValue3, catpath, catalog)
+                    VariationValue vv3 = variationValues.get(catpath + "*" + variationName3 + "*" + variationValue3) ?: getVariationValue(variationName3, variationValue3, catpath, catalog)
                     if (vv3)
                         t.variation3 = vv3
 
@@ -733,6 +743,8 @@ class ImportService {
                 }
             }
         }
+        log.info(countInserts + " SKUs")
+        this.cleanUpGorm()
         impexDir.deleteDir()
         return [errors: [], sheet: "", line: -1]
     }
@@ -744,5 +756,132 @@ class ImportService {
         propertyInstanceMap.get().clear()
     }
 
+    Integer importProducts(Map<String, Category> categories, Map<String, XSSFSheet> sheets, XSSFSheet prdSheet, Map<String, TaxRate> taxRates, Catalog catalog, File dateDir, Map<String, Product> products, int startLine, int countLines) {
+        int countInserts = startLine;
+        // Products
+        for (int rownum = startLine; rownum < startLine + countLines; rownum++) {
+            XSSFRow row
+            row = prdSheet.getRow(rownum)
+            if (row != null) {
+                String cell
+                cell = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell?.length() > 0) {
+                    String catuuid = getFormulaCell(row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String catpath = getFormulaCell(row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String uuid = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String externalCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String code = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String name = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    String xtype = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                    String price = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                    String state = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                    String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                    String descriptionAsText = Jsoup.parse(description).text()
+                    String sales = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+                    String displayStock = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
+                    String calendar = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
+                    String startDate = row.getCell(13, Row.CREATE_NULL_AS_BLANK).toString()
+                    String stopDate = row.getCell(14, Row.CREATE_NULL_AS_BLANK).toString()
+                    String startFeatDate = row.getCell(15, Row.CREATE_NULL_AS_BLANK).toString()
+                    String stopFeatDate = row.getCell(16, Row.CREATE_NULL_AS_BLANK).toString()
+                    String seo = row.getCell(17, Row.CREATE_NULL_AS_BLANK).toString()
+                    String tags = row.getCell(18, Row.CREATE_NULL_AS_BLANK).toString()
+                    String keywords = row.getCell(19, Row.CREATE_NULL_AS_BLANK).toString()
+                    String brandName = row.getCell(20, Row.CREATE_NULL_AS_BLANK).toString()
+                    String taxRateName = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
+                    String dateCreated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
+                    String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
+                    Product p = new Product()
+                    p.category = categories.get(catpath)
+                    TaxRate tr = taxRates.get(taxRateName)
+                    if (tr == null) {
+                        tr = TaxRate.findByName(taxRateName)
+                        taxRates.put(taxRateName, tr)
+                    }
+                    p.company = catalog.company
+                    p.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                    p.externalCode = externalCode
+                    p.code = code
+                    p.name = name
+                    p.xtype = ProductType.valueOf(xtype)
+                    p.price = price.toDouble().toLong()
+                    p.state = ProductState.valueOf(state)
+                    p.description = description
+                    p.descriptionAsText = descriptionAsText
+                    p.nbSales = sales.toDouble().toLong()
+                    p.stockDisplay = displayStock.toLowerCase().equals("false") ? false : true
+                    p.calendarType = ProductCalendar.valueOf(calendar)
+                    p.startDate = getCalendar(startDate)
+                    p.stopDate = getCalendar(stopDate)
+                    p.startFeatureDate = getCalendar(startFeatDate)
+                    p.stopFeatureDate = getCalendar(stopFeatDate)
+                    p.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(name) : seo
+                    p.keywords = keywords
+                    p.taxRate = tr
+                    p.dateCreated = new SimpleDateFormat("yyyy-MM-dd").parse(dateCreated)
+                    p.lastUpdated = new SimpleDateFormat("yyyy-MM-dd").parse(lastUpdated)
+                    if (brandName.length() > 0)
+                        p.brand = Brand.findByNameAndCompany(brandName, catalog.company)
+
+                    if (tags.size() > 0) {
+                        tags.split(',').each {
+                            Tag tag = Tag.findByNameAndCompany(it, catalog.company)
+                            if (tag == null) {
+                                tag = new Tag(name: it, company: catalog.company)
+                                tag.save()
+                            }
+                            p.addToTags(tag)
+                        }
+                    }
+                    if (p.validate()) {
+                        IperUtil.withAutoTimestampSuppression(p) {
+                            p.save(flush: false)
+                        }
+                        products.put(p.code, p)
+
+                        File resDir = new File(dateDir, p.sanitizedName)
+                        if (resDir.exists() && resDir.list().size() > 0) {
+                            File[] files = resDir.listFiles()
+                            int countRes = 1
+                            files.each { file ->
+                                Resource res = new Resource()
+                                res.code = ""
+                                res.description = ""
+                                res.name = file.getName()
+                                String ext = file.getName().substring(file.getName().lastIndexOf('.') + 1)
+                                res.content = ""
+                                res.contentType = "image/$ext"
+                                res.deleted = false
+                                res.uploaded = true
+                                res.xtype = ResourceType.PICTURE
+                                res.active = true
+                                resService.uploadResource(catalog.company, res, file, res.contentType)
+                                Product2Resource product2Resource = new Product2Resource(
+                                        montant: 0,
+                                        product: p,
+                                        resource: res,
+                                        position: countRes++
+                                )
+                                if (product2Resource.validate()) {
+                                    product2Resource.save(flush: false)
+                                }
+                            }
+                        }
+                        countInserts++;
+                        if (countInserts % 100 == 0) {
+                            log.info(countInserts + " products")
+                            this.cleanUpGorm()
+                        }
+                    } else {
+                        p.errors.allErrors.each { println(it) }
+                        return [errors: p.errors.allErrors, sheet: "product", line: rownum]
+                    }
+                }
+            }
+        }
+        log.info(countInserts + " products")
+        this.cleanUpGorm()
+        return countInserts
+    }
 }
 
