@@ -87,6 +87,9 @@ class Category
 
     static transients = [ 'categoryValidation', 'categoryRender' ]
 
+    static hasMany = [features: Feature]
+
+    static mappedBy = [features: "category"]
 
     static mapping = {
 
