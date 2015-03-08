@@ -99,5 +99,6 @@ grails.project.dependency.resolution = {
         compile ":cached-resources:1.0"
         compile ":rest:0.8"
         compile ":joda-time:1.4"
+        compile ":executor:0.3"
     }
 }
