@@ -9,12 +9,12 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
 class Category
-    implements java.io.Serializable
+        implements java.io.Serializable
 {
     def categoryValidation
     def categoryRender
@@ -26,73 +26,76 @@ class Category
 
 
     /**
-     * 
+     *
      */
-    java.lang.String externalCode 
+    java.lang.String externalCode
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    java.lang.String description 
+    java.lang.String description
     /**
-     * 
+     *
      */
-    java.lang.String keywords 
+    java.lang.String keywords
     /**
-     * 
+     *
      */
-    int position 
+    int position
     /**
-     * 
+     *
      */
-    Boolean hide  = false 
+    Boolean hide  = false
     /**
-     * 
+     *
      */
-    java.lang.String sanitizedName 
+    java.lang.String sanitizedName
     /**
-     * 
+     *
      */
-    java.lang.String googleCategory 
+    java.lang.String googleCategory
     /**
-     * 
+     *
      */
-    boolean deleted  = false 
+    boolean deleted  = false
     /**
-     * 
+     *
      */
-    long returnMaxDelay  = 0 
+    long returnMaxDelay  = 0
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Category parent 
+    com.mogobiz.store.domain.Category parent
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Catalog catalog 
+    com.mogobiz.store.domain.Catalog catalog
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Ibeacon ibeacon 
+    com.mogobiz.store.domain.Ibeacon ibeacon
 
     static transients = [ 'categoryValidation', 'categoryRender' ]
 
+    static hasMany = [features: Feature]
+
+    static mappedBy = [features: "category"]
 
     static mapping = {
 
         autoTimestamp true
 
-    uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
+        uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
 
@@ -127,7 +130,7 @@ class Category
     }
 
     static constraints = {
-    uuid (nullable:false, unique:false)
+        uuid (nullable:false, unique:false)
 
         externalCode (nullable:true, unique:false)
         name ( blank:false, nullable:false, unique:false)
