@@ -138,6 +138,7 @@ class TicketType
 
     static transients = [ 'ticketTypeValidation', 'ticketTypeRender' ]
 
+    static belongsTo = [product: Product]
 
     static mapping = {
 
