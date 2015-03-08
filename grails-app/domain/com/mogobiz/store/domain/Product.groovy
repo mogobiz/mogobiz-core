@@ -180,7 +180,9 @@ class Product
             ticketTypes: TicketType ,
             features: Feature,
             featureValues: FeatureValue,
-            productProperties: ProductProperty
+            productProperties: ProductProperty,
+            datePeriods: DatePeriod,
+            intraDayPeriods: IntraDayPeriod
     ]
 
     static mappedBy = [
@@ -188,7 +190,9 @@ class Product
             features: "product",
             featureValues: "product",
             productProperties: "product",
-            product2Resources: "product"
+            product2Resources: "product",
+            datePeriods: "product",
+            intraDayPeriods: "product"
     ]
 
     static transients = [ 'productValidation', 'productRender' ]
