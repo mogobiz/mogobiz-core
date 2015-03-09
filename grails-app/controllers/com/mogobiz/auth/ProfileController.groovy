@@ -291,6 +291,27 @@ class ProfileController {
     }
 
     @Transactional
+    def showUserProfiles(Long id){
+        def user = id ? User.load(id) : authenticationService.retrieveAuthenticatedUser()
+        if(!id) {id = user.id}
+        if(user) {
+            if(id != user.id && !authenticationService.isPermitted(computeStorePermission(PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return
+            }
+            def profiles = user.profiles
+            withFormat {
+                html profiles: profiles
+                xml { render profiles.collect {it.asMapForJSON()} as XML }
+                json { render profiles.collect {it.asMapForJSON()} as JSON }
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
+    }
+
+    @Transactional
     def removeUserProfile(UserProfileCommand cmd){
         cmd.validate()
         if(!cmd.hasErrors()){
@@ -301,6 +322,10 @@ class ProfileController {
                         computeStorePermission(
                                 PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
                     profileService.removeUserProfile(user, profile)
+                    withFormat {
+                        xml { render [:] as XML }
+                        json { render [:] as JSON }
+                    }
                 } else {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 }
@@ -369,6 +394,27 @@ class ProfileController {
         }
         else{
             response.sendError(HttpServletResponse.SC_BAD_REQUEST)
+        }
+    }
+
+    @Transactional
+    def showUserPermissions(Long id){
+        def user = id ? User.load(id) : authenticationService.retrieveAuthenticatedUser()
+        if(!id) {id = user.id}
+        if(user) {
+            if(id != user.id && !authenticationService.isPermitted(computeStorePermission(PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+                return
+            }
+            def permissions = user.permissions
+            withFormat {
+                html permissions: permissions
+                xml { render permissions.collect {it.asMapForJSON()} as XML }
+                json { render permissions.collect {it.asMapForJSON()} as JSON }
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
         }
     }
 
