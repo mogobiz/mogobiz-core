@@ -603,6 +603,13 @@
             <version>1.8.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.grails.plugins</groupId>
+            <artifactId>executor</artifactId>
+            <version>0.3</version>
+            <scope>compile</scope>
+            <type>zip</type>
+        </dependency>
         <!-- end from grails-app/BuildConfig.groovy //-->
 
     </dependencies>
