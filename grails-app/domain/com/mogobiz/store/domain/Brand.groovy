@@ -9,12 +9,12 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
 class Brand
-    implements java.io.Serializable
+        implements java.io.Serializable
 {
     def brandValidation
     def brandRender
@@ -26,52 +26,53 @@ class Brand
 
 
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    java.lang.String website 
+    java.lang.String website
     /**
-     * 
+     *
      */
-    java.lang.String facebooksite 
+    java.lang.String facebooksite
     /**
-     * 
+     *
      */
-    boolean hide  = false 
+    boolean hide  = false
     /**
-     * 
+     *
      */
-    java.lang.String description 
+    java.lang.String description
     /**
-     * 
+     *
      */
-    java.lang.String twitter 
+    java.lang.String twitter
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Ibeacon ibeacon 
+    com.mogobiz.store.domain.Ibeacon ibeacon
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Brand parent 
+    com.mogobiz.store.domain.Brand parent
 
     static transients = [ 'brandValidation', 'brandRender' ]
 
+    static hasMany = [brandProperties: BrandProperty]
 
     static mapping = {
 
         autoTimestamp true
 
-    uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
+        uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
 
@@ -100,7 +101,7 @@ class Brand
     }
 
     static constraints = {
-    uuid (nullable:false, unique:false)
+        uuid (nullable:false, unique:false)
 
         name ( blank:false, nullable:false, unique:false)
         website (nullable:true, unique:false)
