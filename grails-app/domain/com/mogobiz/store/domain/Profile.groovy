@@ -45,6 +45,9 @@ class Profile
 
     static transients = [ 'profileValidation', 'profileRender' ]
 
+    static hasMany = [permissions: ProfilePermission]
+
+    static mappedBy = [permissions: 'profile']
 
     static mapping = {
 
@@ -70,6 +73,8 @@ class Profile
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         parent column:"parent_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        permissions cascade: "all-delete-orphan"
     }
 
     static constraints = {

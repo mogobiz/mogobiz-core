@@ -31,6 +31,9 @@ class Role
     com.mogobiz.store.domain.RoleName name 
     static transients = [ 'roleValidation', 'roleRender' ]
 
+    static hasMany = [permissions: RolePermission]
+
+    static mappedBy = [permissions: 'role']
 
     static mapping = {
 
@@ -51,6 +54,7 @@ class Role
         id name:'id',column:'id',generator:'native'
         name column:"name",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
 
+        permissions cascade: "all-delete-orphan"
     }
 
     static constraints = {

@@ -49,6 +49,7 @@ class UserPermission
 
     static transients = [ 'userPermissionValidation', 'userPermissionRender' ]
 
+    static belongsTo = [User]
 
     static mapping = {
 

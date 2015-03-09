@@ -49,6 +49,7 @@ class RolePermission
 
     static transients = [ 'rolePermissionValidation', 'rolePermissionRender' ]
 
+    static belongsTo = [Role]
 
     static mapping = {
 

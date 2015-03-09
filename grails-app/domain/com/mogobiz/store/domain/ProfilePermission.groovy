@@ -49,6 +49,7 @@ class ProfilePermission
 
     static transients = [ 'profilePermissionValidation', 'profilePermissionRender' ]
 
+    static belongsTo = [Profile]
 
     static mapping = {
 

@@ -371,4 +371,19 @@ class ProfileController {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST)
         }
     }
+
+    def permissions(){
+        def map = [:]
+        def all = []
+        def coll = PermissionType.admin()
+        coll.addAll(PermissionType.seller())
+        coll.each{permission ->
+            all << permission.key
+        }
+        map << [permissions: all]
+        withFormat {
+            xml { render map as XML }
+            json { render map as JSON }
+        }
+    }
 }

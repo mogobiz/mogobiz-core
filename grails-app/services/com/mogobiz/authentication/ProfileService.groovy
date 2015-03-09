@@ -92,11 +92,11 @@ class ProfileService {
         Profile child = null
         if(company && parent && !parent.company){
             child = Profile.findByCompanyAndParent(company, parent) ?: new Profile(
-                    name: name,
                     code: sanitizeUrlService.sanitizeWithDashes(name),
                     parent: parent,
                     company: company
             )
+            child.name = name
             child.validate()
             if(!child.hasErrors()){
                 child.save(flush:true)
@@ -120,12 +120,12 @@ class ProfileService {
     }
 
     void removeProfile(Profile profile){
-        User.findAllByProfilesInList([profile]).each {user ->
+        User.executeQuery('select u from User u left join u.profiles profile where profile=:profile', [profile:profile]).each {user ->
             user.removeFromProfiles(profile)
             user.save(flush: true)
         }
         Profile.findAllByParent(profile).each{child ->
-            User.findAllByProfilesInList([child]).each {user ->
+            User.executeQuery('select u from User u left join u.profiles profile where profile=:profile', [profile:child]).each {user ->
                 user.removeFromProfiles(profile)
                 user.save(flush: true)
             }
@@ -140,11 +140,12 @@ class ProfileService {
      * @param parent - the parent profile from whom the permissions will be copied
      */
     void upgradeProfile(Profile child, Profile parent = child?.parent) {
-        if(parent && !parent.company || child.company?.id == parent.company?.id){
+        if((parent && !parent.company) || child.company?.id == parent.company?.id){
             def wildCard = getWilcardPermission()
             def oldPermissions = ProfilePermission.findAllByProfile(child)
             oldPermissions.each { it.delete(flush: true) }
             def permissions = ProfilePermission.findAllByProfile(parent)
+            log.debug("adding ${permissions.size()} permission(s) from ${parent.name} to ${child.company?.id ?: '*'}:${child.name}")
             permissions.each { parentPermission ->
                 def pp = new ProfilePermission(
                         profile: child,
@@ -155,6 +156,7 @@ class ProfileService {
                 pp.validate()
                 if(!pp.hasErrors()){
                     pp.save(flush: true)
+                    log.debug("added ${pp.key} to ${child.company?.id ?: '*'}:${child.name}")
                 }
             }
         }
@@ -260,11 +262,12 @@ class ProfileService {
         Company company = Company.load(idStore)
         Profile child = null
         if(company && parent && (!parent.company || parent.company.id == idStore)){
-            child = new Profile(
-                    name: name,
-                    code: sanitizeUrlService.sanitizeWithDashes(name),
+            def code = sanitizeUrlService.sanitizeWithDashes(name)
+            child = Profile.findByCompanyAndCode(company, code) ?: new Profile(
+                    code: code,
                     company: company
             )
+            child.name = name
             child.validate()
             if(!child.hasErrors()){
                 child.save(flush: true)

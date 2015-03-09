@@ -9,12 +9,17 @@ import com.mogobiz.RenderBase
 /**
  *
  */
-class RoleRender
-    extends RenderBase<Role>
+class RoleRender extends RenderBase<Role>
 {
 
-    java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.Role entity, String lang = 'fr') {return super.asMap(included, excluded, entity, lang)}
+    Map asMap(List<String> included = [], List<String> excluded = [], Role entity, String lang = 'fr') {
+        final map = super.asMap(included, excluded, entity, lang)
+        def permissions = []
+        RolePermission.findAllByRole(entity).each {permissions << it.asMapForJSON()}
+        map << [permissions: permissions]
+        return map
+    }
 
-    def String asString(com.mogobiz.store.domain.Role entity){return "com.mogobiz.store.domain.Role : "+entity.id}
+    def String asString(Role entity){return "com.mogobiz.store.domain.Role : "+entity.id}
 
 }
