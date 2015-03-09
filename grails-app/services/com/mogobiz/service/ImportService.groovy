@@ -36,6 +36,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
+
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.concurrent.Future
 import java.util.zip.ZipFile
@@ -989,8 +991,8 @@ class ImportService {
                             p.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(name) : seo
                             p.keywords = keywords
                             p.taxRate = tr
-                            p.dateCreated = new SimpleDateFormat("yyyy-MM-dd").parse(dateCreated)
-                            p.lastUpdated = new SimpleDateFormat("yyyy-MM-dd").parse(lastUpdated)
+                            p.dateCreated = parseDate(dateCreated)
+                            p.lastUpdated = parseDate(lastUpdated, p.dateCreated)
                             if (brandName.length() > 0)
                                 p.brand = brands.get(brandName) ?: Brand.findByNameAndCompany(brandName, catalog.company)
 
@@ -1059,6 +1061,15 @@ class ImportService {
             it.get()
         }
         return countLines
+    }
+
+    def Date parseDate(String date, Date d = new Date()) {
+        try{
+            new SimpleDateFormat("yyyy-MM-dd").parse(date)
+        }
+        catch(ParseException e){
+            d
+        }
     }
 }
 
