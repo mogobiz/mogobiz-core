@@ -9,12 +9,12 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
 class Product
-    implements java.io.Serializable
+        implements java.io.Serializable
 {
     def productValidation
     def productRender
@@ -26,153 +26,153 @@ class Product
 
 
     /**
-     * 
+     *
      */
-    java.lang.String externalCode 
+    java.lang.String externalCode
     /**
-     * 
+     *
      */
-    java.lang.String code 
+    java.lang.String code
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.ProductType xtype 
+    com.mogobiz.store.domain.ProductType xtype
     /**
      * <p>
      * Montant de base du produit (en centime)
      * </p>
      */
-    long price 
+    long price
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.ProductState state 
+    com.mogobiz.store.domain.ProductState state
     /**
      * <p>
      * Description détaillée du produit
      * </p>
      */
-    java.lang.String description 
+    java.lang.String description
     /**
-     * 
+     *
      */
-    java.lang.String descriptionAsText 
+    java.lang.String descriptionAsText
     /**
-     * 
+     *
      */
-    long nbSales  = 0 
+    long nbSales  = 0
     /**
      * <p>
      * Url of the first picture associated to this product.
      * </p>
      */
-    java.lang.String picture 
+    java.lang.String picture
     /**
-     * 
+     *
      */
-    java.lang.Boolean stockDisplay  = java.lang.Boolean.valueOf(true) 
+    java.lang.Boolean stockDisplay  = java.lang.Boolean.valueOf(true)
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.ProductCalendar calendarType 
+    com.mogobiz.store.domain.ProductCalendar calendarType
     /**
-     * 
+     *
      */
-    Boolean hide  = false 
+    Boolean hide  = false
     /**
-     * 
+     *
      */
-    java.lang.String sanitizedName 
+    java.lang.String sanitizedName
     /**
      * <p>
      * Date de début de mise à disposition du produit
      * </p>
      */
-    java.util.Calendar startDate 
+    java.util.Calendar startDate
     /**
-     * 
+     *
      */
-    java.util.Calendar modificationDate 
+    java.util.Calendar modificationDate
     /**
-     * 
+     *
      */
-    java.util.Calendar stopFeatureDate 
+    java.util.Calendar stopFeatureDate
     /**
-     * 
+     *
      */
-    java.util.Calendar startFeatureDate 
+    java.util.Calendar startFeatureDate
     /**
      * <p>
      * Date de fin de mise à disposition du produit
      * </p>
      */
-    java.util.Calendar stopDate 
+    java.util.Calendar stopDate
     /**
-     * 
+     *
      */
-    java.lang.String keywords 
+    java.lang.String keywords
     /**
-     * 
+     *
      */
-    java.util.Calendar availabilityDate 
+    java.util.Calendar availabilityDate
     /**
-     * 
+     *
      */
-    boolean deleted  = false 
+    boolean deleted  = false
     /**
-     * 
+     *
      */
-    long downloadMaxTimes  = 0 
+    long downloadMaxTimes  = 0
     /**
-     * 
+     *
      */
-    long downloadMaxDelay  = 0 
+    long downloadMaxDelay  = 0
     /**
-     * 
+     *
      */
-    long returnMaxDelay  = 0 
+    long returnMaxDelay  = 0
     /**
-     * 
+     *
      */
-    com.mogobiz.geolocation.domain.Poi poi 
+    com.mogobiz.geolocation.domain.Poi poi
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Category category 
+    com.mogobiz.store.domain.Category category
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Brand brand 
+    com.mogobiz.store.domain.Brand brand
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Seller seller 
+    com.mogobiz.store.domain.Seller seller
     /**
-     * 
+     *
      */
     com.mogobiz.store.domain.Shipping shipping
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.TaxRate taxRate 
+    com.mogobiz.store.domain.TaxRate taxRate
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Ibeacon ibeacon 
+    com.mogobiz.store.domain.Ibeacon ibeacon
 
     static hasMany = [
             tags:Tag,
@@ -202,7 +202,7 @@ class Product
 
         autoTimestamp true
 
-    uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
+        uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
 
@@ -265,7 +265,7 @@ class Product
     }
 
     static constraints = {
-    uuid (nullable:false, unique:false)
+        uuid (nullable:false, unique:false)
 
         externalCode (nullable:true, unique:false)
         code ( blank:false, nullable:false, unique:false, validator:com.mogobiz.store.domain.ProductValidation.productCodeValidator)

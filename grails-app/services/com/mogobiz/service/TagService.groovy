@@ -15,7 +15,7 @@ class TagService
 {
 
     PagedList<Tag> list(Company company, PagedListCommand cmd) {
-        List<Tag> tags = Tag.findAllByCompany(company, cmd.getPagination())
+        List<Tag> tags = Tag.findAllByCompany(company, cmd.getPagination() + [sort:"name",order:'asc'])
         int totalCount = Tag.countByCompany(company)
         new PagedList<Tag>(list:tags, totalCount:totalCount)
     }

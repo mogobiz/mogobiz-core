@@ -28,9 +28,26 @@ class ExportService {
     final List<String> featHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "domain", "name", "value", "hide"]
     final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide"]
     final List<String> varValHeaders = ["category-uuid", "category-path", "variation-uuid", "variation-name", "uuid", "external-code", "value", "google"]
-    final List<String> prdHeaders = ["category-uuid", "category-path", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords", "brand-name", "date-created", "last-updated"]
+    final List<String> prdHeaders = ["category-uuid", "category-path", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords", "brand-name", "tax-rate", "date-created", "last-updated"]
     final List<String> prdPropHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "name", "value"]
     final List<String> skuHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-name-1", "variation-value-1", "variation-name-2", "variation-value-2", "variation-name-3", "variation-value-3"]
+    final List<String> taxHeaders = ["uuid", "name", "country-code", "state-code", "rate", "active"]
+    final List<String> shipHeaders = ["uuid", "country-code", "min-amount", "max-amount", "price"]
+    final List<String> couponHeaders = ["uuid", "name", "code", "active", "number-of-uses", "start-date", "end-date", "catalog-wise", "for-sale", "description", "anonymous", "pastille", "consumed"]
+    final List<String> reductionRuleHeaders = ["coupon-code", "uuid", "xtype", "quantity-min", "quantity-max", "discount", "xpurchased", "yoffered"]
+    final List<String> couponUseHeaders = ["uuid", "code", "category-uuid", "product-uuid", "sku-uuid", "target-name"]
+
+    List<String> toArray(Coupon it) {
+        [it.uuid, it.name, it.code, it.active, it.numberOfUses, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.endDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.endDate.getTime()) : "", it.catalogWise, it.forSale, it.description, it.anonymous, it.pastille, it.consumed]
+    }
+
+    List<String> toArray(ReductionRule it, String couponCode) {
+        [couponCode, it.uuid, it.xtype.name(), it.quantityMin?.toString(), it.quantityMax?.toString(), it.discount, it.xPurchased?.toString(), it.yOffered?.toString()]
+    }
+
+    List<String> toArray(ShippingRule it) {
+        [it.uuid, it.countryCode, it.minAmount, it.maxAmount, it.price]
+    }
 
     List<String> toArray(Brand it) {
         [it.uuid, it.name, it.website, it.facebooksite, it.twitter, it.description, it.hide]
@@ -59,7 +76,7 @@ class ExportService {
     List<String> toArray(Product it, int catRowNum) {
         ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode ?: "", it.code, it.name, it.xtype, it.price, it.state, it.description ?: "", it.nbSales, it.stockDisplay, it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : "", it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : "", it.sanitizedName, it.tags.collect {
             it.name
-        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
+        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate.name, new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
     }
 
     List<String> toArray(TicketType it, int catRowNum, int prdRowNum) {
@@ -68,6 +85,10 @@ class ExportService {
 
     List<String> toArray(ProductProperty it, int catRowNum, int prdRowNum) {
         ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.name, it.value]
+    }
+
+    List<String> toArray(LocalTaxRate it, String name) {
+        [it.uuid, name, it.countryCode ?: "", it.stateCode ?: "", it.rate, it.active]
     }
 
     CellStyle unlockedCellStyle
@@ -94,6 +115,8 @@ class ExportService {
         int prdRownum = 0
         int prdFeatRownum = 0
         int skuRownum = 0
+        int taxRownum = 0
+        int shipRownum = 0
         int prdPropRownum = 0
 
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -187,10 +210,157 @@ class ExportService {
             skuCell.setCellValue(it)
         }
 
+        XSSFSheet taxRateSheet = workbook.createSheet("taxrate");
+        Row taxRow = taxRateSheet.createRow(0)
+        int taxCellnum = 0
+        taxHeaders.each {
+            Cell taxCell = taxRow.createCell(taxCellnum++)
+            taxCell.setCellValue(it)
+        }
+
+        XSSFSheet shipSheet = workbook.createSheet("shipping");
+        Row shipRow = shipSheet.createRow(0)
+        int shipCellnum = 0
+        shipHeaders.each {
+            Cell shipCell = shipRow.createCell(shipCellnum++)
+            shipCell.setCellValue(it)
+        }
+
+        XSSFSheet couponSheet = workbook.createSheet("coupon");
+        Row couponRow = couponSheet.createRow(0)
+        int couponCellnum = 0
+        couponHeaders.each {
+            Cell couponCell = couponRow.createCell(couponCellnum++)
+            couponCell.setCellValue(it)
+        }
+
+        XSSFSheet reductionSheet = workbook.createSheet("coupon-rule");
+        Row reductionRow = reductionSheet.createRow(0)
+        int reductionCellnum = 0
+        reductionRuleHeaders.each {
+            Cell reductionRuleCell = reductionRow.createCell(reductionCellnum++)
+            reductionRuleCell.setCellValue(it)
+        }
+
+        XSSFSheet couponUseSheet = workbook.createSheet("coupon-use");
+        Row couponUseRow = couponUseSheet.createRow(0)
+        int couponUseCellnum = 0
+        couponUseHeaders.each {
+            Cell couponUseCell = couponUseRow.createCell(couponUseCellnum++)
+            couponUseCell.setCellValue(it)
+        }
+
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File outDir = getExportDir(now)
         File xlsFile = new File(outDir, "mogobiz.xlsx")
         File zipFile = new File(outDir.getParentFile(), "mogobiz-${now}.zip")
+
+        List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
+        brandRownum = 1
+        brands.each {
+            brandCellnum = 0
+            Row branRow = brandSheet.createRow(brandRownum++)
+            toArray(it).each {
+                Cell brandCell = branRow.createCell(brandCellnum++)
+                brandCell.setCellValue(it)
+            }
+        }
+        taxRownum = 1
+        List<TaxRate> taxRates = TaxRate.findAllByCompany(Catalog.get(catalogId).company)
+        taxRates.each { tax ->
+            tax.localTaxRates.each { local ->
+                taxCellnum = 0
+                taxRow = taxRateSheet.createRow(taxRownum++)
+                toArray(local, tax.name).each {
+                    Cell taxCell = taxRow.createCell(taxCellnum++)
+                    taxCell.setCellValue(it)
+                }
+            }
+        }
+
+        shipRownum = 1
+        List<ShippingRule> shippingRules = ShippingRule.findAllByCompany(Catalog.get(catalogId).company)
+        shippingRules.each { shippingRule ->
+            shipCellnum = 0
+            shipRow = shipSheet.createRow(shipRownum++)
+            toArray(shippingRule).each {
+                Cell shipCell = shipRow.createCell(shipCellnum++)
+                shipCell.setCellValue(it)
+            }
+        }
+
+        int couponUseRownum = 1
+        int reductionRownum = 1
+        int couponRownum = 1
+        List<Coupon> coupons = Coupon.findAllByCompany(Catalog.get(catalogId).company)
+        coupons.each { coupon ->
+            couponCellnum = 0
+            couponRow = couponSheet.createRow(couponRownum++)
+            toArray(coupon).each {
+                Cell couponCell = couponRow.createCell(couponCellnum++)
+                couponCell.setCellValue(it)
+            }
+
+            coupon.rules.each { rule ->
+                int ruleCellnum = 0
+                reductionRow = reductionSheet.createRow(reductionRownum++)
+                toArray(rule, coupon.code).each {
+                    Cell reductionCell = reductionRow.createCell(ruleCellnum++)
+                    reductionCell.setCellValue(it)
+                }
+            }
+
+            coupon.categories?.each { category ->
+                couponUseCellnum = 0
+                couponUseRow = couponUseSheet.createRow(couponUseRownum++)
+                Cell couponUseCell = couponUseRow.createCell(0)
+                couponUseCell.setCellValue(coupon.uuid)
+                couponUseCell = couponUseRow.createCell(1)
+                couponUseCell.setCellValue(coupon.code)
+                couponUseCell = couponUseRow.createCell(2)
+                couponUseCell.setCellValue(category.uuid)
+                couponUseCell = couponUseRow.createCell(3)
+                couponUseCell.setCellValue("")
+                couponUseCell = couponUseRow.createCell(4)
+                couponUseCell.setCellValue("")
+                couponUseCell = couponUseRow.createCell(5)
+                couponUseCell.setCellValue(category.name)
+            }
+
+            coupon.products?.each { product ->
+                couponUseCellnum = 0
+                couponUseRow = couponUseSheet.createRow(couponUseRownum++)
+                Cell couponUseCell = couponUseRow.createCell(0)
+                couponUseCell.setCellValue(coupon.uuid)
+                couponUseCell = couponUseRow.createCell(1)
+                couponUseCell.setCellValue(coupon.code)
+                couponUseCell = couponUseRow.createCell(2)
+                couponUseCell.setCellValue("")
+                couponUseCell = couponUseRow.createCell(3)
+                couponUseCell.setCellValue(product.uuid)
+                couponUseCell = couponUseRow.createCell(4)
+                couponUseCell.setCellValue("")
+                couponUseCell = couponUseRow.createCell(5)
+                couponUseCell.setCellValue(product.name)
+            }
+
+            coupon.ticketTypes?.each { sku ->
+                couponUseCellnum = 0
+                couponUseRow = couponUseSheet.createRow(couponUseRownum++)
+                Cell couponUseCell = couponUseRow.createCell(0)
+                couponUseCell.setCellValue(coupon.uuid)
+                couponUseCell = couponUseRow.createCell(1)
+                couponUseCell.setCellValue(coupon.code)
+                couponUseCell = couponUseRow.createCell(2)
+                couponUseCell.setCellValue("")
+                couponUseCell = couponUseRow.createCell(3)
+                couponUseCell.setCellValue("")
+                couponUseCell = couponUseRow.createCell(4)
+                couponUseCell.setCellValue(sku.uuid)
+                couponUseCell = couponUseRow.createCell(5)
+                couponUseCell.setCellValue(sku.name)
+            }
+        }
 
         doExport(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum, prdPropRownum], outDir)
         //Write the workbook in file system
@@ -270,7 +440,6 @@ class ExportService {
         int skuRownum = rownums[6]
         int prdPropRownum = rownums[7]
 
-        XSSFSheet brandSheet = workbook.getSheet("brand");
         XSSFSheet catSheet = workbook.getSheet("category");
         XSSFSheet catFeatSheet = workbook.getSheet("cat-feature");
         XSSFSheet varSheet = workbook.getSheet("variation");
@@ -281,16 +450,6 @@ class ExportService {
         XSSFSheet skuSheet = workbook.getSheet("sku");
 
 
-        List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
-        int brandRownum = 1
-        brands.each {
-            int brandCellnum = 0
-            Row branRow = brandSheet.createRow(brandRownum++)
-            toArray(it).each {
-                Cell brandCell = branRow.createCell(brandCellnum++)
-                brandCell.setCellValue(it)
-            }
-        }
         List<Category> cats = Category.findAllByCatalogAndParent(Catalog.get(catalogId), parent, deleted)
         cats.each {
             int catCellnum = 0
@@ -423,6 +582,7 @@ class ExportService {
                     }
                 }
             }
+
             rownums[0] = catRownum
             rownums[1] = catfeatRownum
             rownums[2] = varRownum
@@ -431,7 +591,7 @@ class ExportService {
             rownums[5] = prdFeatRownum
             rownums[6] = skuRownum
             rownums[7] = prdPropRownum
-
+            log.info(prdRownum + " products")
             doExport(catalogId, workbook, it, deleted, rownums, exportDir)
             catRownum = rownums[0]
             catfeatRownum = rownums[1]
@@ -441,7 +601,6 @@ class ExportService {
             prdFeatRownum = rownums[5]
             skuRownum = rownums[6]
             prdPropRownum = rownums[7]
-
         }
     }
 }

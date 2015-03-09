@@ -9,12 +9,12 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
 class BrandProperty
-    implements java.io.Serializable
+        implements java.io.Serializable
 {
     def brandPropertyValidation
     def brandPropertyRender
@@ -26,17 +26,17 @@ class BrandProperty
 
 
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    java.lang.String value 
+    java.lang.String value
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Brand brand 
+    com.mogobiz.store.domain.Brand brand
 
     static transients = [ 'brandPropertyValidation', 'brandPropertyRender' ]
 
@@ -46,7 +46,7 @@ class BrandProperty
 
         autoTimestamp true
 
-    uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
+        uuid column:"uuid",insertable:true,updateable:false,lazy:false,cache:false
 
 
 
@@ -67,7 +67,7 @@ class BrandProperty
     }
 
     static constraints = {
-    uuid (nullable:false, unique:false)
+        uuid (nullable:false, unique:false)
 
         name ( blank:false, nullable:false, unique:false)
         value (nullable:true, unique:false)
