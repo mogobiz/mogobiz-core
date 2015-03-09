@@ -40,6 +40,7 @@ class BrandProperty
 
     static transients = [ 'brandPropertyValidation', 'brandPropertyRender' ]
 
+    static belongsTo = [Brand]
 
     static mapping = {
 

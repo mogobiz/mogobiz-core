@@ -66,6 +66,7 @@ class Brand
 
     static transients = [ 'brandValidation', 'brandRender' ]
 
+    static hasMany = [brandProperties: BrandProperty]
 
     static mapping = {
 
