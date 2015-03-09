@@ -36,6 +36,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
+
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.concurrent.Future
 import java.util.zip.ZipFile
@@ -151,172 +153,134 @@ class ImportService {
                 'sku'            : skuSheet,
         ]
 
-        log.info("Importing tax rates")
-        // Tax Rate
-        TaxRate.withNewTransaction {
-            for (int rownum = 1; rownum < taxSheet.getPhysicalNumberOfRows(); rownum++) {
-                XSSFRow row = taxSheet.getRow(rownum)
-                if (row != null) {
-                    String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                    if (cell.length() > 0) {
-                        String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
-                        String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                        String countryCode = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                        String stateCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                        String rate = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                        String active = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                        TaxRate t = TaxRate.findByNameAndCompany(name, catalog.company)
-                        if (!t) {
-                            t = new TaxRate()
-                            t.company = catalog.company
-                            t.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                            t.name = name
-                            if (t.validate())
-                                t.save(flush: true)
+        if(taxSheet){
+            log.info("Importing tax rates")
+            // Tax Rate
+            TaxRate.withNewTransaction {
+                for (int rownum = 1; rownum < taxSheet.getPhysicalNumberOfRows(); rownum++) {
+                    XSSFRow row = taxSheet.getRow(rownum)
+                    if (row != null) {
+                        String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                        if (cell.length() > 0) {
+                            String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                            String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                            String countryCode = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                            String stateCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String rate = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            String active = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                            TaxRate t = TaxRate.findByNameAndCompany(name, catalog.company)
+                            if (!t) {
+                                t = new TaxRate()
+                                t.company = catalog.company
+                                t.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                                t.name = name
+                                if (t.validate())
+                                    t.save(flush: true)
+                                else {
+                                    t.errors.allErrors.each { println(it) }
+                                    return [errors: t.errors.allErrors, sheet: "taxrate", line: rownum]
+                                }
+                            }
+                            LocalTaxRate l = new LocalTaxRate()
+                            l.uuid = uuid
+                            l.active = active.equalsIgnoreCase("true")
+                            l.countryCode = countryCode ?: null
+                            l.stateCode ?: null
+                            l.rate = rate.toFloat()
+
+                            if (l.validate()) {
+                                l.save(flush: true)
+                            } else {
+                                l.errors.allErrors.each { println(it) }
+                                return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(shipSheet){
+            log.info("Importing shipping")
+            // Shipping
+            ShippingRule.withNewTransaction {
+                for (int rownum = 1; rownum < shipSheet.getPhysicalNumberOfRows(); rownum++) {
+                    XSSFRow row = shipSheet.getRow(rownum)
+                    if (row != null) {
+                        String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                        if (cell.length() > 0) {
+                            String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                            String countryCode = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                            String minAmount = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                            String maxAmount = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String price = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            ShippingRule sr = ShippingRule.findByUuid(uuid)
+                            if (!sr) {
+                                sr = new ShippingRule()
+                            }
+                            sr.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            sr.countryCode = countryCode
+                            sr.minAmount = minAmount.toFloat().toLong()
+                            sr.maxAmount = maxAmount.toFloat().toLong()
+                            sr.price = price
+                            sr.company = catalog.company
+                            if (sr.validate())
+                                sr.save(flush: true)
                             else {
-                                t.errors.allErrors.each { println(it) }
-                                return [errors: t.errors.allErrors, sheet: "taxrate", line: rownum]
+                                sr.errors.allErrors.each { println(it) }
+                                return [errors: sr.errors.allErrors, sheet: "shipping", line: rownum]
                             }
                         }
-                        LocalTaxRate l = new LocalTaxRate()
-                        l.uuid = uuid
-                        l.active = active.equalsIgnoreCase("true")
-                        l.countryCode = countryCode ?: null
-                        l.stateCode ?: null
-                        l.rate = rate.toFloat()
-
-                        if (l.validate()) {
-                            l.save(flush: true)
-                        } else {
-                            l.errors.allErrors.each { println(it) }
-                            return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
-                        }
                     }
                 }
             }
         }
 
-        log.info("Importing shipping")
-        // Shipping
-        ShippingRule.withNewTransaction {
-            for (int rownum = 1; rownum < shipSheet.getPhysicalNumberOfRows(); rownum++) {
-                XSSFRow row = shipSheet.getRow(rownum)
-                if (row != null) {
-                    String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                    if (cell.length() > 0) {
-                        String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
-                        String countryCode = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                        String minAmount = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                        String maxAmount = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                        String price = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                        ShippingRule sr = ShippingRule.findByUuid(uuid)
-                        if (!sr) {
-                            sr = new ShippingRule()
-                        }
-                        sr.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                        sr.countryCode = countryCode
-                        sr.minAmount = minAmount.toFloat().toLong()
-                        sr.maxAmount = maxAmount.toFloat().toLong()
-                        sr.price = price
-                        sr.company = catalog.company
-                        if (sr.validate())
-                            sr.save(flush: true)
-                        else {
-                            sr.errors.allErrors.each { println(it) }
-                            return [errors: sr.errors.allErrors, sheet: "shipping", line: rownum]
-                        }
-                    }
-                }
-            }
-        }
-
-
-        log.info("Importing Coupons")
-        Coupon.withNewTransaction {
-            for (int rownum = 1; rownum < couponSheet.getPhysicalNumberOfRows(); rownum++) {
-                XSSFRow row = couponSheet.getRow(rownum)
-                if (row != null) {
-                    String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                    if (cell.length() > 0) {
-                        String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
-                        String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                        String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                        String active = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                        String numberOfUses = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                        String startDate = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                        String endDate = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                        String catalogWise = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                        String forSale = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
-                        String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
-                        String anonymous = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
-                        String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
-                        String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
-                        Coupon coupon = Coupon.findByUuid(uuid)
-                        if (!coupon) {
-                            coupon = new Coupon()
-                        }
-                        coupon.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                        coupon.name = name
-                        coupon.code = code
-                        coupon.active = active.equalsIgnoreCase("true")
-                        coupon.numberOfUses = numberOfUses.length() > 0 ? numberOfUses.toFloat().toLong() : null
-                        coupon.startDate = getCalendar(startDate)
-                        coupon.endDate = getCalendar(endDate)
-                        coupon.catalogWise = catalogWise.equalsIgnoreCase("true")
-                        coupon.forSale = forSale.equalsIgnoreCase("true")
-                        coupon.description = description
-                        coupon.anonymous = anonymous.equalsIgnoreCase("true")
-                        coupon.pastille = pastille
-                        coupon.consumed = consumed.length() > 0 ? consumed.toFloat().toLong() : null
-                        coupon.company = catalog.company
-                        if (coupon.validate()) {
-                            coupon.save(flush: true)
-
-                        } else {
-                            coupon.errors.allErrors.each { println(it) }
-                            return [errors: coupon.errors.allErrors, sheet: "coupon", line: rownum]
-                        }
-                    }
-                }
-            }
-        }
-
-        log.info("Importing Reduction rules")
-        //TODO improve inserts
-        Coupon.withNewTransaction {
-            for (int rownum = 1; rownum < couponRuleSheet.getPhysicalNumberOfRows(); rownum++) {
-                XSSFRow row = couponRuleSheet.getRow(rownum)
-                if (row != null) {
-                    String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                    if (cell.length() > 0) {
-                        String couponCode = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
-                        String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                        String xtype = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                        String qMin = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                        String qMax = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                        String discount = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                        String xpurchased = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                        String yoffered = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                        Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, couponCode)
-                        if (coupon) {
-                            ReductionRule rr = ReductionRule.findByUuid(uuid)
-                            if (!rr) {
-                                rr = new ReductionRule()
+        if(couponSheet){
+            log.info("Importing Coupons")
+            Coupon.withNewTransaction {
+                for (int rownum = 1; rownum < couponSheet.getPhysicalNumberOfRows(); rownum++) {
+                    XSSFRow row = couponSheet.getRow(rownum)
+                    if (row != null) {
+                        String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                        if (cell.length() > 0) {
+                            String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                            String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                            String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                            String active = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String numberOfUses = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            String startDate = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                            String endDate = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                            String catalogWise = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                            String forSale = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                            String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                            String anonymous = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+                            String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
+                            String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
+                            Coupon coupon = Coupon.findByUuid(uuid)
+                            if (!coupon) {
+                                coupon = new Coupon()
                             }
-                            rr.uuid = uuid ? uuid : UUID.randomUUID().toString()
-                            rr.xtype = ReductionRuleType.valueOf(xtype)
-                            rr.quantityMin == qMin.length() > 0 ? qMin.toFloat().toLong() : null
-                            rr.quantityMax = qMax.length() > 0 ? qMax.toFloat().toLong() : null
-                            rr.discount = discount.length() > 0 ? discount : null
-                            rr.xPurchased = xpurchased.length() > 0 ? xpurchased.toFloat().toLong() : null
-                            rr.yOffered = yoffered.length() > 0 ? yoffered.toFloat().toLong() : null
-                            coupon.addToRules(rr)
+                            coupon.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            coupon.name = name
+                            coupon.code = code
+                            coupon.active = active.equalsIgnoreCase("true")
+                            coupon.numberOfUses = numberOfUses.length() > 0 ? numberOfUses.toFloat().toLong() : null
+                            coupon.startDate = getCalendar(startDate)
+                            coupon.endDate = getCalendar(endDate)
+                            coupon.catalogWise = catalogWise.equalsIgnoreCase("true")
+                            coupon.forSale = forSale.equalsIgnoreCase("true")
+                            coupon.description = description
+                            coupon.anonymous = anonymous.equalsIgnoreCase("true")
+                            coupon.pastille = pastille
+                            coupon.consumed = consumed.length() > 0 ? consumed.toFloat().toLong() : null
+                            coupon.company = catalog.company
                             if (coupon.validate()) {
                                 coupon.save(flush: true)
 
                             } else {
                                 coupon.errors.allErrors.each { println(it) }
-                                return [errors: coupon.errors.allErrors, sheet: "coupon-rule", line: rownum]
+                                return [errors: coupon.errors.allErrors, sheet: "coupon", line: rownum]
                             }
                         }
                     }
@@ -324,34 +288,81 @@ class ImportService {
             }
         }
 
-        log.info("Importing Coupon Uses")
-        //TODO improve Coupon Use
-        Coupon.withNewTransaction {
-            for (int rownum = 1; rownum < couponUseSheet.getPhysicalNumberOfRows(); rownum++) {
-                XSSFRow row = couponUseSheet.getRow(rownum)
-                if (row != null) {
-                    String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                    if (cell.length() > 0) {
-                        String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
-                        String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                        String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                        String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                        String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                        Coupon coupon = Coupon.findByUuid(uuid)
-                        if (coupon) {
-                            if (catUuid.length() > 0) {
-                                coupon.addToCategories(Category.findByUuid(catUuid))
-                            } else if (prodUuid.length() > 0) {
-                                coupon.addToProducts(Product.findByUuid(prodUuid))
-                            } else if (skuUuid.length() > 0) {
-                                coupon.addToTicketTypes(TicketType.findByUuid(skuUuid))
-                            }
-                            if (coupon.validate()) {
-                                coupon.save(flush: true)
+        if(couponRuleSheet){
+            log.info("Importing Reduction rules")
+            //TODO improve inserts
+            Coupon.withNewTransaction {
+                for (int rownum = 1; rownum < couponRuleSheet.getPhysicalNumberOfRows(); rownum++) {
+                    XSSFRow row = couponRuleSheet.getRow(rownum)
+                    if (row != null) {
+                        String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                        if (cell.length() > 0) {
+                            String couponCode = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
+                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                            String xtype = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                            String qMin = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String qMax = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            String discount = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                            String xpurchased = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                            String yoffered = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                            Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, couponCode)
+                            if (coupon) {
+                                ReductionRule rr = ReductionRule.findByUuid(uuid)
+                                if (!rr) {
+                                    rr = new ReductionRule()
+                                }
+                                rr.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                                rr.xtype = ReductionRuleType.valueOf(xtype)
+                                rr.quantityMin == qMin.length() > 0 ? qMin.toFloat().toLong() : null
+                                rr.quantityMax = qMax.length() > 0 ? qMax.toFloat().toLong() : null
+                                rr.discount = discount.length() > 0 ? discount : null
+                                rr.xPurchased = xpurchased.length() > 0 ? xpurchased.toFloat().toLong() : null
+                                rr.yOffered = yoffered.length() > 0 ? yoffered.toFloat().toLong() : null
+                                coupon.addToRules(rr)
+                                if (coupon.validate()) {
+                                    coupon.save(flush: true)
 
-                            } else {
-                                coupon.errors.allErrors.each { println(it) }
-                                return [errors: coupon.errors.allErrors, sheet: "coupon-use", line: rownum]
+                                } else {
+                                    coupon.errors.allErrors.each { println(it) }
+                                    return [errors: coupon.errors.allErrors, sheet: "coupon-rule", line: rownum]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(couponUseSheet){
+            log.info("Importing Coupon Uses")
+            //TODO improve Coupon Use
+            Coupon.withNewTransaction {
+                for (int rownum = 1; rownum < couponUseSheet.getPhysicalNumberOfRows(); rownum++) {
+                    XSSFRow row = couponUseSheet.getRow(rownum)
+                    if (row != null) {
+                        String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                        if (cell.length() > 0) {
+                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+                            String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                            String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                            Coupon coupon = Coupon.findByUuid(uuid)
+                            if (coupon) {
+                                if (catUuid.length() > 0) {
+                                    coupon.addToCategories(Category.findByUuid(catUuid))
+                                } else if (prodUuid.length() > 0) {
+                                    coupon.addToProducts(Product.findByUuid(prodUuid))
+                                } else if (skuUuid.length() > 0) {
+                                    coupon.addToTicketTypes(TicketType.findByUuid(skuUuid))
+                                }
+                                if (coupon.validate()) {
+                                    coupon.save(flush: true)
+
+                                } else {
+                                    coupon.errors.allErrors.each { println(it) }
+                                    return [errors: coupon.errors.allErrors, sheet: "coupon-use", line: rownum]
+                                }
                             }
                         }
                     }
@@ -980,8 +991,8 @@ class ImportService {
                             p.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(name) : seo
                             p.keywords = keywords
                             p.taxRate = tr
-                            p.dateCreated = new SimpleDateFormat("yyyy-MM-dd").parse(dateCreated)
-                            p.lastUpdated = new SimpleDateFormat("yyyy-MM-dd").parse(lastUpdated)
+                            p.dateCreated = parseDate(dateCreated)
+                            p.lastUpdated = parseDate(lastUpdated, p.dateCreated)
                             if (brandName.length() > 0)
                                 p.brand = brands.get(brandName) ?: Brand.findByNameAndCompany(brandName, catalog.company)
 
@@ -1050,6 +1061,15 @@ class ImportService {
             it.get()
         }
         return countLines
+    }
+
+    def Date parseDate(String date, Date d = new Date()) {
+        try{
+            new SimpleDateFormat("yyyy-MM-dd").parse(date)
+        }
+        catch(ParseException e){
+            d
+        }
     }
 }
 
