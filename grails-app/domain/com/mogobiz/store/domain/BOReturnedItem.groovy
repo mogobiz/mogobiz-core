@@ -51,11 +51,6 @@ class BOReturnedItem
     /**
      * 
      */
-    com.mogobiz.store.domain.BOReturn bOReturn 
-
-    /**
-     * 
-     */
     com.mogobiz.store.domain.BOCartItem bOCartItem 
 
     static transients = [ 'BOReturnedItemValidation', 'BOReturnedItemRender' ]
@@ -84,8 +79,6 @@ class BOReturnedItem
         status column:"status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
 
 
-        bOReturn column:"b_o_return_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
-
         bOCartItem column:"b_o_cart_item_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
@@ -96,7 +89,6 @@ class BOReturnedItem
         refunded ( blank:false, nullable:false, unique:false)
         totalRefunded ( blank:false, nullable:false, unique:false)
         status ( blank:false, nullable:false, unique:false)
-        bOReturn (nullable:true)
         bOCartItem (nullable:true)
     }
 
