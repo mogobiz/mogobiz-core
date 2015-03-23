@@ -8,6 +8,7 @@ import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import grails.converters.JSON
+import grails.converters.XML
 import grails.transaction.Transactional
 import groovy.transform.Synchronized
 import org.hibernate.SessionFactory
@@ -132,8 +133,10 @@ class ImpexController {
                     Date end = new Date()
                     log.info("IMPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
                 } else {
-                    render text:"Missing file", status:401
-                    response.sendError(401, "Missing file")
+                    withFormat {
+                        html {render text:"Error: Missing input file", status:200 }
+                        json { render text:"Missing input file", status:401 }
+                    }
                 }
             }
             finally {
