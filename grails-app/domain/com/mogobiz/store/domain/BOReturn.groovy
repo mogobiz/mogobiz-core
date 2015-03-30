@@ -36,7 +36,7 @@ class BOReturn
     /**
      * 
      */
-    com.mogobiz.store.domain.BOCart bOCart 
+    com.mogobiz.store.domain.BOReturnedItem bOReturnedItem 
 
     static transients = [ 'BOReturnValidation', 'BOReturnRender' ]
 
@@ -58,11 +58,11 @@ class BOReturn
         version false
 
         id name:'id',column:'id',generator:'native'
-        motivation column:"motivation",insertable:true,updateable:true,lazy:false,cache:false
+        motivation column:"motivation",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         status column:"status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
 
 
-        bOCart column:"b_o_cart_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+        bOReturnedItem column:"b_o_returned_item_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -70,7 +70,7 @@ class BOReturn
 
         motivation (nullable:true, unique:false)
         status ( blank:false, nullable:false, unique:false)
-        bOCart ( blank:false, nullable:false)
+        bOReturnedItem (nullable:true)
     }
 
 

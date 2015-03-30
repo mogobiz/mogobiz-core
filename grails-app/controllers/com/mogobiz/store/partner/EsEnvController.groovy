@@ -82,6 +82,12 @@ class EsEnvController {
                     EsEnv.executeUpdate("update EsEnv set active = :active where company.id =  :idCompany and id != :id ", [id:env.id, active:false, idCompany:company.id])
                 }
             }
+            else {
+                env.errors.allErrors.each {
+                    log.error(it)
+                }
+
+            }
         }
         withFormat {
             html env: env

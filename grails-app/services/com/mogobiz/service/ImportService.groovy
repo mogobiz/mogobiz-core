@@ -318,6 +318,7 @@ class ImportService {
                                 rr.discount = discount.length() > 0 ? discount : null
                                 rr.xPurchased = xpurchased.length() > 0 ? xpurchased.toFloat().toLong() : null
                                 rr.yOffered = yoffered.length() > 0 ? yoffered.toFloat().toLong() : null
+                                rr.save(flush: true)
                                 coupon.addToRules(rr)
                                 if (coupon.validate()) {
                                     coupon.save(flush: true)
