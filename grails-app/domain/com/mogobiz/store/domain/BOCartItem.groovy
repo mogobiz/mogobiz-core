@@ -79,6 +79,10 @@ class BOCartItem
     /**
      * 
      */
+    java.lang.String url 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.BOCart bOCart 
 
     /**
@@ -119,6 +123,7 @@ class BOCartItem
         endDate column:"end_date",insertable:true,updateable:true,lazy:false,cache:false
         quantity column:"quantity",insertable:true,updateable:true,lazy:false,cache:false
         ticketTypeFk column:"ticket_type_fk",insertable:true,updateable:true,lazy:false,cache:false
+        url column:"url",insertable:true,updateable:true,lazy:false,cache:false
 
 
         bOCart column:"b_o_cart_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -142,6 +147,7 @@ class BOCartItem
         endDate (nullable:true, unique:false)
         quantity ( blank:false, nullable:false, unique:false)
         ticketTypeFk ( blank:false, nullable:false, unique:false)
+        url (nullable:true, unique:false)
         bOCart ( blank:false, nullable:false)
         bODelivery (nullable:true)
     }
