@@ -222,9 +222,9 @@ class UploadController {
         resource.deleted = false
 
         List<String> variations = []
-        variations << params['variation1']?.id ? VariationValue.get(params['variation1']?.id)?.value : "x"
-        variations << params['variation2']?.id ? VariationValue.get(params['variation2']?.id)?.value : "x"
-        variations << params['variation3']?.id ? VariationValue.get(params['variation3']?.id)?.value : "x"
+        variations << (params['variation1'] ? VariationValue.get(params['variation1'] as Long)?.value : "x")
+        variations << (params['variation2'] ? VariationValue.get(params['variation2'] as Long)?.value : "x")
+        variations << (params['variation3'] ? VariationValue.get(params['variation3'] as Long)?.value : "x")
 
         final variationsAsString = variations.join("")
         if(!variationsAsString.equals("xxx")){
