@@ -33,6 +33,7 @@ class DownloadableController {
                 parent.mkdirs()
                 file.transferTo(new File(parent, id as String))
                 response.status = HttpServletResponse.SC_OK
+                render "success"
             }
             else{
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
@@ -57,6 +58,7 @@ class DownloadableController {
                 else{
                     file.delete()
                     response.status = HttpServletResponse.SC_OK
+                    render "success"
                 }
             }
             else{
@@ -89,6 +91,31 @@ class DownloadableController {
                             out.flush()
                         }
                     }
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+            }
+        }
+    }
+
+    def hasResource(Long id){
+        final ticketType = TicketType.load(id)
+        if(!ticketType){
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
+        else{
+            Company store = ticketType.product?.company
+            if(authenticationService.canAccessStore(store)){
+                String resourcesPath = grailsApplication.config.resources.path
+                String dir = "$resourcesPath${File.separator}resources${File.separator}${store.code}${File.separator}sku"
+                def file = new File(dir, id as String)
+                response.status = HttpServletResponse.SC_OK
+                if(file.exists()){
+                    render "true"
+                }
+                else{
+                    render "false"
                 }
             }
             else{
