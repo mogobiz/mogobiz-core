@@ -3,6 +3,7 @@ package com.mogobiz.store.partner
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.TicketType
 import com.mogobiz.tools.MimeTypeTools
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import javax.servlet.http.HttpServletResponse
@@ -26,12 +27,14 @@ class DownloadableController {
         else{
             Company store = ticketType.product?.company
             if(authenticationService.canAccessStore(store)){
-                def file = (request as MultipartHttpServletRequest).getFile('file')
+                MultipartFile file = (request as MultipartHttpServletRequest).getFile('file')
                 String resourcesPath = grailsApplication.config.resources.path
                 String dir = "$resourcesPath${File.separator}resources${File.separator}${store.code}${File.separator}sku"
                 def parent = new File(dir)
                 parent.mkdirs()
                 file.transferTo(new File(parent, id as String))
+                ticketType.filename = file.getName()
+                ticketType.save(flush:true)
                 response.status = HttpServletResponse.SC_OK
                 render "success"
             }
@@ -82,11 +85,8 @@ class DownloadableController {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND)
                 }
                 else{
-                    String mime = MimeTypeTools.detectMimeType(file);
-                    response.contentType = mime
-                    int index = mime.lastIndexOf('/')
-                    String ext =  index > 0 ?  mime.substring(index+1) : ""
-                    response.setHeader("Content-disposition", "attachment;filename=${file.getName()}.${ext}")
+                    response.contentType = MimeTypeTools.detectMimeType(file);
+                    response.setHeader("Content-disposition", "attachment;filename=${ticketType.filename}")
                     def out = response.outputStream
                     def bytes = new byte[BUFFER_SIZE]
                     file.withInputStream { inp ->
