@@ -82,7 +82,11 @@ class DownloadableController {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND)
                 }
                 else{
-                    response.contentType = MimeTypeTools.detectMimeType(file)
+                    String mime = MimeTypeTools.detectMimeType(file);
+                    response.contentType = mime
+                    int index = mime.lastIndexOf('/')
+                    String ext =  index > 0 ?  mime.substring(index+1) : ""
+                    response.setHeader("Content-disposition", "attachment;filename=${file.getName()}.${ext}")
                     def out = response.outputStream
                     def bytes = new byte[BUFFER_SIZE]
                     file.withInputStream { inp ->
