@@ -33,7 +33,7 @@ class DownloadableController {
                 def parent = new File(dir)
                 parent.mkdirs()
                 file.transferTo(new File(parent, id as String))
-                ticketType.filename = file.getName()
+                ticketType.filename = file.getOriginalFilename()
                 ticketType.save(flush:true)
                 response.status = HttpServletResponse.SC_OK
                 render "success"
@@ -60,6 +60,8 @@ class DownloadableController {
                 }
                 else{
                     file.delete()
+                    ticketType.filename = ""
+                    ticketType.save(flush:true)
                     response.status = HttpServletResponse.SC_OK
                     render "success"
                 }
