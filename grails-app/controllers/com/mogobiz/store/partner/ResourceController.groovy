@@ -44,7 +44,7 @@ class ResourceController {
 		def id = params.id
 		def size = params.size
 		if(id != null){
-			def resource = Resource.get(id)
+			Resource resource = Resource.get(id)
 			if(!resource){
 				response.sendError 404
 				return
@@ -98,7 +98,7 @@ class ResourceController {
 		def company = seller.company
 		def id = params.id
 		if(id != null){
-			def resource = Resource.get(id)
+			Resource resource = Resource.get(id)
 			if(resource && resource.company==company){
 				def resourceVO = resource.asMapForJSON()
 				withFormat {
