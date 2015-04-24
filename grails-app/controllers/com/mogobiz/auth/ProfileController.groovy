@@ -33,6 +33,7 @@ class ProfileController {
     @Transactional
     def index(Long idStore){
         if(authenticationService.isPermitted(
+                computePermission(PermissionType.ADMIN_COMPANY, ALL),/*FIXME*/
                 computeStorePermission(
                         PermissionType.ADMIN_STORE_PROFILES, idStore))){
             def profiles = idStore ? Profile.where {
