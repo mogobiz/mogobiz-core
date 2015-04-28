@@ -88,8 +88,8 @@ class SellerService {
 
     def Seller update(Seller seller, def params) {
         def user = authenticationService.retrieveAuthenticatedUser()
-        def isitme = seller.id == user.id
-        def isSeller = isitme && SecurityUtils.getSubject().hasRole(RoleName.PARTNER.name())
+        def isme = seller.id == user.id
+        def isSeller = isme && SecurityUtils.getSubject().hasRole(RoleName.PARTNER.name())
         // FIXME (bug ihm)
         def oldPassword = seller.password
         def wasAdmin = seller.admin
@@ -99,11 +99,11 @@ class SellerService {
         seller.password = oldPassword
 
         // An admin cannot remove the admin role from himself.
-        if (wasAdmin && isitme)
+        if (wasAdmin && isme)
             seller.admin = true;
 
         // An active user cannot remove the active role from himself.
-        if (wasActive && isitme)
+        if (wasActive && isme)
             seller.active = true;
 
         if (seller.validate()) {
@@ -152,7 +152,7 @@ class SellerService {
                 if (seller.sell) {
                     seller.addToRoles(Role.findByName(RoleName.PARTNER))
                 }
-                seller.save()
+                seller.save(flush: true)
 
                 profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
 
