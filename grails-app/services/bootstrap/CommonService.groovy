@@ -115,6 +115,24 @@ public class CommonService {
             }
         }
 
+        name = "validator"
+        parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
+        oldPermissions = ProfilePermission.findAllByProfile(parent)
+        oldPermissions.each { it.delete(flush: true) }
+        PermissionType.validator().each {pt ->
+            profileService.saveProfilePermission(parent, true, pt)
+        }
+        profileService.upgradeChildProfiles(parent)
+        Company.findAll().each {company ->
+            def child = Profile.findByCompanyAndParent(company, parent)
+            if(!child) {
+                child = profileService.applyProfile(parent, company.id)
+            }
+            Seller.findAllByCompanyAndValidator(company, true).each {
+                profileService.addUserProfile(it, child)
+            }
+        }
+
         name = "seller"
         parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
         oldPermissions = ProfilePermission.findAllByProfile(parent)

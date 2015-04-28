@@ -29,7 +29,9 @@ enum PermissionType {
     IMPORT_STORE_CATALOGS("importCatalogs", "catalogs:{0}:import"),
     EXPORT_STORE_CATALOGS("exportCatalogs", "catalogs:{0}:export"),
     UPDATE_STORE_CATALOG("updateCatalog", "catalogs:{0}:catalog:{1}:update"), // UserPermission per catalog
-    UPDATE_STORE_CATEGORY_WITHIN_CATALOG("updateCatalogCategory", "catalogs:{0}:catalog:{1}:category:{2}:update") // UserPermission per catalog and category
+    UPDATE_STORE_CATEGORY_WITHIN_CATALOG("updateCatalogCategory", "catalogs:{0}:catalog:{1}:category:{2}:update"), // UserPermission per catalog and category
+
+    VALIDATE_STORE_TICKETS("validateTickets", "tickets:{0}:validate")
 
     private String key
 
@@ -73,6 +75,12 @@ enum PermissionType {
                 DELETE_STORE_CATALOGS,
                 IMPORT_STORE_CATALOGS,
                 EXPORT_STORE_CATALOGS
+        ]
+    }
+
+    public static Collection<PermissionType> validator() {
+        [
+                VALIDATE_STORE_TICKETS
         ]
     }
 
