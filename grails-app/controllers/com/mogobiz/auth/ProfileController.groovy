@@ -464,6 +464,7 @@ class ProfileController {
         }
         map << [permissions: all]
         withFormat {
+            html permissions: all
             xml { render map as XML }
             json { render map as JSON }
         }
