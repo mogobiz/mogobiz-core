@@ -110,8 +110,11 @@ public class CommonService {
             if(!child) {
                 child = profileService.applyProfile(parent, company.id)
             }
-            Seller.findAllByCompanyAndAdmin(company, true).each {
-                profileService.addUserProfile(it, child)
+            Seller.findAllByCompanyAndAdmin(company, true).each {administrator ->
+                profileService.addUserProfile(administrator, child)
+//TODO uncomment lines bellow after full migration
+//                administrator.admin = false
+//                administrator.save(flush: true)
             }
         }
 
@@ -128,8 +131,11 @@ public class CommonService {
             if(!child) {
                 child = profileService.applyProfile(parent, company.id)
             }
-            Seller.findAllByCompanyAndValidator(company, true).each {
-                profileService.addUserProfile(it, child)
+            Seller.findAllByCompanyAndValidator(company, true).each {validator ->
+                profileService.addUserProfile(validator, child)
+//TODO uncomment lines bellow after full migration
+//                validator.validator = false
+//                validator.save(flush: true)
             }
         }
 
@@ -146,7 +152,7 @@ public class CommonService {
             if(!child){
                 child = profileService.applyProfile(parent, company.id)
             }
-            Seller.findAllByCompanyAndAgent(company, true).each {seller ->
+            Seller.findAllByCompanyAndSell(company, true).each {seller ->
                 profileService.addUserProfile(seller, child)
                 Catalog.findAllByCompany(company).each {catalog ->
                     profileService.saveUserPermission(
@@ -174,6 +180,9 @@ public class CommonService {
                             env.id as String
                     )
                 }
+//TODO uncomment lines bellow after full migration
+//                seller.sell = false
+//                seller.save(flush: true)
             }
         }
 	}
