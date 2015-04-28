@@ -33,9 +33,13 @@ class ProfileController {
     @Transactional
     def index(Long idStore){
         if(authenticationService.isPermitted(
-                computePermission(PermissionType.ADMIN_COMPANY, ALL),/*FIXME*/
                 computeStorePermission(
-                        PermissionType.ADMIN_STORE_PROFILES, idStore))){
+                        PermissionType.ADMIN_STORE_USERS, idStore
+                ),
+                computeStorePermission(
+                        PermissionType.ADMIN_STORE_PROFILES, idStore
+                )
+        )){
             def profiles = idStore ? Profile.where {
                 company.id == idStore
             }.list() : Profile.findAllByCompanyIsNull()
@@ -56,7 +60,9 @@ class ProfileController {
         if(profile){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id)))
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id
+                    )
+            ))
             withFormat {
                 html profile: profile.asMapForJSON()
                 xml { render profile.asMapForJSON() as XML }
@@ -80,7 +86,9 @@ class ProfileController {
 //            if(company){
                 if(authenticationService.isPermitted(
                         computeStorePermission(
-                                PermissionType.ADMIN_STORE_PROFILES, idCompany))) {
+                                PermissionType.ADMIN_STORE_PROFILES, idCompany
+                        )
+                )) {
                     def name = cmd.name
                     def code = sanitizeUrlService.sanitizeWithDashes(name)
                     def profile = cmd.idProfile ? Profile.load(cmd.idProfile) : Profile.findByCodeAndCompany(code, company)
@@ -142,7 +150,9 @@ class ProfileController {
         if(profile){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id))){
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id
+                    )
+            )){
                 if(!profile.parent){
                     profileService.upgradeChildProfiles(profile)
                     withFormat {
@@ -177,7 +187,9 @@ class ProfileController {
             }
             else if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, profile.company.id))){
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company.id
+                    )
+            )){
                 profileService.removeProfile(profile)
                 withFormat {
                     xml { render [:] as XML }
@@ -199,7 +211,9 @@ class ProfileController {
         if(parent){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, idStore))){
+                            PermissionType.ADMIN_STORE_PROFILES, idStore
+                    )
+            )){
                 def child = profileService.applyProfile(parent, idStore, name)
                 withFormat {
                     html profile: child.asMapForJSON()
@@ -222,7 +236,9 @@ class ProfileController {
         if(profile){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id))){
+                            PermissionType.ADMIN_STORE_PROFILES, profile.company?.id
+                    )
+            )){
                 profile = profileService.unbindProfile(profile)
                 withFormat {
                     html profile: profile.asMapForJSON()
@@ -245,7 +261,9 @@ class ProfileController {
         if(parent){
             if(authenticationService.isPermitted(
                     computeStorePermission(
-                            PermissionType.ADMIN_STORE_PROFILES, idStore))){
+                            PermissionType.ADMIN_STORE_PROFILES, idStore
+                    )
+            )){
                 def profile = profileService.copyProfile(parent, idStore, name)
                 withFormat {
                     html profile: profile.asMapForJSON()
@@ -271,7 +289,9 @@ class ProfileController {
             if(user && profile){
                 if(authenticationService.isPermitted(
                         computeStorePermission(
-                                PermissionType.ADMIN_STORE_USERS, user?.company?.id))) {
+                                PermissionType.ADMIN_STORE_USERS, user?.company?.id
+                        )
+                )) {
                     profileService.addUserProfile(user, profile)
                     withFormat {
                         xml { render [:] as XML }
@@ -296,7 +316,11 @@ class ProfileController {
         def user = id ? User.load(id) : authenticationService.retrieveAuthenticatedUser()
         if(!id) {id = user.id}
         if(user) {
-            if(id != user.id && !authenticationService.isPermitted(computeStorePermission(PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+            if(id != user.id && !authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_USERS, user.company?.id
+                    )
+            )) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 return
             }
@@ -321,7 +345,9 @@ class ProfileController {
             if(user && profile) {
                 if (authenticationService.isPermitted(
                         computeStorePermission(
-                                PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+                                PermissionType.ADMIN_STORE_USERS, user.company?.id
+                        )
+                )) {
                     profileService.removeUserProfile(user, profile)
                     withFormat {
                         xml { render [:] as XML }
@@ -348,7 +374,9 @@ class ProfileController {
             if(user){
                 if(authenticationService.isPermitted(
                         computeStorePermission(
-                                PermissionType.ADMIN_STORE_USERS, user.company?.id))){
+                                PermissionType.ADMIN_STORE_USERS, user.company?.id
+                        )
+                )){
                     def args = cmd.args
                     def permission = profileService.saveUserPermission(user, true, cmd.permission, args.toArray(new String[args.size()]))
                     withFormat {
@@ -378,7 +406,9 @@ class ProfileController {
             if(user) {
                 if (authenticationService.isPermitted(
                         computeStorePermission(
-                                PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+                                PermissionType.ADMIN_STORE_USERS, user.company?.id
+                        )
+                )) {
                     def args = cmd.args
                     profileService.saveUserPermission(user, false, cmd.permission, args.toArray(new String[args.size()]))
                     withFormat {
@@ -403,7 +433,11 @@ class ProfileController {
         def user = id ? User.load(id) : authenticationService.retrieveAuthenticatedUser()
         if(!id) {id = user.id}
         if(user) {
-            if(id != user.id && !authenticationService.isPermitted(computeStorePermission(PermissionType.ADMIN_STORE_USERS, user.company?.id))) {
+            if(id != user.id && !authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_USERS, user.company?.id
+                    )
+            )) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN)
                 return
             }

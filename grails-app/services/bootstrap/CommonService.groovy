@@ -37,6 +37,8 @@ public class CommonService {
 		}
 
         profileService.saveRolePermission(admin, true, PermissionType.ADMIN_COMPANY, ALL)
+        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_PROFILES, ALL)
+        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_USERS, ALL)
 
         // création de l'admin
         User userAdmin = User.findByLogin(Holders.config.superadmin.login)
@@ -108,13 +110,10 @@ public class CommonService {
         Company.findAll().each {company ->
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child) {
-                child = profileService.applyProfile(parent, company.id)
+                profileService.applyProfile(parent, company.id)
             }
             Seller.findAllByCompanyAndAdmin(company, true).each {administrator ->
-                profileService.addUserProfile(administrator, child)
-//TODO uncomment lines bellow after full migration
-//                administrator.admin = false
-//                administrator.save(flush: true)
+                profileService.saveUserPermission(administrator, true, PermissionType.ADMIN_COMPANY, company.id as String)
             }
         }
 
@@ -129,13 +128,12 @@ public class CommonService {
         Company.findAll().each {company ->
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child) {
-                child = profileService.applyProfile(parent, company.id)
+                profileService.applyProfile(parent, company.id)
             }
             Seller.findAllByCompanyAndValidator(company, true).each {validator ->
-                profileService.addUserProfile(validator, child)
-//TODO uncomment lines bellow after full migration
-//                validator.validator = false
-//                validator.save(flush: true)
+                PermissionType.validator().each { pt ->
+                    profileService.saveUserPermission(validator, true, pt, company.id as String)
+                }
             }
         }
 
@@ -150,10 +148,12 @@ public class CommonService {
         Company.findAll().each {company ->
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child){
-                child = profileService.applyProfile(parent, company.id)
+                profileService.applyProfile(parent, company.id)
             }
             Seller.findAllByCompanyAndSell(company, true).each {seller ->
-                profileService.addUserProfile(seller, child)
+                PermissionType.seller().each {pt ->
+                    profileService.saveUserPermission(seller, true, pt, company.id as String)
+                }
                 Catalog.findAllByCompany(company).each {catalog ->
                     profileService.saveUserPermission(
                             seller,

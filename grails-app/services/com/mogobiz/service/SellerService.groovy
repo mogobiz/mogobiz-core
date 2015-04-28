@@ -119,8 +119,14 @@ class SellerService {
                 seller.addToRoles(Role.findByName(RoleName.PARTNER))
             }
             seller.addToCompanies(seller.company)
-            seller.save()
+            seller.save(flush: true)
 
+            PermissionType.validator().each { pt ->
+                profileService.saveUserPermission(seller, seller.validator, pt, seller.company.id as String)
+            }
+            PermissionType.seller().each {pt ->
+                profileService.saveUserPermission(seller, seller.sell || isSeller, pt, seller.company.id as String)
+            }
             profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
 
             return seller
@@ -154,6 +160,12 @@ class SellerService {
                 }
                 seller.save(flush: true)
 
+                PermissionType.validator().each { pt ->
+                    profileService.saveUserPermission(seller, seller.validator, pt, seller.company.id as String)
+                }
+                PermissionType.seller().each {pt ->
+                    profileService.saveUserPermission(seller, seller.sell, pt, seller.company.id as String)
+                }
                 profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
 
                 String targetUri = grailsApplication.config.grails.serverURL;
