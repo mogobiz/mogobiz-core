@@ -424,6 +424,7 @@ class ProfileController {
         def all = []
         def coll = PermissionType.admin()
         coll.addAll(PermissionType.seller())
+        coll.addAll(PermissionType.validator())
         coll.each{permission ->
             all << permission.key
         }
