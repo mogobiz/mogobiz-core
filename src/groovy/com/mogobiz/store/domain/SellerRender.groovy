@@ -6,10 +6,9 @@ package com.mogobiz.store.domain
 /**
  *
  */
-class SellerRender
-        extends com.mogobiz.store.domain.UserRender {
+class SellerRender extends UserRender {
 
-    java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.Seller entity, String lang = 'fr') {
+    Map asMap(List<String> included = [], List<String> excluded = [], Seller entity, String lang = 'fr') {
         if (included == null || included.size() == 0) {
             included = [
                     'id',
@@ -44,16 +43,19 @@ class SellerRender
             ]
         }
         List<String> companies = []
-        Map result = super.asMap(included, excluded, entity, lang);
+        Map result = super.asMap(included, excluded, entity, lang)
+        if(!result.profiles){//FIXME
+            result << [profiles: entity.profiles.collect {it.asMapForJSON()}]
+        }
         entity.companies.each {
             companies << it.code
         }
         result << [companies: companies]
         translate(result, entity, lang)
-        return result;
+        return result
     }
 
-    def String asString(com.mogobiz.store.domain.Seller entity) {
+    String asString(Seller entity) {
         return "com.mogobiz.store.domain.Seller : " + entity.id
     }
 

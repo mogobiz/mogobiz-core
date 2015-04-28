@@ -107,11 +107,11 @@ public class CommonService {
         profileService.upgradeChildProfiles(parent)
         Company.findAll().each {company ->
             def child = Profile.findByCompanyAndParent(company, parent)
-            if(!child){
+            if(!child) {
                 child = profileService.applyProfile(parent, company.id)
-                Seller.findAllByCompanyAndAdmin(company, true).each {
-                    profileService.addUserProfile(it, child)
-                }
+            }
+            Seller.findAllByCompanyAndAdmin(company, true).each {
+                profileService.addUserProfile(it, child)
             }
         }
 
@@ -127,34 +127,34 @@ public class CommonService {
             def child = Profile.findByCompanyAndParent(company, parent)
             if(!child){
                 child = profileService.applyProfile(parent, company.id)
-                Seller.findAllByCompanyAndAgent(company, true).each {seller ->
-                    profileService.addUserProfile(seller, child)
-                    Catalog.findAllByCompany(company).each {catalog ->
-                        profileService.saveUserPermission(
-                                seller,
-                                true,
-                                PermissionType.UPDATE_STORE_CATALOG,
-                                company.id as String,
-                                catalog.id as String
-                        )
-                        profileService.saveUserPermission(
-                                seller,
-                                true,
-                                PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
-                                company.id as String,
-                                catalog.id as String,
-                                ALL
-                        )
-                    }
-                    EsEnv.findAllByCompany(company).each {env ->
-                        profileService.saveUserPermission(
-                                seller,
-                                true,
-                                PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
-                                company.id as String,
-                                env.id as String
-                        )
-                    }
+            }
+            Seller.findAllByCompanyAndAgent(company, true).each {seller ->
+                profileService.addUserProfile(seller, child)
+                Catalog.findAllByCompany(company).each {catalog ->
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.UPDATE_STORE_CATALOG,
+                            company.id as String,
+                            catalog.id as String
+                    )
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                            company.id as String,
+                            catalog.id as String,
+                            ALL
+                    )
+                }
+                EsEnv.findAllByCompany(company).each {env ->
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                            company.id as String,
+                            env.id as String
+                    )
                 }
             }
         }
