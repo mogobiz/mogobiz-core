@@ -264,6 +264,13 @@ class ProfileService {
         query.get()
     }
 
+    Collection<User> getUsersGrantedPermission(PermissionType type, String ... args){
+        def query = UserPermission.where {
+            (target == computePermission(type, args)) && permission.id == getWilcardPermission().id
+        }
+        query.list().collect {it.user}.toSet()
+    }
+
     UserPermission saveUserPermission(User user, boolean add, PermissionType type, String ... args){
         String target = type ? computePermission(type, args) : null
         def wildCardPermission = getWilcardPermission()

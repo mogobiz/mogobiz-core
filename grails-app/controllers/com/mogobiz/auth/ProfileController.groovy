@@ -3,6 +3,7 @@ package com.mogobiz.auth
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.authentication.ProfileService
 import com.mogobiz.service.SanitizeUrlService
+import com.mogobiz.store.cmd.PermissionCommand
 import com.mogobiz.store.cmd.ProfileCommand
 import com.mogobiz.store.cmd.UserPermissionCommand
 import com.mogobiz.store.cmd.UserProfileCommand
@@ -468,6 +469,58 @@ class ProfileController {
         }
         else{
             response.sendError(HttpServletResponse.SC_NOT_FOUND)
+        }
+    }
+
+    def hasPermission(PermissionCommand cmd){
+        cmd.validate()
+        if(!cmd.hasErrors()){
+            def args = cmd.args
+            if(authenticationService.isPermitted(computePermission(cmd.permission, args.toArray(new String[args.size()])))){
+                withFormat {
+                    xml {render [:] as XML}
+                    json {render [:] as JSON}
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST)
+        }
+    }
+
+    def showUsersGrantedPermission(PermissionCommand cmd){
+        cmd.validate()
+        if(!cmd.hasErrors()){
+            if(authenticationService.isPermitted(
+                    computeStorePermission(
+                            PermissionType.ADMIN_STORE_USERS, cmd.idCompany
+                    ))){
+                def args = cmd.args
+                def users = profileService.getUsersGrantedPermission(
+                        cmd.permission,
+                        args.toArray(new String[args.size()])
+                ).collect {u ->
+                    def m = [:]
+                    m << [id: u.id]
+                    m << [firstName: u.firstName]
+                    m << [lastName: u.lastName]
+                    m
+                }
+                withFormat {
+                    html users: users
+                    xml {render users as XML}
+                    json {render users as JSON}
+                }
+            }
+            else{
+                response.sendError(HttpServletResponse.SC_FORBIDDEN)
+            }
+        }
+        else{
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST)
         }
     }
 
