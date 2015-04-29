@@ -305,7 +305,8 @@ class ProfileService {
             }
         }
         else if(rolePermission && !add){
-            rolePermission.delete(flush: true)
+            role.removeFromPermissions(rolePermission)
+            role.save(flush: true)
         }
         rolePermission
     }
