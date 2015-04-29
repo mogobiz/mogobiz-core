@@ -8,6 +8,8 @@ import com.mogobiz.store.cmd.UserPermissionCommand
 import com.mogobiz.store.cmd.UserProfileCommand
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Profile
+import com.mogobiz.store.domain.Role
+import com.mogobiz.store.domain.RoleName
 import com.mogobiz.store.domain.User
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
@@ -292,7 +294,15 @@ class ProfileController {
                                 PermissionType.ADMIN_STORE_USERS, user?.company?.id
                         )
                 )) {
+                    def isme = authenticationService.retrieveAuthenticatedUser()?.id == user.id
+                    def wasSeller = isme && user.roles.contains(Role.findByName(RoleName.PARTNER))
+                    def wasAdmin = isme && (
+                            profileService.containsUserPermission(
+                                    user, PermissionType.ADMIN_COMPANY, user.company.id as String
+                            ) || profileService.containsUserPermission(user, PermissionType.ADMIN_COMPANY, ALL)
+                    )
                     profileService.addUserProfile(user, profile)
+                    profileService.postUpdateUserProfiles(user, wasSeller, wasAdmin)
                     withFormat {
                         xml { render [:] as XML }
                         json { render [:] as JSON }
@@ -348,7 +358,15 @@ class ProfileController {
                                 PermissionType.ADMIN_STORE_USERS, user.company?.id
                         )
                 )) {
+                    def isme = authenticationService.retrieveAuthenticatedUser()?.id == user.id
+                    def wasSeller = isme && user.roles.contains(Role.findByName(RoleName.PARTNER))
+                    def wasAdmin = isme && (
+                            profileService.containsUserPermission(
+                                    user, PermissionType.ADMIN_COMPANY, user.company.id as String
+                            ) || profileService.containsUserPermission(user, PermissionType.ADMIN_COMPANY, ALL)
+                    )
                     profileService.removeUserProfile(user, profile)
+                    profileService.postUpdateUserProfiles(user, wasSeller, wasAdmin)
                     withFormat {
                         xml { render [:] as XML }
                         json { render [:] as JSON }

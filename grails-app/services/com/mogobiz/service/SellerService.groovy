@@ -89,46 +89,21 @@ class SellerService {
     def Seller update(Seller seller, def params) {
         def user = authenticationService.retrieveAuthenticatedUser()
         def isme = seller.id == user.id
-        def isSeller = isme && SecurityUtils.getSubject().hasRole(RoleName.PARTNER.name())
         // FIXME (bug ihm)
         def oldPassword = seller.password
-        def wasAdmin = seller.admin
+//        def wasAdmin = seller.admin
         def wasActive = seller.active
         seller.properties = params['seller']
         seller.login = seller.email
         seller.password = oldPassword
-
-        // An admin cannot remove the admin role from himself.
-        if (wasAdmin && isme)
-            seller.admin = true;
 
         // An active user cannot remove the active role from himself.
         if (wasActive && isme)
             seller.active = true;
 
         if (seller.validate()) {
-            //gestion des roles
-            seller.roles.clear()
-            if (seller.validator) {
-                seller.addToRoles(Role.findByName(RoleName.VALIDATOR))
-            }
-            if (seller.agent) {
-                seller.addToRoles(Role.findByName(RoleName.SALESAGENT))
-            }
-            if (seller.sell || isSeller) {
-                seller.addToRoles(Role.findByName(RoleName.PARTNER))
-            }
             seller.addToCompanies(seller.company)
             seller.save(flush: true)
-
-            PermissionType.validator().each { pt ->
-                profileService.saveUserPermission(seller, seller.validator, pt, seller.company.id as String)
-            }
-            PermissionType.seller().each {pt ->
-                profileService.saveUserPermission(seller, seller.sell || isSeller, pt, seller.company.id as String)
-            }
-            profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
-
             return seller
         } else {
             throw new Exception(seller.errors.allErrors.toListString())
@@ -148,26 +123,7 @@ class SellerService {
                 if (!seller.companies?.contains(seller.company)) {
                     seller.addToCompanies(seller.company)
                 }
-                //gestion des roles
-                if (seller.validator) {
-                    seller.addToRoles(Role.findByName(RoleName.VALIDATOR))
-                }
-                if (seller.agent) {
-                    seller.addToRoles(Role.findByName(RoleName.SALESAGENT))
-                }
-                if (seller.sell) {
-                    seller.addToRoles(Role.findByName(RoleName.PARTNER))
-                }
                 seller.save(flush: true)
-
-                PermissionType.validator().each { pt ->
-                    profileService.saveUserPermission(seller, seller.validator, pt, seller.company.id as String)
-                }
-                PermissionType.seller().each {pt ->
-                    profileService.saveUserPermission(seller, seller.sell, pt, seller.company.id as String)
-                }
-                profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
-
                 String targetUri = grailsApplication.config.grails.serverURL;
                 // email confirmation
                 if (sendConfirmation) {

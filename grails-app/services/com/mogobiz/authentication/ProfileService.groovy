@@ -6,6 +6,7 @@ import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Profile
 import com.mogobiz.store.domain.ProfilePermission
 import com.mogobiz.store.domain.Role
+import com.mogobiz.store.domain.RoleName
 import com.mogobiz.store.domain.RolePermission
 import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.UserPermission
@@ -19,6 +20,8 @@ import static com.mogobiz.utils.ProfileUtils.*
 
 @Transactional
 class ProfileService {
+
+    AuthenticationService authenticationService
 
     SanitizeUrlService sanitizeUrlService
 
@@ -198,6 +201,62 @@ class ProfileService {
         }
     }
 
+    /**
+     *
+     * @param user - user
+     * @param wasSeller - whether this user was previously a seller or not
+     * @param wasAdmin - whether this user was previously an administrator or not
+     */
+    def void postUpdateUserProfiles(User user, boolean wasSeller, boolean wasAdmin) {
+        user.refresh()
+        user.roles.clear()
+        if (isValidator(user)) {
+            user.addToRoles(Role.findByName(RoleName.VALIDATOR))
+        }
+        if (wasSeller || isSeller(user)) {
+            user.addToRoles(Role.findByName(RoleName.PARTNER))
+        }
+        user.save(flush: true)
+        saveUserPermission(user, wasAdmin || isAdmin(user), PermissionType.ADMIN_COMPANY, user.company.id as String)
+    }
+
+    boolean isSeller(User user){
+        if(!user){
+            return false
+        }
+        user.profiles.any {profile ->
+            profile.permissions.any {permission ->
+                retrievePermissionFrom(permission.target)?.key in PermissionType.seller().collect {it.key}
+            }
+        }
+    }
+
+    boolean isValidator(User user){
+        if(!user){
+            return false
+        }
+        user.profiles.any {profile ->
+            profile.permissions.any {permission ->
+                retrievePermissionFrom(permission.target)?.key in PermissionType.validator().collect {it.key}
+            }
+        }
+    }
+
+    boolean isAdmin(User user){
+        if(!user){
+            return false
+        }
+        user.profiles.any {profile ->
+            profile.permissions.any {permission ->
+                retrievePermissionFrom(permission.target)?.key in PermissionType.admin().collect {it.key}
+            }
+        }
+    }
+
+    boolean containsUserPermission(User u, PermissionType type, String ... args){
+        getUserPermission(u, type, args) != null
+    }
+
     UserPermission getUserPermission(User u, PermissionType type, String ... args){
         DetachedCriteria<UserPermission> query = UserPermission.where {
             (target == computePermission(type, args)) && user.id == u.id && permission.id == getWilcardPermission().id
@@ -217,7 +276,8 @@ class ProfileService {
                     user: user).save(flush:true)
         }
         else if(userPermission && !add){
-            userPermission.delete(flush: true)
+            user.removeFromPermissions(userPermission)
+            user.save(flush: true)
         }
         userPermission
     }
