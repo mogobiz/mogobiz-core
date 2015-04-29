@@ -173,12 +173,22 @@ public class CommonService {
                     )
                     profileService.saveUserPermission(
                             seller,
-                            true,
+                            false,
                             PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
                             company.id as String,
                             catalog.id as String,
                             ALL
                     )
+                    Category.findAllByCatalog(catalog).each { category ->
+                        profileService.saveUserPermission(
+                                seller,
+                                true,
+                                PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                                company.id as String,
+                                catalog.id as String,
+                                category.id as String
+                        )
+                    }
                 }
                 EsEnv.findAllByCompany(company).each {env ->
                     profileService.saveUserPermission(

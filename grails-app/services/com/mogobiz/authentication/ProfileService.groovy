@@ -1,6 +1,7 @@
 package com.mogobiz.authentication
 
 import com.mogobiz.service.SanitizeUrlService
+import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Profile
@@ -11,6 +12,7 @@ import com.mogobiz.store.domain.RolePermission
 import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.utils.PermissionType
+import com.mogobiz.utils.ProfileUtils
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 
@@ -265,14 +267,41 @@ class ProfileService {
     }
 
     Collection<User> getUsersGrantedPermission(PermissionType type, String ... args){
+        Set<User> users = []
         def query = UserPermission.where {
             (target == computePermission(type, args)) && permission.id == getWilcardPermission().id
         }
-        query.list().collect {it.user}.toSet()
+        query.list().each {
+            users << it.user
+        }
+        users
     }
 
     UserPermission saveUserPermission(User user, boolean add, PermissionType type, String ... args){
         String target = type ? computePermission(type, args) : null
+        switch(type){
+            case [PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG]:
+                if(args.size() == 3){
+                    def idCategory = args[2]
+                    if(idCategory != ALL){
+                        def parent = Category.load(idCategory as Long)
+                        if(parent){
+                            def categories = Category.findAllByParent(parent)
+                            if(!categories.isEmpty()){
+                                categories.each {category ->
+                                    List<String> l = []
+                                    l.addAll(args.take(2))
+                                    l << (category.id as String)
+                                    saveUserPermission(user, add, type, l.toArray(new String[3]))
+                                }
+                            }
+                        }
+                    }
+                }
+                break
+            default:
+                break
+        }
         def wildCardPermission = getWilcardPermission()
         def userPermission = type && user ? getUserPermission(user, type, args) : null
         if(!userPermission && user && target && add){
