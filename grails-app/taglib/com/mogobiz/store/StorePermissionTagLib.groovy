@@ -67,7 +67,7 @@ class StorePermissionTagLib {
         return check
     }
 
-    private Seller retrieveAuthenticatedSeller(){
+    private static Seller retrieveAuthenticatedSeller(){
         def seller = null
         Subject subject = SecurityUtils.getSubject()
         Object principal = subject?.getPrincipal()
