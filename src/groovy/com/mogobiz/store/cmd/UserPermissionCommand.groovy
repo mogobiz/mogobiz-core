@@ -14,7 +14,7 @@ class UserPermissionCommand {
 
     PermissionType permission
 
-    Collection<String> args = []
+    List<String> args = []
 
     static constraints = {
         idUser (nullable: false)

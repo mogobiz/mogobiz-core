@@ -14,7 +14,7 @@ class PermissionCommand {
 
     PermissionType permission
 
-    Collection<String> args = []
+    List<String> args = []
 
     static constraints = {
         idCompany nullable: true
