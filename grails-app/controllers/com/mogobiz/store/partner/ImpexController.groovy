@@ -1,12 +1,15 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.service.CatalogService
 import com.mogobiz.service.ExportService
 import com.mogobiz.service.ImportService
 import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
+import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -24,6 +27,8 @@ class ImpexController {
     AuthenticationService authenticationService
     ImportService importService
     SessionFactory sessionFactory
+
+    ProfileService profileService
 
     @Transactional
     def purge() {
@@ -94,7 +99,7 @@ class ImpexController {
                     Company company = seller.company
                     def name = "impex"
                     int countSales = 0
-                    Catalog catalog
+                    Catalog catalog = null
                     Catalog.withNewTransaction {
                         catalog = Catalog.findByNameAndCompany(name, seller.company)
                         if (catalog) {
@@ -129,6 +134,27 @@ class ImpexController {
                         tmpFile.delete()
                         render text:"$countSales", status:403
                     }
+
+                    if(catalog){
+                        profileService.saveUserPermission(
+                                seller,
+                                true,
+                                PermissionType.UPDATE_STORE_CATALOG,
+                                company.id as String,
+                                catalog.id as String
+                        )
+                        Category.findAllByCatalog(catalog).each { category ->
+                            profileService.saveUserPermission(
+                                    seller,
+                                    true,
+                                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                                    company.id as String,
+                                    catalog.id as String,
+                                    category.id as String
+                            )
+                        }
+                    }
+
                     log.info("IMPORT FINISHED")
                     Date end = new Date()
                     log.info("IMPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
