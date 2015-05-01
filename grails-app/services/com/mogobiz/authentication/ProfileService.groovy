@@ -12,7 +12,6 @@ import com.mogobiz.store.domain.RolePermission
 import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.utils.PermissionType
-import com.mogobiz.utils.ProfileUtils
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 
@@ -267,12 +266,11 @@ class ProfileService {
     }
 
     Collection<User> getUsersGrantedPermission(PermissionType type, String ... args){
-        Set<User> users = []
         def query = UserPermission.where {
             (target == computePermission(type, args)) && permission.id == getWilcardPermission().id
         }
-        query.list().each {
-            users << it.user
+        def users = query.list([fetch: [user: 'join']]).collect {userPermission ->
+            userPermission.user
         }
         users
     }
