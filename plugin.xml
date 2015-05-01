@@ -157,5 +157,6 @@
     <resource>com.mogobiz.service.TagService</resource>
     <resource>com.mogobiz.service.TaxRateService</resource>
     <resource>com.mogobiz.service.TranslationService</resource>
+    <resource>com.mogobiz.store.StorePermissionTagLib</resource>
   </resources>
 </plugin>
