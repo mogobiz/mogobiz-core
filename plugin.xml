@@ -133,6 +133,7 @@
     <resource>bootstrap.PerfCommerceService</resource>
     <resource>com.mogobiz.ajax.AjaxResponseService</resource>
     <resource>com.mogobiz.authentication.AuthenticationService</resource>
+    <resource>com.mogobiz.authentication.ProfileService</resource>
     <resource>com.mogobiz.geolocation.partner.PoiService</resource>
     <resource>com.mogobiz.service.BrandService</resource>
     <resource>com.mogobiz.service.CatalogService</resource>
@@ -156,5 +157,6 @@
     <resource>com.mogobiz.service.TagService</resource>
     <resource>com.mogobiz.service.TaxRateService</resource>
     <resource>com.mogobiz.service.TranslationService</resource>
+    <resource>com.mogobiz.store.StorePermissionTagLib</resource>
   </resources>
 </plugin>

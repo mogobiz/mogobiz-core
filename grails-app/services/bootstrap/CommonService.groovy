@@ -1,18 +1,25 @@
 package bootstrap
+
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.*
 import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.vo.RegisteredCartItemVO
 import com.mogobiz.utils.DateUtilitaire
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.tools.QRCodeUtils
+import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.util.Holders
 import groovy.json.JsonBuilder
 
+import static com.mogobiz.utils.ProfileUtils.*
+
 public class CommonService {
 
 	SanitizeUrlService sanitizeUrlService
+
+    ProfileService profileService
 
     def destroy() {}
 	def init() {
@@ -29,16 +36,9 @@ public class CommonService {
 			saveEntity(permission)
 		}
 
-		RolePermission adminCompanyRolePermission = RolePermission.createCriteria().get {
-			eq('permission.id', permission?.id)
-			eq('role.id', admin.id)
-			eq('target', 'company:*:admin')
-			eq('actions', '*')
-		}
-		if (!adminCompanyRolePermission) {
-			adminCompanyRolePermission = new RolePermission(permission : permission, role : admin, target : 'company:*:admin');
-			saveEntity(adminCompanyRolePermission)
-		}
+        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_COMPANY, ALL)
+        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_PROFILES, ALL)
+        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_USERS, ALL)
 
         // création de l'admin
         User userAdmin = User.findByLogin(Holders.config.superadmin.login)
@@ -97,6 +97,112 @@ public class CommonService {
         EsEnv.findAll().each {env ->
             env.running = false
             env.save()
+        }
+
+        def name = "admin"
+        def parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
+        def oldPermissions = ProfilePermission.findAllByProfile(parent)
+        oldPermissions.each { it.delete(flush: true) }
+        PermissionType.admin().each {pt ->
+            profileService.saveProfilePermission(parent, true, pt)
+        }
+        profileService.upgradeChildProfiles(parent)
+        Company.findAll().each {company ->
+            def child = Profile.findByCompanyAndParent(company, parent)
+            if(!child) {
+                child = profileService.applyProfile(parent, company.id)
+            }
+            Seller.findAllByCompanyAndAdmin(company, true).each {administrator ->
+                profileService.saveUserPermission(administrator, false, PermissionType.ADMIN_COMPANY, company.id as String)
+                profileService.addUserProfile(administrator, child)
+                administrator.refresh()
+                administrator.admin = false
+                administrator.save(flush: true)
+            }
+        }
+
+        name = "validator"
+        parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
+        oldPermissions = ProfilePermission.findAllByProfile(parent)
+        oldPermissions.each { it.delete(flush: true) }
+        PermissionType.validator().each {pt ->
+            profileService.saveProfilePermission(parent, true, pt)
+        }
+        profileService.upgradeChildProfiles(parent)
+        Company.findAll().each {company ->
+            def child = Profile.findByCompanyAndParent(company, parent)
+            if(!child) {
+                child = profileService.applyProfile(parent, company.id)
+            }
+            Seller.findAllByCompanyAndValidator(company, true).each {validator ->
+                PermissionType.validator().each { pt ->
+                    profileService.saveUserPermission(validator, false, pt, company.id as String)
+                }
+                profileService.addUserProfile(validator, child)
+                validator.refresh()
+                validator.validator = false
+                validator.save(flush: true)
+            }
+        }
+
+        name = "seller"
+        parent = Profile.findByCodeAndCompanyIsNull(name) ?: new Profile(name: name, code:name).save(flush:true)
+        oldPermissions = ProfilePermission.findAllByProfile(parent)
+        oldPermissions.each { it.delete(flush: true) }
+        PermissionType.seller().each {pt ->
+            profileService.saveProfilePermission(parent, true, pt)
+        }
+        profileService.upgradeChildProfiles(parent)
+        Company.findAll().each {company ->
+            def child = Profile.findByCompanyAndParent(company, parent)
+            if(!child){
+                child = profileService.applyProfile(parent, company.id)
+            }
+            Seller.findAllByCompanyAndSell(company, true).each {seller ->
+                PermissionType.seller().each {pt ->
+                    profileService.saveUserPermission(seller, false, pt, company.id as String)
+                }
+                profileService.addUserProfile(seller, child)
+                Catalog.findAllByCompany(company).each {catalog ->
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.UPDATE_STORE_CATALOG,
+                            company.id as String,
+                            catalog.id as String
+                    )
+                    profileService.saveUserPermission(
+                            seller,
+                            false,
+                            PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                            company.id as String,
+                            catalog.id as String,
+                            ALL
+                    )
+                    Category.findAllByCatalog(catalog).each { category ->
+                        profileService.saveUserPermission(
+                                seller,
+                                true,
+                                PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                                company.id as String,
+                                catalog.id as String,
+                                category.id as String
+                        )
+                    }
+                }
+                EsEnv.findAllByCompany(company).each {env ->
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                            company.id as String,
+                            env.id as String
+                    )
+                }
+                seller.refresh()
+                seller.sell = false
+                seller.save(flush: true)
+            }
         }
 	}
 

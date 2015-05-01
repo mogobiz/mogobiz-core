@@ -5,16 +5,20 @@
 package com.mogobiz.store.domain
 
 import com.mogobiz.RenderBase
+import com.mogobiz.utils.ProfileUtils
 
 /**
  *
  */
-class UserPermissionRender
-    extends RenderBase<UserPermission>
+class UserPermissionRender extends RenderBase<UserPermission>
 {
 
-    java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.UserPermission entity, String lang = 'fr') {return super.asMap(included, excluded, entity, lang)}
+    Map asMap(List<String> included = [], List<String> excluded = [], UserPermission entity, String lang = 'fr') {
+        def map = super.asMap(included && !included.isEmpty() ? included : ['id', 'user', 'user.id', 'target'], excluded, entity, lang)
+        map << [key: entity.key ?: ProfileUtils.retrievePermissionFrom(entity.target)?.key]
+        map
+    }
 
-    def String asString(com.mogobiz.store.domain.UserPermission entity){return "com.mogobiz.store.domain.UserPermission : "+entity.id}
+    def String asString(UserPermission entity){return "com.mogobiz.store.domain.UserPermission : "+entity.id}
 
 }

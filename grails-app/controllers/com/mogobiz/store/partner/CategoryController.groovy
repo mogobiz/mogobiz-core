@@ -1,8 +1,10 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
+import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -13,6 +15,8 @@ import grails.transaction.Transactional
 class CategoryController {
     AuthenticationService authenticationService
     SanitizeUrlService sanitizeUrlService
+
+    ProfileService profileService
 
     @Transactional(readOnly = true)
     def show() {
@@ -101,7 +105,7 @@ class CategoryController {
                 }
             }
             if (!category) {
-                category = new Category(params['category'])
+                category = new Category(params['category'] as Map)
                 category.company = seller.company
                 category.uuid = UUID.randomUUID().toString()
                 category.parent = parentId ? Category.get(parentId.toLong()) : null
@@ -130,6 +134,15 @@ class CategoryController {
                     it.position = pos
                     it.save(flush: true)
                 }
+
+                profileService.saveUserPermission(
+                        seller,
+                        true,
+                        PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                        seller.company.id as String,
+                        category.catalog.id as String,
+                        category.id as String
+                )
 
                 withFormat {
                     xml { render category as XML }

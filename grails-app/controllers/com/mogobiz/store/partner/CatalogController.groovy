@@ -1,8 +1,10 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.Company
 import com.mogobiz.elasticsearch.client.ESClient
+import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -14,6 +16,8 @@ import grails.transaction.Transactional
 class CatalogController {
 
     AuthenticationService authenticationService
+
+    ProfileService profileService
 
     static client = ESClient.instance
 
@@ -60,13 +64,21 @@ class CatalogController {
                 }
             }
             if (!catalog) {
-                catalog = new Catalog(params['catalog'])
+                catalog = new Catalog(params['catalog'] as Map)
                 catalog.company = company
                 catalog.uuid = UUID.randomUUID().toString()
-                if (catalog.validate()) {
+                catalog.validate()
+                if (!catalog.hasErrors()) {
                     catalog.save(flush: true)
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.UPDATE_STORE_CATALOG,
+                            company.id as String,
+                            catalog.id as String
+                    )
                 } else {
-                    System.out.println(catalog.errors)
+                    catalog.errors.allErrors.each {log.error(it)}
                 }
                 withFormat {
                     xml { render catalog as XML }

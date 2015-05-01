@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 /**
  * Created by hayssams on 21/07/14.
  */
-class SymmetricCrypt {
+public class SymmetricCrypt {
     static public String encrypt(String clearText, String cryptoSecret, String cryptoAlgorithm) throws Exception {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         stream.write(clearText.getBytes());

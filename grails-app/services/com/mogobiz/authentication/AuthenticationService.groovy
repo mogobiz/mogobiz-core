@@ -1,11 +1,13 @@
 package com.mogobiz.authentication
 
 import com.mogobiz.store.domain.*
+import com.mogobiz.utils.PermissionType
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
-import org.apache.shiro.authc.IncorrectCredentialsException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.subject.Subject
+
+import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -13,7 +15,11 @@ import org.apache.shiro.subject.Subject
  */
 class AuthenticationService {
 
-	Seller retrieveAuthenticatedSeller(){
+    def grailsApplication
+
+    def profileService
+
+    Seller retrieveAuthenticatedSeller(){
 		def seller = null
 		Subject subject = SecurityUtils.getSubject()
 		Object principal = subject?.getPrincipal()
@@ -36,13 +42,14 @@ class AuthenticationService {
 	}
 
     ExternalAccount retrieveExternalAccount(long userId, AccountType accountType){
-        def externalAccount
+        def externalAccount = null
         def externalAccounts = ExternalAccount.findByUserAndAccountType(User.findById(userId), accountType)
         if(externalAccounts && externalAccounts.iterator().hasNext()){
             externalAccount = externalAccounts.iterator().next()
         }
-        return externalAccount
+        externalAccount as ExternalAccount
     }
+
 	String retrieveExternalAccountToken(AccountType accountType){
 		ExternalAccount account = null
 		def user = retrieveAuthenticatedUser()
@@ -72,7 +79,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for all stores
 	 */
 	boolean canAdminAllStores() {
-		return isPermitted('company:*:admin')
+		return isPermitted(computePermission(PermissionType.ADMIN_COMPANY, ALL))
 	}
 
 	/**
@@ -80,7 +87,7 @@ class AuthenticationService {
 	 * @return true if authenticated user has admin permission for this store
 	 */
 	boolean canAdminStore(long idStore) {
-		return isPermitted('company:'+idStore+':admin')
+		return isPermitted(computePermission(PermissionType.ADMIN_COMPANY, idStore as String ?: ALL))
 	}
 
 	/**
@@ -140,25 +147,25 @@ class AuthenticationService {
             User.findByLogin(username)
         }
         catch (AuthenticationException ex){
-            def error = ex.message//"Invalid username and/or password"
-            def incorrectCredentials = ex instanceof IncorrectCredentialsException
-            if(incorrectCredentials){
-                def maxTries = grailsApplication.config.securisation?.essai?.auth ?
-                        grailsApplication.config.securisation?.essai?.auth : 5
-                User user = User.findByLogin(username)
-                def nbFailures = user.nbFailures + 1
-                user.nbFailures = nbFailures
-                if(nbFailures > maxTries){
-                    user.blocked = true
-                }
-                user.save(flush : true)
-            }
+//            def error = ex.message//"Invalid username and/or password"
+//            def incorrectCredentials = ex instanceof IncorrectCredentialsException
+//            if(incorrectCredentials){
+//                def maxTries = grailsApplication.config.securisation?.essai?.auth ?
+//                        grailsApplication.config.securisation?.essai?.auth : 5
+//                User user = User.findByLogin(username)
+//                def nbFailures = user.nbFailures + 1
+//                user.nbFailures = nbFailures
+//                if(nbFailures > maxTries){
+//                    user.blocked = true
+//                }
+//                user.save(flush : true)
+//            }
             throw ex
         }
     }
 
     boolean isPermitted(String... permissions){
-        permissions ? SecurityUtils.getSubject().isPermitted(permissions) : true
+        permissions ? SecurityUtils.getSubject().isPermitted(permissions).any {it} : true
     }
 
 }

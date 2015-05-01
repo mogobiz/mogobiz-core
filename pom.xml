@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.mogobiz</groupId>
     <artifactId>mogobiz-core</artifactId>
     <packaging>grails-plugin</packaging>
@@ -216,24 +216,24 @@
             <version>${grails.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.nekohtml</groupId>
-            <artifactId>nekohtml</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.0.1</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.11</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>net.sourceforge.nekohtml</groupId>
+    <artifactId>nekohtml</artifactId>
+    <scope>compile</scope>
+</dependency>
 
         <!-- begin from grails-app/BuildConfig.groovy //-->
         <dependency>
@@ -252,70 +252,70 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>2.2.3</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.2.3</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-async</artifactId>
             <version>2.2.5</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-core</artifactId>
             <version>2.2.5</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-media-support</artifactId>
             <version>2.2.5</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-stream</artifactId>
             <version>2.2.5</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.11.2</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.oltu.oauth2</groupId>
             <artifactId>org.apache.oltu.oauth2.common</artifactId>
             <version>0.31</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.oltu.oauth2</groupId>
             <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
             <version>0.31</version>
             <scope>compile</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.apache.oltu.oauth2</groupId>
             <artifactId>org.apache.oltu.oauth2.resourceserver</artifactId>
@@ -354,21 +354,21 @@
             <version>${mysql.version}</version>
             <scope>runtime</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.11</artifactId>
             <version>2.3.9</version>
             <scope>runtime</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-stream-experimental_2.11</artifactId>
@@ -400,7 +400,7 @@
         <!-- rxjava-groovy -->
         <dependency>
             <groupId>com.netflix.rxjava</groupId>
-            <artifactId>rxjava-core</artifactId>
+            <artifactId>rxjava-groovy</artifactId>
             <version>0.20.7</version>
             <scope>compile</scope>
             <exclusions>
@@ -410,15 +410,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.2</version>
             <scope>runtime</scope>
         </dependency>
-
-
+        
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>cache</artifactId>
@@ -426,7 +426,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>facebook-graph</artifactId>
@@ -434,7 +434,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>platform-core</artifactId>
@@ -442,17 +442,17 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>google-data</artifactId>
             <version>0.1.3</version>
             <scope>compile</scope>
-
+            
             <type>zip</type>
-
+            
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>email-confirmation</artifactId>
@@ -466,7 +466,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>shiro</artifactId>
@@ -480,7 +480,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>mail</artifactId>
@@ -488,7 +488,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>quartz</artifactId>
@@ -496,7 +496,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>recaptcha</artifactId>
@@ -504,7 +504,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>cache-headers</artifactId>
@@ -512,7 +512,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>cached-resources</artifactId>
@@ -520,7 +520,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>cookie</artifactId>
@@ -528,7 +528,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>rest</artifactId>
@@ -536,7 +536,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>joda-time</artifactId>
@@ -544,7 +544,7 @@
             <scope>compile</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>hibernate</artifactId>
@@ -552,7 +552,7 @@
             <scope>runtime</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>database-migration</artifactId>
@@ -560,7 +560,7 @@
             <scope>runtime</scope>
             <type>zip</type>
         </dependency>
-
+        
         <dependency>
             <groupId>org.grails.plugins</groupId>
             <artifactId>resources</artifactId>
@@ -611,6 +611,12 @@
             <type>zip</type>
         </dependency>
         <!-- end from grails-app/BuildConfig.groovy //-->
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
 
     </dependencies>
 

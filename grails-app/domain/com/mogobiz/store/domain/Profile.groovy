@@ -28,14 +28,26 @@ class Profile
     /**
      * 
      */
+    java.lang.String code 
+    /**
+     * 
+     */
     java.lang.String name 
     /**
      * 
      */
     com.mogobiz.store.domain.Company company 
 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Profile parent 
+
     static transients = [ 'profileValidation', 'profileRender' ]
 
+    static hasMany = [permissions: ProfilePermission]
+
+    static mappedBy = [permissions: 'profile']
 
     static mapping = {
 
@@ -54,17 +66,24 @@ class Profile
         version false
 
         id name:'id',column:'id',generator:'native'
+        code column:"code",insertable:true,updateable:true,lazy:false,cache:false
         name column:"name",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        parent column:"parent_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        permissions cascade: "all-delete-orphan"
     }
 
     static constraints = {
     uuid (nullable:false, unique:false)
 
+        code ( blank:false, nullable:false, unique:false)
         name ( blank:false, nullable:false, unique:false)
         company (nullable:true)
+        parent (nullable:true)
     }
 
 

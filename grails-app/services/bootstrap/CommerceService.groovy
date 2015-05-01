@@ -1,5 +1,6 @@
 package bootstrap
 
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
@@ -11,7 +12,6 @@ import com.mogobiz.store.domain.Feature
 import com.mogobiz.store.domain.GoogleEnv
 import com.mogobiz.store.domain.Ibeacon
 import com.mogobiz.store.domain.LocalTaxRate
-import com.mogobiz.store.domain.Permission
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.ProductState
@@ -24,14 +24,17 @@ import com.mogobiz.store.domain.Shipping
 import com.mogobiz.store.domain.Tag
 import com.mogobiz.store.domain.TaxRate
 import com.mogobiz.store.domain.TicketType
-import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.store.vo.RegisteredCartItemVO
+import com.mogobiz.utils.PermissionType
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
 
 class CommerceService {
 
     CommonService commonService
+
+    ProfileService profileService
+
     def destroy() {}
 
     void init() {
@@ -98,20 +101,7 @@ class CommerceService {
             commonService.saveEntity(seller)
         }
 
-        Permission permission = Permission.findByTypeAndPossibleActions('org.apache.shiro.authz.permission.WildcardPermission', '*');
-        UserPermission userPermission = UserPermission.createCriteria().get{
-            eq('permission.id', permission?.id)
-            eq('user.id', seller.id)
-            eq('target', 'company:'+seller.company.id+':admin')
-            eq('actions', '*')
-        }
-        if (seller.admin) {
-            if(!userPermission) {
-                userPermission = new UserPermission(permission:permission, user:seller, target:'company:'+seller.company.id+':admin',actions:'*')
-                commonService.saveEntity(userPermission)
-            }
-        }
-        else if(userPermission) { userPermission.delete() }
+        profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
 
         // création du valideur
         Seller userValidator = Seller.findByLogin("validator@mogobiz.com")
