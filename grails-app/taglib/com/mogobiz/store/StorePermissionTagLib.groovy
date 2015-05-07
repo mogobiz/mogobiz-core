@@ -42,14 +42,13 @@ class StorePermissionTagLib {
 
         def check = false
 
-        String permission = attrs["permission"]
-        if (!permission) {
-            throwTagError("Tag [$tagname] must have a [permission] one.")
-        }
-
-        def storePermission = PermissionType.findByKey(permission)
-        if(!storePermission){
-            throwTagError("No store permission found for [$permission].")
+        List<String> permissions = attrs["in"] as List<String>
+        if(!permissions){
+            String permission = attrs["permission"]
+            if (!permission) {
+                throwTagError("Tag [$tagname] must have a [permission] or [in] attribute.")
+            }
+            permissions = [permission]
         }
 
         def id = attrs["id"] as Long
@@ -61,7 +60,15 @@ class StorePermissionTagLib {
         }
 
         if(id){
-            check = SecurityUtils.subject.isPermitted(computeStorePermission(storePermission, id))
+            def storePermissions = permissions.collect {permission ->
+                def storePermission = PermissionType.findByKey(permission)
+                if(!storePermission){
+                    throwTagError("No store permission found for [$permission].")
+                }
+                computeStorePermission(storePermission, id)
+            }
+
+            check = SecurityUtils.subject.isPermitted(storePermissions?.toArray(new String[storePermissions.size()])).any {it}
         }
 
         return check
