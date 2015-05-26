@@ -4,17 +4,24 @@ import com.mogobiz.authentication.ProfileService
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.PermissionType
+import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
 import org.hibernate.SessionFactory
 
-class PerfCommerceService {
+import java.util.concurrent.Future
 
+class PerfCommerceService {
+static transactional = false
     CommonService commonService
     SessionFactory sessionFactory
-    ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     ProfileService profileService
+
+    int FLUSHSIZE = Holders.config.importCatalog.flushsize ?: 100
+
+    int NBTHREADS = Holders.config.importCatalog.nbthreads ?: 3
+
 
     def destroy() {}
 
@@ -67,10 +74,10 @@ class PerfCommerceService {
             commonService.saveEntity(env)
         }
 
-        Catalog mogobizCatalog = Catalog.findByNameAndCompany("Performance Catalog", mogobiz)
-        if(!mogobizCatalog){
-            mogobizCatalog = new Catalog(name: "Performance Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: mogobiz)
-            commonService.saveEntity(mogobizCatalog)
+        Catalog mogobizCatalog1 = Catalog.findByNameAndCompany("Performance Catalog", mogobiz)
+        if (!mogobizCatalog1) {
+            mogobizCatalog1 = new Catalog(name: "Performance Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: mogobiz)
+            commonService.saveEntity(mogobizCatalog1)
         }
 
         // création des sellers
@@ -95,75 +102,95 @@ class PerfCommerceService {
             commonService.saveEntity(userValidator)
         }
 
-        Company company = Company.findByCode("mogobiz");
-        TaxRate taxRate = TaxRate.findByNameAndCompany("TaxRate", company);
+        Company company1 = Company.findByCode("mogobiz");
         // Création des marques
-        Brand samsung = commonService.createBrand("Samsung", "http://www.samsung.com/fr", company);
-        commonService.createTranslation(company, 'de', samsung.id, [website: 'http://www.samsung.com/de'])
-        commonService.createTranslation(company, 'en', samsung.id, [website: 'http://www.samsung.com'])
-        commonService.createTranslation(company, 'es', samsung.id, [website: 'http://www.samsung.com/es'])
-        commonService.createTranslation(company, 'fr', samsung.id, [website: 'http://www.samsung.com/fr'])
+        Brand samsung1 = commonService.createBrand("Samsung", "http://www.samsung.com/fr", company1);
+        commonService.createTranslation(company1, 'de', samsung1.id, [website: 'http://www.samsung.com/de'])
+        commonService.createTranslation(company1, 'en', samsung1.id, [website: 'http://www.samsung.com'])
+        commonService.createTranslation(company1, 'es', samsung1.id, [website: 'http://www.samsung.com/es'])
+        commonService.createTranslation(company1, 'fr', samsung1.id, [website: 'http://www.samsung.com/fr'])
 
-        commonService.createBrand("Philips", "http://www.philips.com", company);
+        commonService.createBrand("Philips", "http://www.philips.com", company1);
 
-        Brand nike = commonService.createBrand("Nike", "http://www.nike.com/fr/fr_fr/", company)
-        commonService.createTranslation(company, 'de', nike.id, [website: 'http://www.nike.com/de/de_de/'])
-        commonService.createTranslation(company, 'en', nike.id, [website: 'http://www.nike.com'])
-        commonService.createTranslation(company, 'es', nike.id, [website: 'http://www.nike.com/es/es_es/'])
-        commonService.createTranslation(company, 'fr', nike.id, [website: 'http://www.nike.com/fr/fr_fr/'])
+        Brand nike1 = commonService.createBrand("Nike", "http://www.nike.com/fr/fr_fr/", company1)
+        commonService.createTranslation(company1, 'de', nike1.id, [website: 'http://www.nike.com/de/de_de/'])
+        commonService.createTranslation(company1, 'en', nike1.id, [website: 'http://www.nike.com'])
+        commonService.createTranslation(company1, 'es', nike1.id, [website: 'http://www.nike.com/es/es_es/'])
+        commonService.createTranslation(company1, 'fr', nike1.id, [website: 'http://www.nike.com/fr/fr_fr/'])
 
-        Brand puma = commonService.createBrand("Puma", "http://www.shop.puma.fr", company);
-        commonService.createTranslation(company, 'de', puma.id, [website: 'http://www.shop.puma.de'])
-        commonService.createTranslation(company, 'en', puma.id, [website: 'http://www.puma.com'])
-        commonService.createTranslation(company, 'es', puma.id, [website: 'http://www.puma.com'])
-        commonService.createTranslation(company, 'fr', puma.id, [website: 'http://www.shop.puma.fr'])
+        Brand puma1 = commonService.createBrand("Puma", "http://www.shop.puma.fr", company1);
+        commonService.createTranslation(company1, 'de', puma1.id, [website: 'http://www.shop.puma.de'])
+        commonService.createTranslation(company1, 'en', puma1.id, [website: 'http://www.puma.com'])
+        commonService.createTranslation(company1, 'es', puma1.id, [website: 'http://www.puma.com'])
+        commonService.createTranslation(company1, 'fr', puma1.id, [website: 'http://www.shop.puma.fr'])
 
-        commonService.createBrand("Hide brand", "http://www.google.fr", company, true);
+        commonService.createBrand("Hide brand", "http://www.google.fr", company1, true);
+
 
         int countInserts = 0;
         // création des categories
         for (int i = 1; i <= level1; i++) {
-            Category cat = commonService.createCategory("Main $i", null, mogobiz, mogobizCatalog, 1, "hello, I am category Main $i from catalog ${mogobizCatalog.name}");
-            for (int j = 1; j <= level2; j++) {
-                log.info("Begin Performance Sub category creation $i$j")
-                Category subcat = commonService.createCategory("Sub $i$j", cat, mogobiz, mogobizCatalog, 1, "hello, I am category Sub $i$j from catalog ${mogobizCatalog.name}");
+            commonService.createCategory("Main $i", null, mogobiz, mogobizCatalog1, 1, "hello, I am category Main $i from catalog ${mogobizCatalog1.name}");
+            Category cat1 = Category.findByNameAndCatalog("Main $i", mogobizCatalog1)
+            commonService.createVariation("Couleur", 1, cat1, ["Blanc", "Rouge", "Noir"]);
+            commonService.createVariation("Taille", 2, cat1, ["S", "M", "L"]);
+            List<Future<Integer>> futures = new ArrayList<>(level2)
+            Range<Integer> range = 1..level2
+            range.each { j ->
+                Future<Integer> future = callAsync {
+                    log.info("Begin Performance Sub category creation $i$j")
+                    Category.withNewTransaction {
+                        Company company = Company.findByCode("mogobiz");
+                        Brand samsung = Brand.findByNameAndCompany("Samung", company)
+                        Brand nike = Brand.findByNameAndCompany("Nike", company)
+                        Brand puma = Brand.findByNameAndCompany("Puma", company)
+                        Catalog mogobizCatalog = Catalog.findByNameAndCompany("Performance Catalog", company)
+                        Category cat = Category.findByNameAndCatalog("Main $i", mogobizCatalog)
+                        TaxRate taxRate = TaxRate.findByNameAndCompany("TaxRate", company);
+                        Category subcat = commonService.createCategory("Sub $i$j", cat, company, mogobizCatalog, 1, "hello, I am category Sub $i$j from catalog ${mogobizCatalog.name}");
 
-                // création des variations
-                commonService.createVariation("Couleur", 1, cat, ["Blanc", "Rouge", "Noir"]);
-                commonService.createVariation("Taille", 2, cat, ["S", "M", "L"]);
-                commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for en $i$j"}', "CATEGORY");
-                commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for es $i$j"}', "CATEGORY");
-                commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for fr $i$j"}', "CATEGORY");
-                commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for de $i$j"}', "CATEGORY");
+                        // création des variations
+                        commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for en $i$j"}', "CATEGORY");
+                        commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for es $i$j"}', "CATEGORY");
+                        commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for fr $i$j"}', "CATEGORY");
+                        commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for de $i$j"}', "CATEGORY");
 
-                // Création des produits
-                for (int k = 1; k < maxProducts; k++) {
-                    Shipping shipping = commonService.createShipping(25 + k, 120, 110, 15)
-                    Product product = commonService.createProduct("PRODUCT_$i$j$k", "Product of sub cat $i$j with id $k", 28000 + (k * 100), ProductType.PRODUCT, ProductCalendar.NO_DATE, company, samsung, subcat, taxRate, "Product $i$j$k", null, shipping, null, false)
-                    commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, k % 2 == 0 ? "Blanc" : "Rouge", k % 2 == 0 ? "M" : "L", null, 10000 + (k * 100), false)
-                    Feature feature = commonService.createFeature("Frabriqué en ", "Country $k", product, 0, false)
-                    commonService.createTranslation(company, 'en', feature.id, [name: "Made in", value: "China"], false)
-                    commonService.createTranslation(company, 'es', feature.id, [name: "Fabricado :)", value: "China"], false)
-                    commonService.createFeature("Size", "100\"", product, 0, false)
-                    commonService.createFeature("Resulution", "Full HD", product, 1, false)
-                    countInserts++;
-                    if (countInserts % 100 == 0) {
-                        log.info(countInserts)
-                        this.cleanUpGorm()
+                        // Création des produits
+                        for (int k = 1; k < maxProducts; k++) {
+                            Shipping shipping = commonService.createShipping(25 + k, 120, 110, 15)
+                            Product product = commonService.createProduct("PRODUCT_$i$j$k", "Product of sub cat $i$j with id $k", 28000 + (k * 100), ProductType.PRODUCT, ProductCalendar.NO_DATE, company, samsung, subcat, taxRate, "Product $i$j$k", null, shipping, null, false)
+                            commonService.createSKU("Standard$i$j$k", 30000 + (k * 100), product, k % 2 == 0 ? "Blanc" : "Rouge", k % 2 == 0 ? "M" : "L", null, 10000 + (k * 100), false)
+                            Feature feature = commonService.createFeature("Frabriqué en ", "Country $k", product, 0, false)
+                            commonService.createTranslation(company, 'en', feature.id, [name: "Made in", value: "China"], false)
+                            commonService.createTranslation(company, 'es', feature.id, [name: "Fabricado :)", value: "China"], false)
+                            commonService.createFeature("Size", "100\"", product, 0, false)
+                            commonService.createFeature("Resulution", "Full HD", product, 1, false)
+                            countInserts++;
+                            if (countInserts % 100 == 0) {
+                                log.info(countInserts)
+                                this.cleanUpGorm()
+                            }
+                        }
+                        log.info("End Performance Sub category creation $i$j")
                     }
                 }
-                log.info("End Performance Sub category creation $i$j")
+                futures.add(future)
+            }
+            futures.each {
+                it.get()
             }
         }
-        commonService.createShippingRule(company, "fr", 0L, 500L, "-10")
-        commonService.createShippingRule(company, "fr", 5001L, 1000L, "-100")
-        commonService.createShippingRule(company, "fr", 10001L, 10000L, "-10%")
+        commonService.createShippingRule(company1, "fr", 0L, 500L, "-10")
+        commonService.createShippingRule(company1, "fr", 5001L, 1000L, "-100")
+        commonService.createShippingRule(company1, "fr", 10001L, 10000L, "-10%")
         log.info("End Performance catalog creation")
     }
+
     def cleanUpGorm() {
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
+        ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
         propertyInstanceMap.get().clear()
     }
 
