@@ -78,7 +78,7 @@ class CatalogController {
                             catalog.id as String
                     )
                 } else {
-                    catalog.errors.allErrors.each {log.error(it)}
+                    catalog.errors.allErrors.each { log.error(it) }
                 }
                 withFormat {
                     xml { render catalog as XML }
