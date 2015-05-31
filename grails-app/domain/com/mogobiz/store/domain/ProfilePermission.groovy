@@ -9,7 +9,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -26,26 +26,26 @@ class ProfilePermission
 
 
     /**
-     * 
+     *
      */
-    java.lang.String target 
+    java.lang.String target
     /**
-     * 
+     *
      */
-    java.lang.String actions  = "*" 
+    java.lang.String actions  = "*"
     /**
-     * 
+     *
      */
-    java.lang.String key 
+    java.lang.String key
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Permission permission 
+    com.mogobiz.store.domain.Permission permission
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Profile profile 
+    com.mogobiz.store.domain.Profile profile
 
     static transients = [ 'profilePermissionValidation', 'profilePermissionRender' ]
 
@@ -70,7 +70,7 @@ class ProfilePermission
         id name:'id',column:'id',generator:'native'
         target column:"target",insertable:true,updateable:true,lazy:false,cache:false
         actions column:"actions",insertable:true,updateable:true,lazy:false,cache:false
-        key column:"key",insertable:true,updateable:true,lazy:false,cache:false
+        key column:"xkey",insertable:true,updateable:true,lazy:false,cache:false
 
 
         permission column:"permission_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
