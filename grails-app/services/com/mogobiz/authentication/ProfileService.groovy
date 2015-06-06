@@ -22,16 +22,8 @@ import static com.mogobiz.utils.ProfileUtils.*
 @Transactional
 class ProfileService {
 
-    // By making it protected we do not allow grails to inject the circular dependency
-    protected AuthenticationService authenticationService
-
     SanitizeUrlService sanitizeUrlService
 
-    def grailsApplication
-
-    def setCircularDependency() {
-        this.authenticationService = grailsApplication.mainContext.authenticationService
-    }
     /**
      *
      * @param p - profile
