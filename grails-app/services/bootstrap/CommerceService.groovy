@@ -16,6 +16,7 @@ import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.ProductType
+import com.mogobiz.store.domain.Profile
 import com.mogobiz.store.domain.ReductionRule
 import com.mogobiz.store.domain.ReductionRuleType
 import com.mogobiz.store.domain.RoleName
@@ -28,6 +29,8 @@ import com.mogobiz.store.vo.RegisteredCartItemVO
 import com.mogobiz.utils.PermissionType
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
+
+import static com.mogobiz.utils.ProfileUtils.ALL
 
 class CommerceService {
 
@@ -102,6 +105,57 @@ class CommerceService {
         }
 
         profileService.saveUserPermission(seller, seller.admin, PermissionType.ADMIN_COMPANY, seller.company.id as String)
+
+        PermissionType.seller().each {pt ->
+            profileService.saveUserPermission(seller, false, pt, mogobiz.id as String)
+        }
+        def parentProfile = Profile.findByCodeAndCompanyIsNull("seller")
+        if(parentProfile){
+            def child = Profile.findByCompanyAndParent(mogobiz, parentProfile)
+            if(!child){
+                child = profileService.applyProfile(parentProfile, mogobiz.id)
+            }
+            profileService.addUserProfile(seller, child)
+        }
+        Catalog.findAllByCompany(mogobiz).each {catalog ->
+            profileService.saveUserPermission(
+                    seller,
+                    true,
+                    PermissionType.UPDATE_STORE_CATALOG,
+                    mogobiz.id as String,
+                    catalog.id as String
+            )
+            profileService.saveUserPermission(
+                    seller,
+                    false,
+                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                    mogobiz.id as String,
+                    catalog.id as String,
+                    ALL
+            )
+            Category.findAllByCatalog(catalog).each { category ->
+                profileService.saveUserPermission(
+                        seller,
+                        true,
+                        PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                        mogobiz.id as String,
+                        catalog.id as String,
+                        category.id as String
+                )
+            }
+        }
+        EsEnv.findAllByCompany(mogobiz).each {env ->
+            profileService.saveUserPermission(
+                    seller,
+                    true,
+                    PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                    mogobiz.id as String,
+                    env.id as String
+            )
+        }
+        seller.refresh()
+        seller.sell = false
+        seller.save(flush: true)
 
         // création du valideur
         Seller userValidator = Seller.findByLogin("validator@mogobiz.com")
