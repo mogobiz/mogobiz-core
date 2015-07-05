@@ -62,6 +62,7 @@
     <resource>com.mogobiz.geolocation.domain.PoiType</resource>
     <resource>com.mogobiz.pay.domain.BOAccount</resource>
     <resource>com.mogobiz.pay.domain.BOTransaction</resource>
+    <resource>com.mogobiz.pay.domain.BOTransactionLog</resource>
     <resource>com.mogobiz.pay.domain.PaymentData</resource>
     <resource>com.mogobiz.store.domain.Album</resource>
     <resource>com.mogobiz.store.domain.BOCart</resource>

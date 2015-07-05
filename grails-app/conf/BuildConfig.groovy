@@ -80,13 +80,14 @@ grails.project.dependency.resolution = {
         }
 
 // plugins needed at runtime but not for compilation
-        runtime ':hibernate:3.6.10.15' // ':hibernate4:4.3.5.3' for Hibernate 4
+        runtime ':hibernate:3.6.10.15'
+        //runtime ':hibernate4:4.3.5.3'
         runtime ':database-migration:1.4.0'
         compile ":facebook-graph:0.14"
         compile ':platform-core:1.0.0'
         compile ":google-data:0.1.3"
         runtime ":resources:1.2.8"
-        compile (":email-confirmation:2.0.8") {
+        compile (":email-confirmation:2.0.9-SNAPSHOT") {
             excludes 'quartz'
         }
         compile (":shiro:1.2.1") {
@@ -94,11 +95,11 @@ grails.project.dependency.resolution = {
         }
         compile ":mail:1.0.5"
         compile ":quartz:1.0.1"
-        compile ':recaptcha:0.6.8'
+        compile ':recaptcha:1.2.0'
         compile ":cache-headers:1.1.6"
         compile ":cached-resources:1.0"
         compile ":rest:0.8"
-        compile ":joda-time:1.4"
+        compile ":joda-time:1.5"
         compile ":executor:0.3"
     }
 }
