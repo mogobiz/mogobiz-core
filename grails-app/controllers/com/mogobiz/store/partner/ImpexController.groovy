@@ -11,10 +11,7 @@ import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
-import grails.converters.XML
 import grails.transaction.Transactional
-import groovy.transform.Synchronized
-import org.hibernate.SessionFactory
 
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
@@ -26,7 +23,6 @@ class ImpexController {
     CatalogService catalogService
     AuthenticationService authenticationService
     ImportService importService
-    SessionFactory sessionFactory
 
     ProfileService profileService
 
