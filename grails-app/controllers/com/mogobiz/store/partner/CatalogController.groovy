@@ -54,18 +54,18 @@ class CatalogController {
             return
         }
         def name = params['catalog']?.name
-        Company company = seller.company
+        Company compy = seller.company
         if (name) {
             def catalog = Catalog.withCriteria {
                 eq('name', name)
                 eq('deleted', false)
                 company {
-                    eq('id', company.id)
+                    eq('id', compy.id)
                 }
             }
             if (!catalog) {
                 catalog = new Catalog(params['catalog'] as Map)
-                catalog.company = company
+                catalog.company = compy
                 catalog.uuid = UUID.randomUUID().toString()
                 catalog.validate()
                 if (!catalog.hasErrors()) {
@@ -74,7 +74,7 @@ class CatalogController {
                             seller,
                             true,
                             PermissionType.UPDATE_STORE_CATALOG,
-                            company.id as String,
+                            compy.id as String,
                             catalog.id as String
                     )
                 } else {
