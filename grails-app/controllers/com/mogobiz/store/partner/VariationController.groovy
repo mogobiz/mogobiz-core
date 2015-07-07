@@ -267,6 +267,7 @@ class VariationController {
 			}
 			if (variationValue){
 				variation.removeFromVariationValues(variationValue)
+				variation.save(flush:true)
 				withFormat {
 					html variation:variation
 					xml {
