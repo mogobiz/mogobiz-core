@@ -185,7 +185,7 @@ class ImportService {
                             l.uuid = uuid
                             l.active = active.equalsIgnoreCase("true")
                             l.countryCode = countryCode ?: null
-                            l.stateCode ?: null
+                            l.stateCode = stateCode ?: null
                             l.rate = rate.toFloat()
 
                             if (l.validate()) {

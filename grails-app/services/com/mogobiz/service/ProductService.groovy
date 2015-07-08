@@ -215,8 +215,15 @@ class ProductService
         if (params["product"]?.shipping) {
             Shipping shipping = new Shipping()
             shipping.properties = params["product"].shipping
-            shipping.save()
-            entity.shipping = shipping
+			if (!shipping.hasErrors()) {
+				shipping.save(flush:true)
+				entity.shipping = shipping
+			}
+			else {
+				shipping.errors.each {
+					println(it)
+				}
+			}
         }
 
         // Ibeacon

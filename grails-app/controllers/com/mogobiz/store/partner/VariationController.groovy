@@ -2,6 +2,7 @@ package com.mogobiz.store.partner
 
 import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.service.CategoryService
 import grails.converters.JSON
 import grails.converters.XML
 
@@ -14,7 +15,7 @@ import grails.transaction.Transactional
 class VariationController {
     AuthenticationService authenticationService
 	AjaxResponseService ajaxResponseService
-
+	CategoryService categoryService
 
 	private List<Variation> getVariations(Category category) {
 		List<Variation> variations = Variation.findAllByCategory(category,[sort:'position',order:'asc'])
@@ -159,7 +160,8 @@ class VariationController {
 			return
 		}
 		Variation variation = params['variation']?.id?Variation.get (params['variation']?.id):null
-		if(variation && variation.category == category){
+
+		if(variation && categoryService.isChildOf(category, variation.category)) {
 			String name = params['variation']?.name
 			variation.properties = params['variation']
 			if(variation.validate()) {
@@ -254,7 +256,6 @@ class VariationController {
 	def removeVariationValue() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-		boolean isAdmin = authenticationService.isAdministrator()
 		if (seller?(seller.company!=category.company):!authenticationService.isAdministrator()) {
 			response.sendError 401
 			return
@@ -267,6 +268,7 @@ class VariationController {
 			}
 			if (variationValue){
 				variation.removeFromVariationValues(variationValue)
+				variationValue.delete(flush:true)
 				variation.save(flush:true)
 				withFormat {
 					html variation:variation
