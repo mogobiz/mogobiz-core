@@ -10,11 +10,6 @@ import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Suggestion
 
-/**
- * @author hayssam.saleh@ebiznext.com
- * @author stephane.manciot@ebiznext.com
- *
- */
 class SuggestionsController {
 
     def authenticationService
@@ -85,6 +80,7 @@ class SuggestionsController {
         def products = []
         Company company = params['company']?.id ? Company.get(params['company'].id as long) : null
         long cid = params.long("catalog.id")
+        String fullSearch = params['fullSearch'] + "%"
         if (!authenticationService.canAdminAllStores()) {
             def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
             if (seller == null || company == null || seller.company.id != company.id) {
@@ -93,7 +89,10 @@ class SuggestionsController {
             }
             company = seller.company
         }
-        List<Product> dbProducts = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and p.deleted = false and p.company = :company and d.id = :cid order by p.name asc", [company: company, cid: cid])
+        List<Product> dbProducts = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and p.deleted = false and p.company = :company and d.id = :cid and p.name like :fullSearch order by p.name asc", [company: company, cid: cid, fullSearch: fullSearch], [max: 100])
+        dbProducts.each {
+            println(it)
+        }
 
         dbProducts.each { product ->
             products.add(product.asMapForJSON())
