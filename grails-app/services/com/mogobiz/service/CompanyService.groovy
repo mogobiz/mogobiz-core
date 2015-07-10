@@ -5,14 +5,20 @@
  */
 package com.mogobiz.service
 
+import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.exceptions.CompanyAlreadyExistException
 import com.mogobiz.exceptions.InvalidDomainObjectException
 import com.mogobiz.store.domain.Catalog;
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.EsEnv
+import com.mogobiz.store.domain.Profile
 import com.mogobiz.utils.IperUtil
+import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import grails.util.Holders
+
+import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  * Management service compagnies
@@ -20,6 +26,11 @@ import grails.util.Holders
 class CompanyService
 {
     def grailsApplication
+
+    AuthenticationService authenticationService
+
+    ProfileService profileService
+
 	/**
 	 * This methode returns company's informations
 	 * @param locale
@@ -27,8 +38,8 @@ class CompanyService
 	 * @return
 	 * @throws java.lang.Exception
 	 */
-    Map getCompany(Locale locale, java.lang.String companyCode)
-    {		
+    Map getCompany(Locale locale, String companyCode)
+    {
 		Map result = [:]
 		def company = Company.findByCode(companyCode)
 		if (company) {
@@ -37,7 +48,13 @@ class CompanyService
 
         return result
 	}
-    private void createEsEnvAndCatalog(Company company) {
+
+    private void createEsEnvAndCatalogAndProfiles(Company company) {
+        def profiles = Profile.findAllByCompanyIsNull()
+        profiles.each {parent ->
+            profileService.applyProfile(parent, company.id)
+        }
+        def user = authenticationService.retrieveAuthenticatedUser()
         EsEnv env = new EsEnv(
                 name: 'dev',
                 url: Holders.config.elasticsearch.serverURL as String,
@@ -46,8 +63,31 @@ class CompanyService
                 active: true
         )
         env.save(flush: true)
+        profileService.saveUserPermission(
+                user,
+                true,
+                PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                company.id as String,
+                env.id as String
+        )
+
         Catalog catalog = new Catalog(name: "Default Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: company)
         catalog.save(flush: true)
+        profileService.saveUserPermission(
+                user,
+                true,
+                PermissionType.UPDATE_STORE_CATALOG,
+                company.id as String,
+                catalog.id as String
+        )
+        profileService.saveUserPermission(
+                user,
+                false,
+                PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                company.id as String,
+                catalog.id as String,
+                ALL
+        )
     }
 
 
@@ -67,13 +107,13 @@ class CompanyService
                 if (location.validate()) {
                     location.save()
                     company.save()
-                    createEsEnvAndCatalog(company)
+                    createEsEnvAndCatalogAndProfiles(company)
                 } else {
                     company.errors = location.errors
                 }
             } else {
                 company.save()
-                createEsEnvAndCatalog(company)
+                createEsEnvAndCatalogAndProfiles(company)
             }
             return company.asMapForJSON()
         }
