@@ -76,10 +76,10 @@ static transactional = false
             commonService.saveEntity(env)
         }
 
-        Catalog mogobizCatalog1 = Catalog.findByNameAndCompany("Performance Catalog", mogobiz)
-        if (!mogobizCatalog1) {
-            mogobizCatalog1 = new Catalog(name: "Performance Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: mogobiz)
-            commonService.saveEntity(mogobizCatalog1)
+        Catalog performanceCatalog = Catalog.findByNameAndCompany("Performance Catalog", mogobiz)
+        if (!performanceCatalog) {
+            performanceCatalog = new Catalog(name: "Performance Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: mogobiz)
+            commonService.saveEntity(performanceCatalog)
         }
 
         // création des sellers
@@ -183,8 +183,8 @@ static transactional = false
         int countInserts = 0;
         // création des categories
         for (int i = 1; i <= level1; i++) {
-            commonService.createCategory("Main $i", null, mogobiz, mogobizCatalog1, 1, "hello, I am category Main $i from catalog ${mogobizCatalog1.name}");
-            Category cat1 = Category.findByNameAndCatalog("Main $i", mogobizCatalog1)
+            commonService.createCategory("Main $i", null, mogobiz, performanceCatalog, 1, "hello, I am category Main $i from catalog ${performanceCatalog.name}");
+            Category cat1 = Category.findByNameAndCatalog("Main $i", performanceCatalog)
             commonService.createVariation("Couleur", 1, cat1, ["Blanc", "Rouge", "Noir"]);
             commonService.createVariation("Taille", 2, cat1, ["S", "M", "L"]);
             List<Future<Integer>> futures = new ArrayList<>(level2)
@@ -237,6 +237,19 @@ static transactional = false
         commonService.createShippingRule(company1, "fr", 5001L, 1000L, "-100")
         commonService.createShippingRule(company1, "fr", 10001L, 10000L, "-10%")
         log.info("End Performance catalog creation")
+
+        Category.findAllByCatalog(performanceCatalog).each { category ->
+            profileService.saveUserPermission(
+                    seller,
+                    true,
+                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                    mogobiz.id as String,
+                    performanceCatalog.id as String,
+                    category.id as String
+            )
+        }
+        seller.refresh()
+        seller.save(flush: true)
     }
 
     def cleanUpGorm() {
