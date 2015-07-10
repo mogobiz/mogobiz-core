@@ -69,7 +69,7 @@ class QueueSocialService {
 					if(externalAccount){
 						FBClient client = new FBClient(externalAccount.token)
 						def album = client.createAlbum (albumName, albumDescription)
-						localFile = new File(resource.url)
+						localFile = new File(resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator))
 						FileInputStream fis = new FileInputStream(localFile)
 						def photo = client.publishPhoto (fis, product.name + " (" + filePrefix(resource.name)+")", album)
 						fis.close()
@@ -84,7 +84,7 @@ class QueueSocialService {
 						// TODO how to retrieve album by id
 						def albumId = client.createAlbum(albumName, albumDescription).id
 						if(albumId){
-							localFile = new File(resource.url)
+							localFile = new File(resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator))
 							FileInputStream fis = new FileInputStream(localFile)
 							def photo = client.publishPhoto (fis, getMimeType(localFile), resource.name, albumId)
 							fis.close()
@@ -97,7 +97,7 @@ class QueueSocialService {
 					externalAccount = authenticationService.retrieveExternalAccount(userId, AccountType.TWITTER)
 					if(externalAccount){
 						TwitterClient client = new TwitterClient(externalAccount.token, externalAccount.tokenSecret)
-						localFile = new File(resource.url)
+						localFile = new File(resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator))
 						String url = client.uploadImage(localFile)
 						client.updateStatus("Passnguide - " + product.name + "("+ url+")")
 						QueueSocialService.log.debug("Twitter published photo "+ url)
@@ -109,7 +109,7 @@ class QueueSocialService {
 					externalAccount = retrieveExternalAccount(userId, AccountType.GOOGLE)
 					if(externalAccount){
 						YouTubeClient client = new YouTubeClient(externalAccount.token, externalAccount.tokenSecret)
-						localFile = new File(resource.url)
+						localFile = new File(resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator))
 						FileInputStream fis = new FileInputStream(localFile)
 						def video = client.uploadVideo (fis, getMimeType(localFile), resource.name, albumName, resource.description, null)
 						fis.close()
@@ -121,7 +121,7 @@ class QueueSocialService {
 					if(externalAccount){
 						FBClient client = new FBClient(externalAccount.token)
 						def album = client.createAlbum (albumName, albumDescription)
-						localFile = new File(resource.url)
+						localFile = new File(resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator))
 						FileInputStream fis = new FileInputStream(localFile)
 						def video = client.publishVideo (fis, product.name + " (" + filePrefix(resource.name)+")", album)
 						fis.close()

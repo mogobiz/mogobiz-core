@@ -48,7 +48,6 @@ class SuggestionRender
 			]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
 		def resource = entity.product? productService.retrievePicture(entity.product) : null
 		if(resource){
 			def picture = 

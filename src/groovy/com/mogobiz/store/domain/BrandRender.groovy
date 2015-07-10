@@ -18,7 +18,6 @@ class BrandRender
 			included = ["id", "name", "website", "facebooksite", "ibeacon", "ibeacon.id", "ibeacon.name"]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
 		return result;
 	}
 

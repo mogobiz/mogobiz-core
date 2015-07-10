@@ -18,7 +18,6 @@ class TagRender
 			included = ["id", "name", "ibeacon", "ibeacon.id", "ibeacon.name"]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
 		return result;
 	}
 

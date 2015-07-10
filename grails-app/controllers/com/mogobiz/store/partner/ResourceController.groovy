@@ -53,10 +53,10 @@ class ResourceController {
                 String resourcesPath = grailsApplication.config.resources.path
 				File file
 				if (size) {
-					file = ImageTools.getFile(new File(resourcesPath + (resource.url - resourcesPath)), ImageSize.valueOf(size), true);
+					file = ImageTools.getFile(new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath)), ImageSize.valueOf(size), true);
 				}
 				else {
-					file = new File(resourcesPath + (resource.url - resourcesPath))
+					file = new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
 				}
 				response.contentType = resource.contentType ?: MimeTypeTools.detectMimeType(file)
 				// response.outputStream << file.path

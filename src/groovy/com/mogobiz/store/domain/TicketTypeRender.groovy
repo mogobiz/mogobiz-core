@@ -41,7 +41,6 @@ class TicketTypeRender
 			]
 		}
 		Map result = super.asMap(included, excluded, entity, lang)
-		translate(result, entity, lang)
         def picture = entity.picture
         if(picture && ResourceType.PICTURE.equals(picture.xtype)) {
             result['picture'] = picture.asMapForJSON(null, null, lang)

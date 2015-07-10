@@ -28,11 +28,11 @@ class RenderBase<T extends Serializable> {
 				eq ("lang", lang)
 				eq ("target", entity.id)
 			}
-			
+
 			if (translation) {
 				result << new JsonSlurper().parseText(translation.value)
 			}
-		}		
+		}
 	}
 
     String formatAmount(double amount, String currencyCode, String lang) {

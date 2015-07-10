@@ -111,7 +111,6 @@ class ProductRender
 			]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
 		def resource = productService.retrievePicture(entity)
 		if(resource) {
 			result['picture'] = resource.asMapForJSON(null, null, lang); 

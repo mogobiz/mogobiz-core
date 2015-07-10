@@ -967,10 +967,16 @@ class ImportService {
 
                             Product p = new Product()
                             p.category = categories.get(catpath)
-                            TaxRate tr = taxRates.get(taxRateName)
-                            if (tr == null) {
-                                tr = TaxRate.findByName(taxRateName)
-                                taxRates.put(taxRateName, tr)
+                            TaxRate tr
+                            if (taxRateName.size() == 0) {
+                                tr = null
+                            }
+                            else {
+                                tr  = taxRates.get(taxRateName)
+                                if (tr == null) {
+                                    tr = TaxRate.findByName(taxRateName)
+                                    taxRates.put(taxRateName, tr)
+                                }
                             }
                             p.company = catalog.company
                             p.uuid = uuid ? uuid : UUID.randomUUID().toString()

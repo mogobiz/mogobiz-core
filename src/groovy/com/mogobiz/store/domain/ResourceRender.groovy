@@ -38,7 +38,6 @@ class ResourceRender
 			]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
 		result['url'] = RenderUtil.extractResourceUrl(entity)
 		result['smallPicture'] = RenderUtil.extractResourceSmallPicture(entity)
 

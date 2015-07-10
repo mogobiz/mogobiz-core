@@ -64,7 +64,7 @@ class ResService {
         def d = new File(resourcesPath + dir)
         d.mkdirs()
         resource.url = dir + resource.id
-        final resourceFile = new File(resourcesPath + (resource.url - resourcesPath))
+        final resourceFile = new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
         file.renameTo(resourceFile)
         if (resource.xtype == ResourceType.PICTURE) {
             resource.smallPicture = ImageTools.getFile(resourceFile, ImageSize.SMALL, true).path - resourcesPath

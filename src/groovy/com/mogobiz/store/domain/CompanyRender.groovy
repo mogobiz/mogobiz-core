@@ -76,7 +76,6 @@ class CompanyRender
             ]
         }
         Map result = super.asMap(included, excluded, entity, lang);
-        translate(result, entity, lang)
         return result;
     }
 

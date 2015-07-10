@@ -51,7 +51,6 @@ class SellerRender extends UserRender {
             companies << it.code
         }
         result << [companies: companies]
-        translate(result, entity, lang)
         return result
     }
 

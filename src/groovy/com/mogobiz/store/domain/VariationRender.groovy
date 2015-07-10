@@ -24,8 +24,7 @@ class VariationRender
 			]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
-		
+
 		List<Map> values = []
 		entity.variationValues?.each { value ->
 			values.add(value.asMapForJSON())

@@ -140,7 +140,7 @@ class ProductResourceController {
 					product2Resource.delete()
 					if (params['delete']) {
                         String resourcesPath = grailsApplication.config.resources.path
-						ImageTools.deleteAll(new File(resourcesPath + (resource.url - resourcesPath)))
+						ImageTools.deleteAll(new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath)))
 						resource.delete();
 					}
 				}

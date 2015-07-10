@@ -18,7 +18,6 @@ class DatePeriodRender
 			included = ['id', 'startDate', 'endDate', 'product', 'product.id', 'pack', 'pack.id']
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
-		translate(result, entity, lang)
 		return result;
 	}
 

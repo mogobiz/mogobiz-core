@@ -76,7 +76,7 @@ class ExportService {
     List<String> toArray(Product it, int catRowNum) {
         ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode ?: "", it.code, it.name, it.xtype, it.price, it.state, it.description ?: "", it.nbSales, it.stockDisplay, it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : "", it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : "", it.sanitizedName, it.tags.collect {
             it.name
-        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate.name, new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
+        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate? it.taxRate.name : "", new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
     }
 
     List<String> toArray(TicketType it, int catRowNum, int prdRowNum) {
@@ -91,11 +91,9 @@ class ExportService {
         [it.uuid, name, it.countryCode ?: "", it.stateCode ?: "", it.rate, it.active]
     }
 
-    CellStyle unlockedCellStyle
-
 
     private static def boolValidateCell(XSSFSheet sheet, List<Integer> cellNums) {
-        sheet.protectSheet("")
+        //sheet.protectSheet("")
         XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
         DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
         cellNums.each {
@@ -120,8 +118,6 @@ class ExportService {
         int prdPropRownum = 0
 
         XSSFWorkbook workbook = new XSSFWorkbook();
-        unlockedCellStyle = workbook.createCellStyle();
-        unlockedCellStyle.setLocked(false);
 
         XSSFSheet brandSheet = workbook.createSheet("brand");
         int brandRownum = 0
@@ -460,7 +456,6 @@ class ExportService {
                     catCell.setCellValue(it)
                 } else {
                     catCell.setCellValue(it)
-                    catCell.setCellStyle(unlockedCellStyle)
                 }
             }
 
@@ -474,7 +469,6 @@ class ExportService {
                         catFeatCell.setCellFormula(it)
                     } else {
                         catFeatCell.setCellValue(it)
-                        catFeatCell.setCellStyle(unlockedCellStyle)
 
                     }
                 }
@@ -490,7 +484,6 @@ class ExportService {
                         varCell.setCellFormula(it)
                     else {
                         varCell.setCellValue(it)
-                        varCell.setCellStyle(unlockedCellStyle)
                     }
                 }
                 List<VariationValue> values = VariationValue.findAllByVariation(varit)
@@ -503,7 +496,6 @@ class ExportService {
                             varValCell.setCellFormula(it)
                         else {
                             varValCell.setCellValue(it)
-                            varValCell.setCellStyle(unlockedCellStyle)
                         }
                     }
                 }
@@ -513,25 +505,26 @@ class ExportService {
             products.each { prd ->
                 int prdCellnum = 0
                 Row prdRow = prdSheet.createRow(prdRownum++)
-                toArray(prd, catRownum).each {
+                println(prd)
+                println("-->" + prdRownum)
+                toArray(prd, catRownum).each { col ->
                     Cell prdCell = prdRow.createCell(prdCellnum++)
                     if (prdCellnum <= 2)
-                        prdCell.setCellFormula(it)
+                        prdCell.setCellFormula(col)
                     else {
-                        prdCell.setCellValue(it.toString())
-                        prdCell.setCellStyle(unlockedCellStyle)
+                        prdCell.setCellValue(col.toString())
                     }
                 }
 
                 (new File(exportDir, prd.sanitizedName)).mkdirs()
                 List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
                 prdres.each {
-                    Path resUrl = Paths.get(resourcesPath + (it.resource.url - resourcesPath))
+                    Path resUrl = Paths.get(resourcesPath + (it.resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
                     try {
                         Files.copy(resUrl, Paths.get(exportDir.getAbsolutePath(), prd.sanitizedName, it.resource.name))
                     }
                     catch (IOException ioe) {
-                        ioe.printStackTrace()
+                        // ioe.printStackTrace()
                     }
                 }
 
@@ -546,7 +539,6 @@ class ExportService {
                             prdFeatCell.setCellFormula(it)
                         else {
                             prdFeatCell.setCellValue(it)
-                            //prdFeatCell.setCellStyle(unlockedCellStyle)
                         }
                     }
                 }
@@ -562,7 +554,6 @@ class ExportService {
                             prdPropCell.setCellFormula(it)
                         else {
                             prdPropCell.setCellValue(it)
-                            prdPropCell.setCellStyle(unlockedCellStyle)
                         }
                     }
                 }
@@ -577,7 +568,6 @@ class ExportService {
                             skuCell.setCellFormula(it)
                         else {
                             skuCell.setCellValue(it)
-                            skuCell.setCellStyle(unlockedCellStyle)
                         }
                     }
                 }

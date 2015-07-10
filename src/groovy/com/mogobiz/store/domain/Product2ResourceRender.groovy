@@ -45,7 +45,6 @@ class Product2ResourceRender
 		Map result = super.asMap(included, excluded, entity, lang);
 		result['resource']['url'] = RenderUtil.extractResourceUrl(entity.resource)
 		result['resource']['smallPicture'] = RenderUtil.extractResourceSmallPicture(entity.resource)
-		translate(result, entity, lang)
 		return result;
 	}
 
