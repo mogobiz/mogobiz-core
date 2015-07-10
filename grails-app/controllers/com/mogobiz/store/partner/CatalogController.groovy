@@ -53,16 +53,10 @@ class CatalogController {
             response.sendError 401
             return
         }
-        def name = params['catalog']?.name
+        String name = params['catalog']?.name
         Company company = seller.company
         if (name) {
-            def catalog = Catalog.withCriteria {
-                eq('name', name)
-                eq('deleted', false)
-                company {
-                    eq('id', company.id)
-                }
-            }
+            def catalog = Catalog.findByNameAndDeletedAndCompany(name, false, company)
             if (!catalog) {
                 catalog = new Catalog(params['catalog'] as Map)
                 catalog.company = company

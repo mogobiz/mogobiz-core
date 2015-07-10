@@ -37,8 +37,14 @@ class CategoryService {
         res.push(cat.name)
         while (cat.parent) {
             cat = cat.parent
-            res.add(0,cat.name)
+            res.add(0, cat.name)
         }
         return "/" + res.join("/")
+    }
+
+    boolean isChildOf(Category child, Category parent) {
+        if (child == null) return false
+        if (child == parent) return true
+        return isChildOf(child.parent, parent)
     }
 }

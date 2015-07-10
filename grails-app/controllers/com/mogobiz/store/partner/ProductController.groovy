@@ -12,6 +12,7 @@ import grails.converters.JSON
 import grails.converters.XML
 import grails.plugin.mail.MailService
 import grails.transaction.Transactional
+import groovy.json.JsonOutput
 
 import java.text.DateFormat
 import java.text.ParseException
@@ -94,7 +95,8 @@ class ProductController {
         } else {
             // filter les produits suivants les params
             Long idCategory = params['product']?.idCategorie?.toLong()
-
+            Long catalogId = params['catalog']?.id?.toLong()
+            Catalog catalogue = catalogId == null ? null : Catalog.get(catalogId)
             def products = Product.createCriteria()
             int offset;
             int pageSize = IperConstant.NUMBER_PRODUCT_PER_PAGE;
@@ -121,6 +123,9 @@ class ProductController {
                 }
                 if (idCategory != null) {
                     category { eq('id', idCategory) }
+                }
+                if (catalogue != null) {
+                    category { eq("catalog", catalogue)}
                 }
                 order(params.orderBy ? params.orderBy : "name", params.orderDirection ? params.orderDirection : "asc")
             }
@@ -194,7 +199,7 @@ class ProductController {
         }
         def company = seller.company
         def tags = Tag.findAllByCompany(company)
-        
+
         String tagsString = '';
         if (tags) {
             def names = []
@@ -219,10 +224,12 @@ class ProductController {
         }
         Product product = params['product']?.id ? Product.get(params['product']?.id) : null
         if (product) {
+            def res = new ArrayList()
+            product.tags.each { res.add(it.asMapForJSON()) }
             withFormat {
-                html tags: product.tags
-                xml { render product.tags as XML }
-                json { render product.tags as JSON }
+                html tags: res
+                xml { render res as XML }
+                json { render res as JSON }
             }
         } else {
             response.sendError 404
@@ -283,8 +290,8 @@ class ProductController {
             }
             if (tag) {
                 product.removeFromTags(tag)
-                product.save(flush:true)
-                List<Product> productsWithTag = Product.executeQuery("select p from Product p left join p.tags as t where t.id=:idTag and t.company.id = :idCompany", [idTag:tag.id, idCompany:tag.company.id])
+                product.save(flush: true)
+                List<Product> productsWithTag = Product.executeQuery("select p from Product p left join p.tags as t where t.id=:idTag and t.company.id = :idCompany", [idTag: tag.id, idCompany: tag.company.id])
                 if (productsWithTag == null || productsWithTag.size() == 0) {
                     tag.delete();
                 }
