@@ -1,6 +1,7 @@
 package bootstrap
 
 import com.mogobiz.authentication.ProfileService
+import com.mogobiz.service.CountryImportService
 import com.mogobiz.store.domain.*
 import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.vo.RegisteredCartItemVO
@@ -21,8 +22,19 @@ public class CommonService {
 
     ProfileService profileService
 
+    CountryImportService countryImportService
+
     def destroy() {}
 	def init() {
+        // import countries
+        final codes = (Holders.config.importCountries?.codes as String)?.split(',')?.collect{it.trim().toUpperCase()} ?: ['DE','ES','FR','GB','US']
+        final countryCodes = Country.findAll().collect {it.code}
+        def countries = codes.collect {code -> if(!countryCodes.contains(code)) code else []}.flatten() as Collection<String>
+        if(countries.size() > 0){
+            File countriesDir = new File(Holders.config.importCountries.dir as String)
+            countryImportService.importAll(countries, countriesDir)
+        }
+
 		// création des roles
 		Role admin = createRole(RoleName.ADMINISTRATOR)
 		createRole(RoleName.CLIENT)
@@ -215,7 +227,7 @@ public class CommonService {
 		}
 		return feature
 	}
-	
+
 	public Brand createBrand(String name, String website, Company company, boolean hide = false)
 	{
 		Brand brand = Brand.findByNameAndCompany(name, company);
@@ -564,7 +576,7 @@ public class CommonService {
 			throw new Exception(msg);
 		}
 	}
-	
+
 	private Calendar getDateDebutAnnee()
 	{
 		Calendar c = Calendar.getInstance();
@@ -584,7 +596,7 @@ public class CommonService {
 		c.add(Calendar.MINUTE, -1);
 		return c;
 	}
-	
+
 	private  Calendar getDateDebutMois(Integer heure = null)
 	{
 		Calendar c = Calendar.getInstance();
