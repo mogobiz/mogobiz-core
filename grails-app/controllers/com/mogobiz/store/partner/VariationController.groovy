@@ -96,7 +96,6 @@ class VariationController {
 	def save() {
 		Category category = params['category']?.id?Category.get(params['category']?.id):null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-		boolean isAdmin = authenticationService.isAdministrator()
 		if (seller?(seller.company!= category.company):!authenticationService.isAdministrator()) {
 			response.sendError 401
 			return
@@ -154,7 +153,6 @@ class VariationController {
 	def update() {
 		Category category = params['category']?.id ? Category.get(params['category']?.id) : null
 		Seller seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-		boolean isAdmin = authenticationService.isAdministrator()
 		if (seller?(seller.company!=category.company):!authenticationService.isAdministrator()) {
 			response.sendError 401
 			return

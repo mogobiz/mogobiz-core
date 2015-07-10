@@ -254,10 +254,14 @@ class ProductController {
                 def tag = product.tags.find { tag ->
                     tag.name.toLowerCase() == tagName.toLowerCase()
                 }
+
                 if (!tag) {
-                    def newTag = new Tag(name: tagName, company: seller.company)
-                    newTag.save()
-                    product.addToTags(newTag)
+                    tag = Tag.findByCompanyAndNameIlike(product.company, tagName)
+                    if (!tag)
+                    tag= new Tag(name: tagName, company: seller.company)
+                    tag.save()
+                    product.addToTags(tag)
+                    product.save(flush:true)
                     withFormat {
                         html tags: product.tags
                         xml { render product.tags as XML }
