@@ -31,7 +31,9 @@ enum PermissionType {
     UPDATE_STORE_CATALOG("updateCatalog", "catalogs:{0}:catalog:{1}:update"), // UserPermission per catalog
     UPDATE_STORE_CATEGORY_WITHIN_CATALOG("updateCatalogCategory", "catalogs:{0}:catalog:{1}:category:{2}:update"), // UserPermission per catalog and category
 
-    VALIDATE_STORE_TICKETS("validateTickets", "tickets:{0}:validate")
+    VALIDATE_STORE_TICKETS("validateTickets", "tickets:{0}:validate"),
+
+    PUBLISH_BO_TO_MOGOPAY("publishBoToMogopay", "bo:{0}:publish:{1}")
 
     private String key
 

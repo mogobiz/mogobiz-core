@@ -216,6 +216,26 @@ public class CommonService {
                 seller.save(flush: true)
             }
         }
+
+        // begin stuff to export bo entities for mogopay
+        def all = Company.findByCode(ALL)
+        if(!all){
+            all = new Company(code: ALL, name: "ALL", aesPassword: SecureCodec.genKey())
+            saveEntity(all)
+        }
+        def esEnv = EsEnv.findByCompanyAndName(all, "mogopay")
+        if(!esEnv){
+            esEnv = new EsEnv(company: all, name: "mogopay", cronExpr: "0 0 0 * * ?", url: Holders.config.mogopay?.elasticsearch?.serverURL as String, active: false)
+            saveEntity(esEnv)
+        }
+        profileService.saveUserPermission(
+                userAdmin,
+                true,
+                PermissionType.PUBLISH_BO_TO_MOGOPAY,
+                ALL,
+                esEnv.id as String
+        )
+        // end stuff to export bo entities for mogopay
 	}
 
 	public Feature createFeature(String name, String value, Product product, int position, boolean flush = true)

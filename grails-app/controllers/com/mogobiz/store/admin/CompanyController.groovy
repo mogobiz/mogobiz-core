@@ -90,7 +90,7 @@ class CompanyController {
         } else {
             def c = Company.createCriteria()
 
-            def companiesList = c.list { order("name", "asc") }
+            def companiesList = c.list { ne("code", "*") order("name", "asc") }
 
             def retList = new ArrayList()
             companiesList.each { comp ->
