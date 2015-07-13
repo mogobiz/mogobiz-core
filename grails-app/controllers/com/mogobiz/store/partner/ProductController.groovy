@@ -400,7 +400,7 @@ class ProductController {
         }
     }
 
-    def search(Long idCatalog, String query){
+    def search(Long idCatalog, String query, boolean activeOnly = true){
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
             response.sendError 401
@@ -411,13 +411,21 @@ class ProductController {
             'in'('user', seller)
         }.collect {computeShiroPermission(it.target)}
 
+        def params = [idCatalog:idCatalog, query: "%$query%"]
+        def sql = "SELECT distinct p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
+                "WHERE p.category.catalog.id=:idCatalog " +
+                "AND (lower(tag.name) like lower(:query) OR lower(p.name) like lower(:query) " +
+                "OR lower(p.description) like lower(:query) OR lower(sku.name) like lower(:query) " +
+                "OR lower(sku.description) like lower(:query))"
+
+        if(activeOnly){
+            params << [productState: ProductState.ACTIVE]
+            sql += " AND p.state = :productState AND p.deleted = false"
+        }
+
         def products = Product.executeQuery(
-                "SELECT distinct p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
-                        "WHERE p.category.catalog.id=:idCatalog AND p.state = :productState AND p.deleted = false " +
-                        "AND (lower(tag.name) like lower(:query) OR lower(p.name) like lower(:query) " +
-                        "OR lower(p.description) like lower(:query) OR lower(sku.name) like lower(:query) " +
-                        "OR lower(sku.description) like lower(:query))",
-                [idCatalog:idCatalog, productState:ProductState.ACTIVE, query: "%$query%"]
+                sql,
+                params
         ).collect {product ->
             final requiredPermission = computeShiroPermission(
                     PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
