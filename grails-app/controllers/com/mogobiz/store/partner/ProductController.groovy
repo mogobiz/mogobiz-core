@@ -400,7 +400,7 @@ class ProductController {
         }
     }
 
-    def search(Long idCatalog, String query, boolean activeOnly = true){
+    def search(Long idCatalog, String query, boolean activeOnly){
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
             response.sendError 401
