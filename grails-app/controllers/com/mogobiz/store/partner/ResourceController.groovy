@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.mogobiz.store.partner
 
@@ -27,15 +27,15 @@ import com.mogobiz.utils.IperUtil
  *
  */
 class ResourceController {
-	
+
 	AjaxResponseService ajaxResponseService
-	
+
 	def authenticationService
-	
+
 	SimpleDateFormat sdf = new SimpleDateFormat(IperConstant.DATE_FORMAT)
-	
+
 	/**
-	 * 
+	 *
 	 */
 	static final int BUFFER_SIZE = 2048
 
@@ -58,14 +58,20 @@ class ResourceController {
 				else {
 					file = new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
 				}
-				response.contentType = resource.contentType ?: MimeTypeTools.detectMimeType(file)
-				// response.outputStream << file.path
-				def out = response.outputStream
-				def bytes = new byte[BUFFER_SIZE]
-				file.withInputStream { inp ->
-					while( inp.read(bytes) != -1) {
-						out.write(bytes)
-						out.flush()
+				if(!file.exists()){
+					log.warn("${file.absolutePath} not found")
+					response.sendError(404)
+				}
+				else{
+					response.contentType = resource.contentType ?: MimeTypeTools.detectMimeType(file)
+					// response.outputStream << file.path
+					def out = response.outputStream
+					def bytes = new byte[BUFFER_SIZE]
+					file.withInputStream { inp ->
+						while( inp.read(bytes) != -1) {
+							out.write(bytes)
+							out.flush()
+						}
 					}
 				}
 			}
@@ -89,7 +95,7 @@ class ResourceController {
 
 	@Transactional(readOnly = true)
 	def show() {
-		
+
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
 			response.sendError 401
@@ -116,17 +122,17 @@ class ResourceController {
 			def resourceslist
 			def c = Resource.createCriteria()
 			def productId = params['product']?.id
-			
-			if (productId!=null){	
-				
+
+			if (productId!=null){
+
 				def critProduct2Resource = Product2Resource.createCriteria()
 				def product2ResourceList = critProduct2Resource.list {
 					eq('product.id',  productId.toLong())
 					order("position", "asc")
 				}
-				
+
 				def attachedResourcesIdlist=product2ResourceList['resource']['id']
-				
+
 				resourceslist = c.list {
 					eq('company', company)
 					eq('active',true)
@@ -157,7 +163,7 @@ class ResourceController {
 			resourceslist.each { res ->
 				resList.add( res.asMapForJSON())
 			}
-			
+
 			withFormat {
 				html resList:resList
 				xml {  render resList as XML }
@@ -165,7 +171,7 @@ class ResourceController {
 			}
 		}
 	}
-	
+
 	/**
 	 * mise a jour d'une ressource
 	 */
@@ -178,32 +184,32 @@ class ResourceController {
 			return
 		}
 		def company = seller.company
-		def id = params['resource']?.id		
+		def id = params['resource']?.id
 		def resource = params['resource']?.id?Resource.get (params['resource']?.id):null
 		if(resource && resource.company==company){
-			
+
 			saveResource(params, resource, EventType.MODIFY)
 		}
 		else{
 			response.sendError 404
 		}
 	}
-	
-	
+
+
 	/**
 	 * creation d'une nouvelle ressource
 	 */
 	@Transactional
 	def save() {
-		
+
 		def resourceMap = new HashMap()
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
-		
+
 		if(seller == null){
-			response.sendError 401			
+			response.sendError 401
 			return
 		}
-		
+
 		def resource = new Resource()
 		resource.active = true
 		resource.deleted = false
@@ -216,7 +222,7 @@ class ResourceController {
 		def resourceMap = new HashMap()
 		def seller = request.seller?request.seller:authenticationService.retrieveAuthenticatedSeller()
 		if(seller == null){
-			response.sendError 401			
+			response.sendError 401
 			return
 		}
 		def company = seller.company
@@ -226,7 +232,7 @@ class ResourceController {
 				resource.active = false
 			}
 			resource.deleted=!resource.deleted
-			
+
 			resourceMap = resource.asMapForJSON()
 			resource.save()
 
@@ -248,7 +254,7 @@ class ResourceController {
 			response.sendError 404
 		}
 	}
-	
+
 	/**
 	 * create or update resource
 	 * @param params the request params
@@ -256,10 +262,10 @@ class ResourceController {
 	 * @param eventType the event type (creation or modification)
 	 */
 	private saveResource(params, resource, eventType) {
-		
+
 		def poi
 		def resourceVO = new HashMap()
-		
+
 		resource.properties = params['resource']
 		if(resource.validate()){
 			if(params['poi']){
