@@ -58,7 +58,7 @@ class ResourceController {
 				else {
 					file = new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
 				}
-				if(!file.exists()){
+				if(!file?.exists()){
 					log.warn("${file.absolutePath} not found")
 					response.sendError(404)
 				}
