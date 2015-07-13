@@ -412,7 +412,7 @@ class ProductController {
         }.collect {computeShiroPermission(it.target)}
 
         def products = Product.executeQuery(
-                "SELECT p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
+                "SELECT distinct p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
                         "WHERE p.category.catalog.id=:idCatalog AND p.state = :productState AND p.deleted = false " +
                         "AND (lower(tag.name) like lower(:query) OR lower(p.name) like lower(:query) " +
                         "OR lower(p.description) like lower(:query) OR lower(sku.name) like lower(:query) " +
@@ -434,7 +434,15 @@ class ProductController {
                         'category',
                         'category.id',
                         'category.name',
-                        'lastUpdated'
+                        'lastUpdated',
+                        'state',
+                        'picture',
+                        'brand',
+                        'code',
+                        'xtype',
+                        'price',
+                        'dateCreated',
+                        'descriptionAsText'
                 ] as List<String>)
             }
             else{
