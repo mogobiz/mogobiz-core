@@ -8,11 +8,11 @@ import com.mogobiz.service.ProductService
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.Page
+import com.mogobiz.utils.PermissionType
+import static com.mogobiz.utils.ProfileUtils.*
 import grails.converters.JSON
 import grails.converters.XML
-import grails.plugin.mail.MailService
 import grails.transaction.Transactional
-import groovy.json.JsonOutput
 
 import java.text.DateFormat
 import java.text.ParseException
@@ -406,6 +406,11 @@ class ProductController {
             response.sendError 401
             return
         }
+
+        def permissions = UserPermission.createCriteria().list {
+            'in'('user', seller)
+        }.collect {computeShiroPermission(it.target)}
+
         def products = Product.executeQuery(
                 "SELECT p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
                         "WHERE p.category.catalog.id=:idCatalog AND p.state = :productState AND p.deleted = false " +
@@ -413,15 +418,30 @@ class ProductController {
                         "OR lower(p.description) like lower(:query) OR lower(sku.name) like lower(:query) " +
                         "OR lower(sku.description) like lower(:query))",
                 [idCatalog:idCatalog, productState:ProductState.ACTIVE, query: "%$query%"]
-        ).collect {product -> product.asMapForJSON([
-                'id',
-                'name',
-                'description',
-                'category',
-                'category.id',
-                'category.name',
-                'lastUpdated'
-        ] as List<String>)}
+        ).collect {product ->
+            final requiredPermission = computeShiroPermission(
+                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                    "${product.company.id}",
+                    "$idCatalog",
+                    "${product.category.id}"
+            )
+            def authorized = permissions.find {it.implies(requiredPermission)}
+            if(authorized){
+                product.asMapForJSON([
+                        'id',
+                        'name',
+                        'description',
+                        'category',
+                        'category.id',
+                        'category.name',
+                        'lastUpdated'
+                ] as List<String>)
+            }
+            else{
+                log.warn("user not granted ${requiredPermission.toString()}")
+                []
+            }
+        }.flatten()
         withFormat {
             html products: products
             xml { render products as XML }

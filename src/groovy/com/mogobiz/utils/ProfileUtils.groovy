@@ -1,5 +1,8 @@
 package com.mogobiz.utils
 
+import org.apache.shiro.authz.Permission
+import org.apache.shiro.authz.permission.WildcardPermission
+
 import java.text.MessageFormat
 import java.util.regex.Pattern
 
@@ -26,6 +29,14 @@ final class ProfileUtils {
     static PermissionType retrievePermissionFrom(String target){
         final args = target.split(":").findAll {ARG_PATTERN.matcher(it).matches()}
         PermissionType.values().find {computePermission(it, args.toArray(new String[args.size()])).equals(target)}
+    }
+
+    static Permission computeShiroPermission(PermissionType type, String ... args){
+        computeShiroPermission(computePermission(type, args))
+    }
+
+    static Permission computeShiroPermission(String target){
+        new WildcardPermission(target)
     }
 
 }
