@@ -330,10 +330,10 @@ class IperUtil {
 
     public static String normalizeSeparator(String url) {
         if (File.separatorChar == '/') {
-            return url.replaceAll("\\\\", File.separator)
+            return url.replaceAll("\\\\", '/')
         }
         else {
-            return url.replaceAll("/", File.separator)
+            return url.replaceAll("/", "\\\\")
         }
     }
 }
