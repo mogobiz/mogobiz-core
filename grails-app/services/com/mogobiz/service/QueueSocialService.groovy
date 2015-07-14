@@ -70,7 +70,7 @@ class QueueSocialService {
 					if(externalAccount){
 						FBClient client = new FBClient(externalAccount.token)
 						def album = client.createAlbum (albumName, albumDescription)
-						localFile = new File(IperUtil.normalizeSeparator(resource.url)
+						localFile = new File(IperUtil.normalizeSeparator(resource.url))
 						FileInputStream fis = new FileInputStream(localFile)
 						def photo = client.publishPhoto (fis, product.name + " (" + filePrefix(resource.name)+")", album)
 						fis.close()
