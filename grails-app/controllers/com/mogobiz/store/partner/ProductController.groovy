@@ -429,7 +429,8 @@ class ProductController {
 
         def products = Product.executeQuery(
                 sql,
-                params
+                params,
+                [max: 100, offset: 0]
         ).unique(false).collect {product ->
             final requiredPermission = computeShiroPermission(
                     PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
