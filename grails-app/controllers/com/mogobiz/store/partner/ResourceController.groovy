@@ -53,10 +53,10 @@ class ResourceController {
                 String resourcesPath = grailsApplication.config.resources.path
 				File file
 				if (size) {
-					file = ImageTools.getFile(new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath)), ImageSize.valueOf(size), true);
+					file = ImageTools.getFile(new File(resourcesPath + (IperUtil.normalizeSeparator(resource.url) - resourcesPath)), ImageSize.valueOf(size), true);
 				}
 				else {
-					file = new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
+					file = new File(resourcesPath + (IperUtil.normalizeSeparator(resource.url) - resourcesPath))
 				}
 				if(!file?.exists()){
 					log.warn("${file?.absolutePath ?: "image"} not found")

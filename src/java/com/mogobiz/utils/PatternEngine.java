@@ -11,21 +11,21 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 public class PatternEngine {
-	public static void main(String[] args) throws Exception {
-		String prefix = "C:/Projects/IPER2010";
-		if ("hayssams".equals(System.getProperty("user.name"))) {
-			prefix = "/Users/hayssams/workspaces/IPER2010/SNAPSHOT/trunk";
-		}
-		String inputDir = prefix
-				+ "/iper2010/web-app/WEB-INF/site/__defaultsite__";
-		String outputDir = prefix + "/iper2010/web-app/site";
-		String companyCode = "technoagile";
-		String paramDir = prefix + "/iper2010/web-app/WEB-INF/site/param";
+    public static void main(String[] args) throws Exception {
+        String prefix = "C:/Projects/IPER2010";
+        if ("hayssams".equals(System.getProperty("user.name"))) {
+            prefix = "/Users/hayssams/workspaces/IPER2010/SNAPSHOT/trunk";
+        }
+        String inputDir = prefix
+                + "/iper2010/web-app/WEB-INF/site/__defaultsite__";
+        String outputDir = prefix + "/iper2010/web-app/site";
+        String companyCode = "technoagile";
+        String paramDir = prefix + "/iper2010/web-app/WEB-INF/site/param";
 
-		PatternEngine engine = new PatternEngine(companyCode,
-				new File(inputDir), new File(outputDir), new File(paramDir));
-		engine.treat();
-	}
+        PatternEngine engine = new PatternEngine(companyCode,
+                new File(inputDir), new File(outputDir), new File(paramDir));
+        engine.treat();
+    }
 
 	private String companyCode;
 	private File inputDir;

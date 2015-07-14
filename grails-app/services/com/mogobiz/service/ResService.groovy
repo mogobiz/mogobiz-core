@@ -7,6 +7,7 @@ import com.mogobiz.store.domain.ResourceType
 import com.mogobiz.tools.ImageSize
 import com.mogobiz.tools.ImageTools
 import com.mogobiz.tools.MimeTypeTools
+import com.mogobiz.utils.IperUtil
 
 
 class ResService {
@@ -64,7 +65,7 @@ class ResService {
         def d = new File(resourcesPath + dir)
         d.mkdirs()
         resource.url = dir + resource.id
-        final resourceFile = new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
+        final resourceFile = new File(resourcesPath + (IperUtil.normalizeSeparator(resource.url) - resourcesPath))
         file.renameTo(resourceFile)
         if (resource.xtype == ResourceType.PICTURE) {
             resource.smallPicture = ImageTools.getFile(resourceFile, ImageSize.SMALL, true).path - resourcesPath

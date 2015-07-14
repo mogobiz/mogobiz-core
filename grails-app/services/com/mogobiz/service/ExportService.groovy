@@ -1,6 +1,7 @@
 package com.mogobiz.service
 
 import com.mogobiz.store.domain.*
+import com.mogobiz.utils.IperUtil
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.DataValidationConstraint
@@ -76,7 +77,7 @@ class ExportService {
     List<String> toArray(Product it, int catRowNum) {
         ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode ?: "", it.code, it.name, it.xtype, it.price, it.state, it.description ?: "", it.nbSales, it.stockDisplay, it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : "", it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : "", it.sanitizedName, it.tags.collect {
             it.name
-        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate? it.taxRate.name : "", new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
+        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate ? it.taxRate.name : "", new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
     }
 
     List<String> toArray(TicketType it, int catRowNum, int prdRowNum) {
@@ -519,7 +520,7 @@ class ExportService {
                 (new File(exportDir, prd.sanitizedName)).mkdirs()
                 List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
                 prdres.each {
-                    Path resUrl = Paths.get(resourcesPath + (it.resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath))
+                    Path resUrl = Paths.get(resourcesPath + (IperUtil.normalizeSeparator(it.resource.url) - resourcesPath))
                     try {
                         Files.copy(resUrl, Paths.get(exportDir.getAbsolutePath(), prd.sanitizedName, it.resource.name))
                     }

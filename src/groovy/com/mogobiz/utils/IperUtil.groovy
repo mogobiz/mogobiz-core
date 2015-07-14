@@ -328,5 +328,12 @@ class IperUtil {
         null
     }
 
-
+    public static String normalizeSeparator(String url) {
+        if (File.separatorChar == '/') {
+            return url.replaceAll("\\\\", File.separator)
+        }
+        else {
+            return url.replaceAll("/", File.separator)
+        }
+    }
 }

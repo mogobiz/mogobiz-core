@@ -4,6 +4,7 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.tools.ImageTools
+import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 
 import com.mogobiz.store.domain.Product
@@ -140,7 +141,7 @@ class ProductResourceController {
 					product2Resource.delete()
 					if (params['delete']) {
                         String resourcesPath = grailsApplication.config.resources.path
-						ImageTools.deleteAll(new File(resourcesPath + (resource.url.replaceAll("/", File.separator).replaceAll("\\\\", File.separator) - resourcesPath)))
+						ImageTools.deleteAll(new File(resourcesPath + (IperUtil.normalizeSeparator(resource.url) - resourcesPath)))
 						resource.delete();
 					}
 				}
