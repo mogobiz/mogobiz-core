@@ -401,6 +401,10 @@ class ProductController {
     }
 
     def search(Long idCatalog, String query, boolean activeOnly){
+        if(!idCatalog || !query){
+            response.sendError(400)
+            return
+        }
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
         if (seller == null) {
             response.sendError 401
@@ -412,7 +416,7 @@ class ProductController {
         }.collect {computeShiroPermission(it.target)}
 
         def params = [idCatalog:idCatalog, query: "%$query%"]
-        def sql = "SELECT distinct p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
+        def sql = "SELECT p FROM Product p left join p.ticketTypes as sku left join p.tags as tag " +
                 "WHERE p.category.catalog.id=:idCatalog " +
                 "AND (lower(tag.name) like lower(:query) OR lower(p.name) like lower(:query) " +
                 "OR lower(p.description) like lower(:query) OR lower(sku.name) like lower(:query) " +
@@ -426,7 +430,7 @@ class ProductController {
         def products = Product.executeQuery(
                 sql,
                 params
-        ).collect {product ->
+        ).unique(false).collect {product ->
             final requiredPermission = computeShiroPermission(
                     PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
                     "${product.company.id}",
