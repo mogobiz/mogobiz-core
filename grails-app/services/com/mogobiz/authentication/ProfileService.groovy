@@ -9,6 +9,7 @@ import com.mogobiz.store.domain.ProfilePermission
 import com.mogobiz.store.domain.Role
 import com.mogobiz.store.domain.RoleName
 import com.mogobiz.store.domain.RolePermission
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.UserPermission
 import com.mogobiz.utils.PermissionType
@@ -181,6 +182,18 @@ class ProfileService {
         if (profile && user && profile.company.id == user.company.id) {
             user.addToProfiles(profile)
             user.save(flush: true)
+        }
+    }
+
+    /**
+     * add a seller profile
+     * @param seller - seller
+     * @param profile - profile
+     */
+    void addSellerProfile(Seller seller, Profile profile) {
+        if (profile && seller && profile.company in seller.companies) {
+            seller.addToProfiles(profile)
+            seller.save(flush: true)
         }
     }
 

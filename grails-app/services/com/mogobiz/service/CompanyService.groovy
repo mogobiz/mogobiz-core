@@ -72,6 +72,16 @@ class CompanyService
             catalog.save(flush: true)
         }
         if(seller){
+            // admin profile
+            def profile = Profile.findByCompanyAndName(company, 'admin')
+            profileService.addSellerProfile(seller, profile)
+            // seller profile
+            profile = Profile.findByCompanyAndName(company, 'seller')
+            profileService.addSellerProfile(seller, profile)
+            // validator profile
+            profile = Profile.findByCompanyAndName(company, 'validator')
+            profileService.addSellerProfile(seller, profile)
+            // user permissions related to this store
             profileService.saveUserPermission(
                     seller,
                     true,
