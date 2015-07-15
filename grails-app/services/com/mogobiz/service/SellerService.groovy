@@ -43,9 +43,11 @@ class SellerService {
         String ownerlastname = data.get("ownerlastname")
 
         Company company = Company.findByCode(storecode)
+        boolean creation = false
         if (company == null) {
             company = new Company(code: storecode, name: storename)
             companyService.save(company)
+            creation = true
         }
         Seller seller = Seller.findByEmail(owneremail)
         if (seller == null) {
@@ -54,6 +56,9 @@ class SellerService {
             seller = new Seller(password: password, firstName: ownerfirstname, lastName: ownerlastname, email: owneremail, login: owneremail, admin: true, sell: true, validator: true, active: true)
             seller.company = company
             this.save(seller, clearPassword, false)
+        }
+        if(creation){
+            companyService.createEsEnvAndCatalogAndProfiles(company, seller)
         }
         if (!seller.companies?.contains(company)) {
             seller.addToCompanies(company)

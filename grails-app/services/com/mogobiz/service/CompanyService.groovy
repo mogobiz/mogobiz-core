@@ -13,6 +13,7 @@ import com.mogobiz.store.domain.Catalog;
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.EsEnv
 import com.mogobiz.store.domain.Profile
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
@@ -49,49 +50,55 @@ class CompanyService
         return result
 	}
 
-    private void createEsEnvAndCatalogAndProfiles(Company company) {
+    void createEsEnvAndCatalogAndProfiles(Company company, Seller seller = null) {
         def profiles = Profile.findAllByCompanyIsNull()
         profiles.each {parent ->
             profileService.applyProfile(parent, company.id)
         }
-        def user = authenticationService.retrieveAuthenticatedUser()
-        EsEnv env = new EsEnv(
-                name: 'dev',
-                url: Holders.config.elasticsearch.serverURL as String,
-                cronExpr: Holders.config.elasticsearch.export.cron as String,
-                company: company,
-                active: true
-        )
-        env.save(flush: true)
-        profileService.saveUserPermission(
-                user,
-                true,
-                PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
-                company.id as String,
-                env.id as String
-        )
-
-        Catalog catalog = new Catalog(name: "Default Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: company)
-        catalog.save(flush: true)
-        profileService.saveUserPermission(
-                user,
-                true,
-                PermissionType.UPDATE_STORE_CATALOG,
-                company.id as String,
-                catalog.id as String
-        )
-        profileService.saveUserPermission(
-                user,
-                false,
-                PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
-                company.id as String,
-                catalog.id as String,
-                ALL
-        )
+        EsEnv env = EsEnv.findByCompanyAndName(company, 'dev')
+        if(!env){
+            env = new EsEnv(
+                    name: 'dev',
+                    url: Holders.config.elasticsearch.serverURL as String,
+                    cronExpr: Holders.config.elasticsearch.export.cron as String,
+                    company: company,
+                    active: true
+            )
+            env.save(flush: true)
+        }
+        Catalog catalog = Catalog.findByCompanyAndName(company, "Default Catalog")
+        if(!catalog){
+            catalog = new Catalog(name: "Default Catalog", uuid: UUID.randomUUID().toString(), social: false, activationDate: new Date(), company: company)
+            catalog.save(flush: true)
+        }
+        if(seller){
+            profileService.saveUserPermission(
+                    seller,
+                    true,
+                    PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                    company.id as String,
+                    env.id as String
+            )
+            profileService.saveUserPermission(
+                    seller,
+                    true,
+                    PermissionType.UPDATE_STORE_CATALOG,
+                    company.id as String,
+                    catalog.id as String
+            )
+            profileService.saveUserPermission(
+                    seller,
+                    false,
+                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                    company.id as String,
+                    catalog.id as String,
+                    ALL
+            )
+        }
     }
 
 
-    Company save(Company company) {
+    Map save(Company company) {
         if (!company.code)
             company.code = IperUtil.normalizeName(company.name)
         company.code = company.code.toLowerCase()
