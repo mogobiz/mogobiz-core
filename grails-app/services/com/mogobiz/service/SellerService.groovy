@@ -57,15 +57,16 @@ class SellerService {
             seller.company = company
             this.save(seller, clearPassword, false)
         }
-        if(creation){
-            companyService.createEsEnvAndCatalogAndProfiles(company, seller)
-        }
         if (!seller.companies?.contains(company)) {
             seller.addToCompanies(company)
         }
         seller.company = company
         seller.autosign = true
         seller.save(flush: true)
+
+        if(creation){
+            companyService.createEsEnvAndCatalogAndProfiles(company, seller)
+        }
 
         UsernamePasswordToken authToken = new UsernamePasswordToken(seller.login, seller.password)
         // Log the user in the application.
