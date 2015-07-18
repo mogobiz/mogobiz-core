@@ -1,4 +1,4 @@
-<plugin name='mogobiz-core' version='0.1-SNAPSHOT' grailsVersion='2.3 &gt; *'>
+<plugin name='mogobiz-core' version='0.2-SNAPSHOT' grailsVersion='2.3 &gt; *'>
   <author>Your name</author>
   <title>Mogobiz Core Plugin</title>
   <description>Brief summary/description of the plugin.
@@ -62,6 +62,7 @@
     <resource>com.mogobiz.geolocation.domain.PoiType</resource>
     <resource>com.mogobiz.pay.domain.BOAccount</resource>
     <resource>com.mogobiz.pay.domain.BOTransaction</resource>
+    <resource>com.mogobiz.pay.domain.BOTransactionLog</resource>
     <resource>com.mogobiz.pay.domain.PaymentData</resource>
     <resource>com.mogobiz.store.domain.Album</resource>
     <resource>com.mogobiz.store.domain.BOCart</resource>
@@ -143,9 +144,11 @@
     <resource>com.mogobiz.service.CountryService</resource>
     <resource>com.mogobiz.service.CouponService</resource>
     <resource>com.mogobiz.service.EmailConfirmationNotificationService</resource>
+    <resource>com.mogobiz.service.ExportCsvService</resource>
     <resource>com.mogobiz.service.ExportService</resource>
     <resource>com.mogobiz.service.FeatureService</resource>
     <resource>com.mogobiz.service.IbeaconService</resource>
+    <resource>com.mogobiz.service.ImportCsvService</resource>
     <resource>com.mogobiz.service.ImportService</resource>
     <resource>com.mogobiz.service.ProductService</resource>
     <resource>com.mogobiz.service.QueueSocialService</resource>
