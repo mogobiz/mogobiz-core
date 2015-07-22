@@ -117,6 +117,14 @@ class TicketType
     /**
      * 
      */
+    java.lang.Boolean available 
+    /**
+     * 
+     */
+    java.lang.String byDateTimes 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.VariationValue variation1 
 
     /**
@@ -178,6 +186,8 @@ class TicketType
         mpn column:"mpn",insertable:true,updateable:true,lazy:false,cache:false
         availabilityDate column:"availability_date",insertable:true,updateable:true,lazy:false,cache:false
         filename column:"filename",insertable:true,updateable:true,lazy:false,cache:false
+        available column:"available",insertable:true,updateable:true,lazy:false,cache:false
+        byDateTimes column:"by_date_times",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         variation1 column:"variation1_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -211,6 +221,8 @@ class TicketType
         mpn (nullable:true, unique:false)
         availabilityDate (nullable:true, unique:false)
         filename (nullable:true, unique:false)
+        available (nullable:true, unique:false)
+        byDateTimes (nullable:true, unique:false)
         variation1 (nullable:true)
         variation2 (nullable:true)
         product ( blank:false, nullable:false)

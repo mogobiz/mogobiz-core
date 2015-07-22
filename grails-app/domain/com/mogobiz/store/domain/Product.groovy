@@ -138,6 +138,10 @@ class Product
     /**
      *
      */
+    java.lang.Boolean stockAvailable 
+    /**
+     * 
+     */
     com.mogobiz.geolocation.domain.Poi poi
 
     /**
@@ -241,7 +245,7 @@ class Product
         downloadMaxTimes column:"download_max_times",insertable:true,updateable:true,lazy:false,cache:false
         downloadMaxDelay column:"download_max_delay",insertable:true,updateable:true,lazy:false,cache:false
         returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
-
+        stockAvailable column:"stock_available",insertable:true,updateable:true,lazy:false,cache:false
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
@@ -292,6 +296,7 @@ class Product
         downloadMaxTimes (nullable:true, unique:false)
         downloadMaxDelay (nullable:true, unique:false)
         returnMaxDelay ( blank:false, nullable:false, unique:false)
+        stockAvailable (nullable:true, unique:false)
         poi (nullable:true)
         category ( blank:false, nullable:false)
         brand (nullable:true)
