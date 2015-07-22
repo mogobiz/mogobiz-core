@@ -29,11 +29,6 @@ class Comment
      * 
      */
     java.lang.String extra 
-    /**
-     * 
-     */
-    com.mogobiz.store.domain.Product product 
-
     static transients = [ 'commentValidation', 'commentRender' ]
 
 
@@ -56,15 +51,12 @@ class Comment
         id name:'id',column:'id',generator:'native'
         extra column:"extra",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
-
-        product column:"product_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
     uuid (nullable:false, unique:false)
 
         extra ( blank:false, nullable:false, unique:false)
-        product ( blank:false, nullable:false)
     }
 
 

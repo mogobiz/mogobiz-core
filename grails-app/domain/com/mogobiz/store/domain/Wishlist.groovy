@@ -29,7 +29,6 @@ class Wishlist
      * 
      */
     java.lang.String extra 
-
     static transients = [ 'wishlistValidation', 'wishlistRender' ]
 
 

@@ -32,8 +32,7 @@ class Notation
     /**
      * 
      */
-    com.mogobiz.store.domain.Product product 
-
+    java.lang.Long productId 
     static transients = [ 'notationValidation', 'notationRender' ]
 
 
@@ -55,16 +54,15 @@ class Notation
 
         id name:'id',column:'id',generator:'native'
         extra column:"extra",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        productId column:"product_id",insertable:true,updateable:true,lazy:false,cache:false
 
-
-        product column:"product_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
     uuid (nullable:false, unique:false)
 
         extra ( blank:false, nullable:false, unique:false)
-        product ( blank:false, nullable:false)
+        productId ( blank:false, nullable:false, unique:false)
     }
 
 
