@@ -5,6 +5,7 @@ import com.mogobiz.authentication.AuthenticationService
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
+import org.quartz.CronExpression
 
 class EsEnvController {
 
@@ -50,14 +51,19 @@ class EsEnvController {
             return
         }
         def company = seller?.company
-        EsEnv env = new EsEnv(params['esenv'])
+        EsEnv env = new EsEnv(params['esenv'] as Map)
         env.company = company
         if (env.validate()) {
-            if(env.active){
-                EsEnv.executeUpdate("update EsEnv set active = :active", [active:false])
-                servletContext.setAttribute(env.company.code, env.url)
+            if(!CronExpression.isValidExpression(env.cronExpr)){
+                log.error("invalid cron expression ${env.cronExpr}")
             }
-            env.save()
+            else{
+                if(env.active){
+                    EsEnv.executeUpdate("update EsEnv set active = :active", [active:false])
+                    servletContext.setAttribute(env.company.code, env.url)
+                }
+                env.save()
+            }
         }
         withFormat {
             html env: env
@@ -77,16 +83,20 @@ class EsEnvController {
         if (env && env.company == company) {
             env.properties = params['esenv']
             if (env.validate()) {
-                env.save(flush:true)
-                if(env.active){
-                    EsEnv.executeUpdate("update EsEnv set active = :active where company.id =  :idCompany and id != :id ", [id:env.id, active:false, idCompany:company.id])
+                if(!CronExpression.isValidExpression(env.cronExpr)){
+                    log.error("invalid cron expression ${env.cronExpr}")
+                }
+                else {
+                    env.save(flush: true)
+                    if (env.active) {
+                        EsEnv.executeUpdate("update EsEnv set active = :active where company.id =  :idCompany and id != :id ", [id: env.id, active: false, idCompany: company.id])
+                    }
                 }
             }
             else {
                 env.errors.allErrors.each {
                     log.error(it)
                 }
-
             }
         }
         withFormat {
