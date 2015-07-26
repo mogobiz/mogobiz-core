@@ -76,6 +76,7 @@
     <resource>com.mogobiz.store.domain.BrandProperty</resource>
     <resource>com.mogobiz.store.domain.Catalog</resource>
     <resource>com.mogobiz.store.domain.Category</resource>
+    <resource>com.mogobiz.store.domain.Comment</resource>
     <resource>com.mogobiz.store.domain.Company</resource>
     <resource>com.mogobiz.store.domain.CompanyProperty</resource>
     <resource>com.mogobiz.store.domain.Consumption</resource>
@@ -99,6 +100,7 @@
     <resource>com.mogobiz.store.domain.Ibeacon</resource>
     <resource>com.mogobiz.store.domain.IntraDayPeriod</resource>
     <resource>com.mogobiz.store.domain.LocalTaxRate</resource>
+    <resource>com.mogobiz.store.domain.Notation</resource>
     <resource>com.mogobiz.store.domain.Permission</resource>
     <resource>com.mogobiz.store.domain.Price</resource>
     <resource>com.mogobiz.store.domain.Product</resource>
@@ -128,6 +130,7 @@
     <resource>com.mogobiz.store.domain.Variation</resource>
     <resource>com.mogobiz.store.domain.VariationValue</resource>
     <resource>com.mogobiz.store.domain.Warehouse</resource>
+    <resource>com.mogobiz.store.domain.Wishlist</resource>
     <resource>com.mogobiz.auth.AuthRealm</resource>
     <resource>bootstrap.CommerceService</resource>
     <resource>bootstrap.CommonService</resource>
