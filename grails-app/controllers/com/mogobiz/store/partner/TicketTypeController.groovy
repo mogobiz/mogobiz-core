@@ -58,6 +58,8 @@ public class TicketTypeController {
                 }
             }
         } else if (params['name']) {
+            Long catalogId = params['catalog']?.id?.toLong()
+
             List<TicketType> ticketTypes = TicketType.withCriteria {
                 "product" {
                     "company" {
@@ -65,8 +67,11 @@ public class TicketTypeController {
                     }
                 }
                 if (params['name']) {
-                    ilike('name', '%' + params['name'] + '%')
+                    ilike('sku', '%' + params['name'] + '%')
                 }
+            }
+            if (catalogId) {
+                ticketTypes = ticketTypes.findAll { it.product.category.catalog.id == catalogId }
             }
             render ticketTypes as JSON
         } else {
