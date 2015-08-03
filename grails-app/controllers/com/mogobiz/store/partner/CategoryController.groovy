@@ -56,6 +56,9 @@ class CategoryController {
                 company {
                     eq('id', seller.company.id)
                 }
+                if (params['name']) {
+                    ilike('name', '%' + params['name'] + '%')
+                }
                 catalog { eq('id', catalogId) }
                 if (allCategories.equals("false"))
                     isNull('parent')
