@@ -28,6 +28,7 @@ class TicketTypeRender
 				'product',
 				'product.id',
 				'sku',
+                'nbSales',
 				'stock',
 				'stock.stock',
 				'stock.stockUnlimited',

@@ -41,6 +41,7 @@ class ProductRender
 				'stopDate',
 				'uuid',
 				'price',
+                'nbSales',
 				// feature
 				'startFeatureDate',
 				'stopFeatureDate',
