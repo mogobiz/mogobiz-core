@@ -25,6 +25,7 @@ class CompanyRender
                     'email',
                     'aboutUs',
                     'termsAndPolicies',
+                    'defaultLanguage',
                     // location
                     'location',
                     'location.id',
