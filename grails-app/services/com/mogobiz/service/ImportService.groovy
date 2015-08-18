@@ -153,7 +153,7 @@ class ImportService {
                 'sku'            : skuSheet,
         ]
 
-        if(taxSheet){
+        if (taxSheet) {
             log.info("Importing tax rates")
             // Tax Rate
             TaxRate.withNewTransaction {
@@ -181,15 +181,23 @@ class ImportService {
                                     return [errors: t.errors.allErrors, sheet: "taxrate", line: rownum]
                                 }
                             }
-                            LocalTaxRate l = new LocalTaxRate()
+
+
+                            LocalTaxRate l = LocalTaxRate.findByUuid(uuid)
+                            boolean isNewLocalTaxRate = l == null
+                            if (isNewLocalTaxRate)
+                                l = new LocalTaxRate()
                             l.uuid = uuid
                             l.active = active.equalsIgnoreCase("true")
                             l.countryCode = countryCode ?: null
                             l.stateCode = stateCode ?: null
                             l.rate = rate.toFloat()
-
                             if (l.validate()) {
                                 l.save(flush: true)
+                                if (isNewLocalTaxRate) {
+                                    t.addToLocalTaxRates(l)
+                                    t.save(flush: true)
+                                }
                             } else {
                                 l.errors.allErrors.each { println(it) }
                                 return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
@@ -200,7 +208,7 @@ class ImportService {
             }
         }
 
-        if(shipSheet){
+        if (shipSheet) {
             log.info("Importing shipping")
             // Shipping
             ShippingRule.withNewTransaction {
@@ -236,7 +244,7 @@ class ImportService {
             }
         }
 
-        if(couponSheet){
+        if (couponSheet) {
             log.info("Importing Coupons")
             Coupon.withNewTransaction {
                 for (int rownum = 1; rownum < couponSheet.getPhysicalNumberOfRows(); rownum++) {
@@ -288,7 +296,7 @@ class ImportService {
             }
         }
 
-        if(couponRuleSheet){
+        if (couponRuleSheet) {
             log.info("Importing Reduction rules")
             //TODO improve inserts
             Coupon.withNewTransaction {
@@ -334,7 +342,7 @@ class ImportService {
             }
         }
 
-        if(couponUseSheet){
+        if (couponUseSheet) {
             log.info("Importing Coupon Uses")
             //TODO improve Coupon Use
             Coupon.withNewTransaction {
@@ -759,7 +767,7 @@ class ImportService {
         range.each { index ->
             Future<Integer> future = callAsync {
                 int startIndex = index * countPerThread
-                log.info("sku-worker-"+ index+" = " + startIndex)
+                log.info("sku-worker-" + index + " = " + startIndex)
                 int rownum = startIndex
                 int nbProductsToInsert
                 if (index == nbthreads) {
@@ -848,7 +856,7 @@ class ImportService {
                             rownum++
                         }
                         this.cleanUpGorm()
-                        log.info("sku-worker-"+ index+" = " + rownum)
+                        log.info("sku-worker-" + index + " = " + rownum)
                     }
                 }
             }
@@ -925,7 +933,7 @@ class ImportService {
         range.each { index ->
             Future<Integer> future = callAsync {
                 int startIndex = index * countPerThread
-                log.info("product-worker-"+ index+" = " + startIndex)
+                log.info("product-worker-" + index + " = " + startIndex)
                 int rownum = startIndex
                 int nbProductsToInsert
                 if (index == nbthreads) {
@@ -970,9 +978,8 @@ class ImportService {
                             TaxRate tr
                             if (taxRateName.size() == 0) {
                                 tr = null
-                            }
-                            else {
-                                tr  = taxRates.get(taxRateName)
+                            } else {
+                                tr = taxRates.get(taxRateName)
                                 if (tr == null) {
                                     tr = TaxRate.findByName(taxRateName)
                                     taxRates.put(taxRateName, tr)
@@ -1057,7 +1064,7 @@ class ImportService {
                             rownum++
                         }
                         this.cleanUpGorm()
-                        log.info("product-worker-"+ index+" = " + rownum)
+                        log.info("product-worker-" + index + " = " + rownum)
                     }
                 }
                 return 0
@@ -1071,10 +1078,10 @@ class ImportService {
     }
 
     def Date parseDate(String date, Date d = new Date()) {
-        try{
+        try {
             new SimpleDateFormat("yyyy-MM-dd").parse(date)
         }
-        catch(ParseException e){
+        catch (ParseException e) {
             d
         }
     }
