@@ -80,7 +80,7 @@ class Coupon
      */
     com.mogobiz.store.domain.Company company 
 
-    static hasMany = [ categories:com.mogobiz.store.domain.Category , products:com.mogobiz.store.domain.Product , ticketTypes:com.mogobiz.store.domain.TicketType ,  rules:com.mogobiz.store.domain.ReductionRule ]
+    static hasMany = [ categories:com.mogobiz.store.domain.Category , products:com.mogobiz.store.domain.Product , ticketTypes:com.mogobiz.store.domain.TicketType ,  rules:com.mogobiz.store.domain.ReductionRule , catalogs:com.mogobiz.store.domain.Catalog ]
 
     static transients = [ 'couponValidation', 'couponRender' ]
 
@@ -125,6 +125,8 @@ class Coupon
         rules column:"rules_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        catalogs column:"catalogs_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
