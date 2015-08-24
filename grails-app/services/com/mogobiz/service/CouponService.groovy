@@ -211,6 +211,12 @@ class CouponService {
         coupon.startDate = params.startDate
         coupon.endDate = params.endDate
 
+        def couponCatalogs = []
+        couponCatalogs += coupon.catalogs
+        couponCatalogs.each { catalog ->
+            coupon.removeFromCatalogs(catalog)
+        }
+
         // link with catalogs
         params.catalogs?.each { Catalog c ->
             coupon.addToCatalogs(c)
