@@ -211,6 +211,11 @@ class CouponService {
         coupon.startDate = params.startDate
         coupon.endDate = params.endDate
 
+        // link with catalogs
+        params.catalogs?.each { Catalog c ->
+            coupon.addToCatalogs(c)
+        }
+
         // link with categories
         params.categories?.each { Category c ->
             coupon.addToCategories(c)
