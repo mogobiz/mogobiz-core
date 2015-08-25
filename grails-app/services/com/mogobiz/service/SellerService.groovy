@@ -5,6 +5,7 @@ import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.*
 import com.mogobiz.tools.RandomPassword
 import com.mogobiz.utils.PermissionType
+import com.mogobiz.utils.SecureCodec
 import com.mogobiz.utils.SymmetricCrypt
 import grails.converters.JSON
 import grails.util.Holders
@@ -45,7 +46,7 @@ class SellerService {
         Company company = Company.findByCode(storecode)
         boolean creation = false
         if (company == null) {
-            company = new Company(code: storecode, name: storename)
+            company = new Company(code: storecode, name: storename, aesPassword: SecureCodec.genKey())
             companyService.save(company)
             creation = true
         }
