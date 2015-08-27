@@ -53,7 +53,7 @@ class CommerceService {
         // création des compagnies
         Company mogobiz = Company.findByCode("mogobiz")
         if (mogobiz == null) {
-            mogobiz = new Company(code: "mogobiz", name: "Mogobiz", location: adresseMogobiz, website: "http://www.ebiznext.com", aesPassword:"5c3f3da15cae1bf2bc736b95bda10c78", email:"contact@mogobiz.com")
+            mogobiz = new Company(code: "mogobiz", name: "Mogobiz", location: adresseMogobiz, website: "http://www.ebiznext.com", aesPassword:"5c3f3da15cae1bf2", email:"contact@mogobiz.com")
             GoogleEnv googleEnv = new GoogleEnv(
                     merchant_id: '100653663',
                     merchant_url: Holders.config.grails.serverURL,
