@@ -167,11 +167,12 @@ class TaxRateService {
      * @param active
      * @return the created LocalTaxRate or null if the given TaxRate doesn't not exist
      */
-    LocalTaxRate createLocalTaxRate(Company company, long taxRateId, String country, float rate, boolean active) {
+    LocalTaxRate createLocalTaxRate(Company company, long taxRateId, String country, String state, float rate, boolean active) {
         TaxRate taxRate = TaxRate.get(taxRateId);
         if (taxRate != null && taxRate.company.id == company.id) {
             LocalTaxRate localTaxRate = new LocalTaxRate();
             localTaxRate.countryCode = country;
+            localTaxRate.stateCode = state;
             localTaxRate.rate = rate;
             localTaxRate.active = active;
             if (localTaxRate.validate()) {
@@ -193,10 +194,11 @@ class TaxRateService {
      * @param active
      * @return the modified LocalTaxRate or null if the given LocalTaxRate doesn't exist
      */
-    LocalTaxRate updateLocalTaxRate(Company company, long localTaxRateId, float rate, boolean active) {
+    LocalTaxRate updateLocalTaxRate(Company company, long localTaxRateId, String state, float rate, boolean active) {
         TaxRate taxRate = findTaxRateFormLocalTaxRate(localTaxRateId)
         LocalTaxRate localTaxRate = LocalTaxRate.get(localTaxRateId);
         if (localTaxRate != null && taxRate != null && taxRate.company.id == company.id) {
+            localTaxRate.stateCode = state;
             localTaxRate.rate = rate;
             localTaxRate.active = active;
             if (localTaxRate.validate()) {

@@ -154,12 +154,13 @@ class TaxRateController {
 		Float rate = params.float("rate");
 		Boolean active = params.boolean("active");
 		String country = params["country"];
+		String state = params["state"];
 		if (taxRateId == null || rate == null || active == null || country == null) {
 			response.sendError HttpServletResponse.SC_BAD_REQUEST
 			return
 		}
 
-		LocalTaxRate localTaxRate = taxRateService.createLocalTaxRate(company, taxRateId, country, rate, active);
+		LocalTaxRate localTaxRate = taxRateService.createLocalTaxRate(company, taxRateId, country, state, rate, active);
 		renderLocalTaxRate(localTaxRate);
 	}
 
@@ -179,12 +180,13 @@ class TaxRateController {
 		Long localTaxRateId = params.long("localTaxRateId");
 		Float rate = params.float("rate");
 		Boolean active = params.boolean("active");
+        String state = params["state"];
 		if (localTaxRateId == null || rate == null || active == null) {
 			response.sendError HttpServletResponse.SC_BAD_REQUEST
 			return
 		}
 
-		LocalTaxRate localTaxRate = taxRateService.updateLocalTaxRate(company, localTaxRateId, rate, active);
+		LocalTaxRate localTaxRate = taxRateService.updateLocalTaxRate(company, localTaxRateId, state, rate, active);
 		renderLocalTaxRate(localTaxRate);
 	}
 	

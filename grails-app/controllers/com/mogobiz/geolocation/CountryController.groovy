@@ -25,6 +25,18 @@ class CountryController {
 		catch (CountryException ex) {
 			log.error(ex.message);
 			response.sendError HttpServletResponse.SC_NOT_FOUND
-		}	
+		}
 	}
+
+    def countryStates(String countryCode){
+        try
+        {
+            def sates = countryService.getCountryStates(countryCode)
+            render sates as JSON
+        }
+        catch (CountryException ex) {
+            log.error(ex.message);
+            response.sendError HttpServletResponse.SC_NOT_FOUND
+        }
+    }
 }

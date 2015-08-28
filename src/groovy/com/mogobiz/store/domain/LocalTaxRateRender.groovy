@@ -15,7 +15,7 @@ class LocalTaxRateRender
 
     java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.LocalTaxRate entity, String lang = 'fr') {
 		if (included == null || included.size() == 0) {
-			included = [ 'id', 'rate', 'active', 'countryCode']
+			included = [ 'id', 'rate', 'active', 'countryCode', 'stateCode']
 		}
 		return super.asMap(included, excluded, entity, lang);
 	}

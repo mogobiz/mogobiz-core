@@ -2,6 +2,7 @@ package com.mogobiz.service
 
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.store.domain.Country
+import com.mogobiz.store.domain.CountryAdmin
 import com.mogobiz.store.exception.CountryException
 
 class CountryService implements IperConstant {
@@ -50,4 +51,22 @@ class CountryService implements IperConstant {
 		}
 	}
 
+    /**
+     * Returns the list of country states. Each item of list contain a "code", "name" and "active"
+     * @param countryCode : the code of the country to get
+     * @return
+     */
+    def getCountryStates(String countryCode) throws CountryException {
+        Country country = Country.findByCode(countryCode);
+        if(country != null) {
+            try {
+                List<CountryAdmin> states =  CountryAdmin.findAllByCountryAndLevel(country, 1)
+                return states.sort { a, b -> a.name <=> b.name}
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+                throw new CountryException("Unable to retrieve states")
+            }
+        }
+    }
 }
