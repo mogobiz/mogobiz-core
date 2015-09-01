@@ -791,7 +791,7 @@ class ImportService {
                             String name = cols[7]
                             String price = cols[8]
                             String minorder = cols[9]
-                            String maxorder = cols[9]
+                            String maxorder = cols[10]
                             String sales = cols[11]
                             String startDate = cols[12]
                             String stopDate = cols[13]
