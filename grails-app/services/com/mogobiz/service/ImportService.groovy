@@ -902,8 +902,6 @@ class ImportService {
                     String sales = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
                     String displayStock = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
                     String calendar = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
-                    String startDate = row.getCell(13, Row.CREATE_NULL_AS_BLANK).toString()
-                    String stopDate = row.getCell(14, Row.CREATE_NULL_AS_BLANK).toString()
                     String startFeatDate = row.getCell(15, Row.CREATE_NULL_AS_BLANK).toString()
                     String stopFeatDate = row.getCell(16, Row.CREATE_NULL_AS_BLANK).toString()
                     String seo = row.getCell(17, Row.CREATE_NULL_AS_BLANK).toString()
@@ -915,7 +913,7 @@ class ImportService {
                     String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
                     String[] cols = [
                             catuuid, catpath, uuid, externalCode, code, name, xtype, price, state, description,
-                            sales, displayStock, calendar, startDate, stopDate, startFeatDate, stopFeatDate, seo,
+                            sales, displayStock, calendar, startFeatDate, stopFeatDate, seo,
                             tags, keywords, brandName, taxRateName, dateCreated, lastUpdated
                     ]
                     prodList.add(cols)
@@ -961,17 +959,15 @@ class ImportService {
                             String sales = cols[10]
                             String displayStock = cols[11]
                             String calendar = cols[12]
-                            String startDate = cols[13]
-                            String stopDate = cols[14]
-                            String startFeatDate = cols[15]
-                            String stopFeatDate = cols[16]
-                            String seo = cols[17]
-                            String tags = cols[18]
-                            String keywords = cols[19]
-                            String brandName = cols[20]
-                            String taxRateName = cols[21]
-                            String dateCreated = cols[22]
-                            String lastUpdated = cols[23]
+                            String startFeatDate = cols[13]
+                            String stopFeatDate = cols[14]
+                            String seo = cols[15]
+                            String tags = cols[16]
+                            String keywords = cols[17]
+                            String brandName = cols[18]
+                            String taxRateName = cols[19]
+                            String dateCreated = cols[20]
+                            String lastUpdated = cols[21]
 
                             Product p = new Product()
                             p.category = categories.get(catpath)
