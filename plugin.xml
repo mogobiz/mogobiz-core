@@ -24,7 +24,6 @@
     <resource>com.mogobiz.store.admin.KeyGenController</resource>
     <resource>com.mogobiz.store.admin.SellerController</resource>
     <resource>com.mogobiz.store.admin.SellerPasswordController</resource>
-    <resource>com.mogobiz.store.admin.SuiviVentesActiviteController</resource>
     <resource>com.mogobiz.store.admin.TaxRateController</resource>
     <resource>com.mogobiz.store.partner.BrandController</resource>
     <resource>com.mogobiz.store.partner.CatalogController</resource>
@@ -55,7 +54,6 @@
     <resource>com.mogobiz.store.partner.TranslationController</resource>
     <resource>com.mogobiz.store.partner.UploadController</resource>
     <resource>com.mogobiz.store.partner.VariationController</resource>
-    <resource>com.mogobiz.store.sale.SaleController</resource>
     <resource>com.mogobiz.store.validator.ValidatorController</resource>
     <resource>com.mogobiz.geolocation.domain.Location</resource>
     <resource>com.mogobiz.geolocation.domain.Poi</resource>
