@@ -198,11 +198,16 @@ class VariationController {
 		}
 		def variation = params['variation']?.id?Variation.get (params['variation']?.id):null
 		if(variation){
-			variation.delete(flush:true)
-			withFormat {
-				xml {  render [:] as XML }
-				json { render [:] as JSON }
-			}
+            try {
+                variation.delete(flush: true)
+                withFormat {
+                    xml {  render [:] as XML }
+                    json { render [:] as JSON }
+                }
+            }
+            catch (Exception){
+                response.sendError 403
+            }
 		}
 		else{
 			response.sendError 404
