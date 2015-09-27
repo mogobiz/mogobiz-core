@@ -61,7 +61,8 @@ class ImpexController {
                 File zipFile = exportService.export(catalogId)
                 response.setContentType("application/octet-stream")
                 response.setHeader("Content-Disposition", "Attachment;Filename=\"${zipFile.getName()}\"")
-                response.outputStream << zipFile.newInputStream()
+                zipFile.withInputStream { response.outputStream << it }
+                // response.outputStream << zipFile.newInputStream()
                 zipFile.delete()
                 log.info("EXPORT FINISHED")
                 Date end = new Date()
