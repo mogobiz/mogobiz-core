@@ -195,7 +195,7 @@ class TaxRateService {
      * @return the modified LocalTaxRate or null if the given LocalTaxRate doesn't exist
      */
     LocalTaxRate updateLocalTaxRate(Company company, long localTaxRateId, String state, float rate, boolean active) {
-        TaxRate taxRate = findTaxRateFormLocalTaxRate(localTaxRateId)
+        TaxRate taxRate = findTaxRateFromLocalTaxRate(localTaxRateId)
         LocalTaxRate localTaxRate = LocalTaxRate.get(localTaxRateId);
         if (localTaxRate != null && taxRate != null && taxRate.company.id == company.id) {
             localTaxRate.stateCode = state;
@@ -214,7 +214,7 @@ class TaxRateService {
      * @return the deleted LocalTaxRate of null if the given LocalTaxRate doesn't exist
      */
     LocalTaxRate deleteLocalTaxRate(Company company, long localTaxRateId) {
-        TaxRate taxRate = findTaxRateFormLocalTaxRate(localTaxRateId)
+        TaxRate taxRate = findTaxRateFromLocalTaxRate(localTaxRateId)
         LocalTaxRate localTaxRate = LocalTaxRate.get(localTaxRateId);
         if (localTaxRate != null && taxRate != null && taxRate.company.id == company.id) {
             taxRate.removeFromLocalTaxRates(localTaxRate);
@@ -230,7 +230,7 @@ class TaxRateService {
      * @param localTaxRateId
      * @return
      */
-    private TaxRate findTaxRateFormLocalTaxRate(long localTaxRateId) {
+    private TaxRate findTaxRateFromLocalTaxRate(long localTaxRateId) {
         return TaxRate.createCriteria().get() {
             localTaxRates { eq("id", localTaxRateId) }
         }

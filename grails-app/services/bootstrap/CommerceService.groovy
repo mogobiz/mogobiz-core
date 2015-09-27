@@ -75,7 +75,7 @@ class CommerceService {
             // création des TaxRate
             LocalTaxRate frTaxRate = new LocalTaxRate(rate: 19.6, active: true, countryCode: "FR");
             commonService.saveEntity(frTaxRate)
-            LocalTaxRate usaAlTaxRate = new LocalTaxRate(rate: 9.0, active: true, countryCode: "USA", stateCode: "USA.AL");
+            LocalTaxRate usaAlTaxRate = new LocalTaxRate(rate: 9.0, active: true, countryCode: "US", stateCode: "US.AL");
             commonService.saveEntity(usaAlTaxRate)
 
             TaxRate taxRate = new TaxRate(name: "TaxRate", company: mogobiz);
