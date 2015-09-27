@@ -3,6 +3,8 @@ package com.mogobiz.service
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Country
+import com.mogobiz.store.domain.CountryAdmin
 import com.mogobiz.store.domain.Coupon
 import com.mogobiz.store.domain.Feature
 import com.mogobiz.store.domain.FeatureValue
@@ -41,6 +43,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.concurrent.Future
 import java.util.zip.ZipFile
+import org.springframework.validation.ObjectError
 
 @Transactional
 class ImportService {
@@ -169,6 +172,20 @@ class ImportService {
                             String rate = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                             String active = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                             TaxRate t = TaxRate.findByNameAndCompany(name, catalog.company)
+                            Country country = Country.findByCode(countryCode)
+                            if (!country) {
+                                ObjectError err = new ObjectError("Country", "Invalid Country Code $countryCode")
+                                log.error(err)
+                                return [errors: [err], sheet: "taxrate", line: rownum]
+                            }
+                            if (stateCode?.length() > 0) {
+                                CountryAdmin adm = CountryAdmin.findByCountryAndCode(country, stateCode)
+                                if (!adm) {
+                                    ObjectError serr = new ObjectError("CountryAdmin", "Invalid state code Code $countryCode / $stateCode")
+                                    log.error(err)
+                                    return [errors: [serr], sheet: "taxrate", line: rownum]
+                                }
+                            }
                             if (!t) {
                                 t = new TaxRate()
                                 t.company = catalog.company
@@ -177,7 +194,7 @@ class ImportService {
                                 if (t.validate())
                                     t.save(flush: true)
                                 else {
-                                    t.errors.allErrors.each { println(it) }
+                                    t.errors.allErrors.each { log.error(it) }
                                     return [errors: t.errors.allErrors, sheet: "taxrate", line: rownum]
                                 }
                             }
@@ -199,7 +216,7 @@ class ImportService {
                                     t.save(flush: true)
                                 }
                             } else {
-                                l.errors.allErrors.each { println(it) }
+                                l.errors.allErrors.each { log.error(it) }
                                 return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
                             }
                         }
@@ -235,7 +252,7 @@ class ImportService {
                             if (sr.validate())
                                 sr.save(flush: true)
                             else {
-                                sr.errors.allErrors.each { println(it) }
+                                sr.errors.allErrors.each { log.error(it) }
                                 return [errors: sr.errors.allErrors, sheet: "shipping", line: rownum]
                             }
                         }
@@ -287,7 +304,7 @@ class ImportService {
                                 coupon.save(flush: true)
 
                             } else {
-                                coupon.errors.allErrors.each { println(it) }
+                                coupon.errors.allErrors.each { log.error(it) }
                                 return [errors: coupon.errors.allErrors, sheet: "coupon", line: rownum]
                             }
                         }
@@ -332,7 +349,7 @@ class ImportService {
                                     coupon.save(flush: true)
 
                                 } else {
-                                    coupon.errors.allErrors.each { println(it) }
+                                    coupon.errors.allErrors.each { log.error(it) }
                                     return [errors: coupon.errors.allErrors, sheet: "coupon-rule", line: rownum]
                                 }
                             }
@@ -369,7 +386,7 @@ class ImportService {
                                     coupon.save(flush: true)
 
                                 } else {
-                                    coupon.errors.allErrors.each { println(it) }
+                                    coupon.errors.allErrors.each { log.error(it) }
                                     return [errors: coupon.errors.allErrors, sheet: "coupon-use", line: rownum]
                                 }
                             }
@@ -410,7 +427,7 @@ class ImportService {
                                 b.save(flush: true)
                                 brands.put(name, b)
                             } else {
-                                b.errors.allErrors.each { println(it) }
+                                b.errors.allErrors.each { log.error(it) }
                                 return [errors: b.errors.allErrors, sheet: "cat-feature", line: rownum]
                             }
                         }
@@ -476,7 +493,7 @@ class ImportService {
                                     cat.save(flush: true)
                                     categories.put(path, cat)
                                 } else {
-                                    cat.errors.allErrors.each { println(it) }
+                                    cat.errors.allErrors.each { log.error(it) }
                                     return [errors: cat.errors.allErrors, sheet: "category", line: rownum]
                                 }
                             }
@@ -517,7 +534,7 @@ class ImportService {
                             f.save(flush: true)
                             features.put(uuid, f)
                         } else {
-                            f.errors.allErrors.each { println(it) }
+                            f.errors.allErrors.each { log.error(it) }
                             return [errors: f.errors.allErrors, sheet: "cat-feature", line: rownum]
                         }
 
@@ -556,7 +573,7 @@ class ImportService {
                             v.save(flush: false)
                             variations.put(catpath + "*" + name, v)
                         } else {
-                            v.errors.allErrors.each { println(it) }
+                            v.errors.allErrors.each { log.error(it) }
                             return [errors: v.errors.allErrors, sheet: "variation", line: rownum]
                         }
 
@@ -590,7 +607,7 @@ class ImportService {
                         // Variation.findByNameAndCategory(varname, categories.get(catpath)) // getCategoryFromPath(catpath, catalog))
 
                         if (v.variation == null) {
-                            println(varname + "->" + catpath)
+                            log.debug(varname + "->" + catpath)
                         }
                         v.externalCode = externalCode
                         v.value = value
@@ -600,7 +617,7 @@ class ImportService {
                             v.save(flush: true)
                             variationValues.put(catpath + "*" + varname + "*" + value, v)
                         } else {
-                            v.errors.allErrors.each { println(it) }
+                            v.errors.allErrors.each { log.error(it) }
                             return [errors: v.errors.allErrors, sheet: "variation-value", line: rownum]
                         }
 
@@ -654,7 +671,7 @@ class ImportService {
                             if (f.validate()) {
                                 f.save(flush: false)
                             } else {
-                                f.errors.allErrors.each { println(it) }
+                                f.errors.allErrors.each { log.error(it) }
                                 return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
                             }
                         }
@@ -696,7 +713,7 @@ class ImportService {
                         if (pp.validate())
                             pp.save(flush: false)
                         else {
-                            pp.errors.allErrors.each { println(it) }
+                            pp.errors.allErrors.each { log.error(it) }
                             return [errors: pp.errors.allErrors, sheet: "product-property", line: rownum]
                         }
                         countInserts++;
@@ -850,7 +867,7 @@ class ImportService {
                             if (t.validate())
                                 t.save(flush: false)
                             else {
-                                t.errors.allErrors.each { println(it) }
+                                t.errors.allErrors.each { log.error(it) }
                                 return [errors: t.errors.allErrors, sheet: "sku", line: rownum]
                             }
                             rownum++
@@ -1058,7 +1075,7 @@ class ImportService {
                                     }
                                 }
                             } else {
-                                p.errors.allErrors.each { println(it) }
+                                p.errors.allErrors.each { log.error(it) }
                                 return [errors: p.errors.allErrors, sheet: "product", line: rownum]
                             }
                             rownum++

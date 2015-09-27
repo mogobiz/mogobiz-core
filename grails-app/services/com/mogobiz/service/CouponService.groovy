@@ -180,15 +180,9 @@ class CouponService {
         if (coupon == null || seller.company.id != coupon.company.id) {
             throw new IllegalArgumentException("Unknown coupon")
         }
-        if (coupon.rules?.size() > 0) {
-            List<Long> ids = coupon.rules.collect { it.id }
-            ids.each {
-                coupon.removeFromRules(ReductionRule.load(it))
-            }
-        }
-        coupon.categories?.clear()
-        coupon.products?.clear()
-        coupon.ticketTypes?.clear()
+//        coupon.categories?.clear()
+//        coupon.products?.clear()
+//        coupon.ticketTypes?.clear()
         return createOrUpdate(coupon, params)
     }
 
@@ -211,8 +205,39 @@ class CouponService {
         coupon.startDate = params.startDate
         coupon.endDate = params.endDate
 
-        coupon.catalogs?.each { catalog ->
-            coupon.removeFromCatalogs(catalog)
+        if (coupon.rules?.size() > 0) {
+            List<Long> ids = coupon.rules.collect { it.id }
+            ids.each {
+                coupon.removeFromRules(ReductionRule.load(it))
+            }
+        }
+
+        if (coupon.catalogs?.size() > 0) {
+            List<Long> ids = coupon.catalogs.collect { it.id }
+            ids.each {
+                coupon.removeFromCatalogs(Catalog.load(it))
+            }
+        }
+
+        if (coupon.categories?.size() > 0) {
+            List<Long> ids = coupon.categories.collect { it.id }
+            ids.each {
+                coupon.removeFromCategories(Category.load(it))
+            }
+        }
+
+        if (coupon.products?.size() > 0) {
+            List<Long> ids = coupon.products.collect { it.id }
+            ids.each {
+                coupon.removeFromProducts(Product.load(it))
+            }
+        }
+
+        if (coupon.ticketTypes?.size() > 0) {
+            List<Long> ids = coupon.ticketTypes.collect { it.id }
+            ids.each {
+                coupon.removeFromTicketTypes(TicketType.load(it))
+            }
         }
 
         // link with catalogs
