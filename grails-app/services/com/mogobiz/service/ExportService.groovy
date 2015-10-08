@@ -25,7 +25,7 @@ class ExportService {
     def grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide"]
-    final List<String> catHeaders = ["uuid", "external-code", "path", "description", "keywords", "hide", "seo", "google", "deleted"]
+    final List<String> catHeaders = ["uuid", "external-code", "path", "position", "description", "keywords", "hide", "seo", "google", "deleted"]
     final List<String> featHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "domain", "name", "value", "hide"]
     final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide"]
     final List<String> varValHeaders = ["category-uuid", "category-path", "variation-uuid", "variation-name", "uuid", "external-code", "value", "google"]
@@ -55,7 +55,7 @@ class ExportService {
     }
 
     List<String> toArray(Category it) {
-        [it.uuid, it.externalCode, categoryService.path(it), it.description, it.keywords, it.hide, it.sanitizedName, it.googleCategory, it.deleted]
+        [it.uuid, it.externalCode, categoryService.path(it), it.position.toString(), it.description, it.keywords, it.hide, it.sanitizedName, it.googleCategory, it.deleted]
     }
 
     List<String> toArrayForCat(Feature it, int catRowNum) {

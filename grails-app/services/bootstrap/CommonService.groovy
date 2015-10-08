@@ -46,11 +46,11 @@ public class CommonService {
 		if (!permission) {
 			permission = new Permission(type:'org.apache.shiro.authz.permission.WildcardPermission', possibleActions:'*')
 			saveEntity(permission)
+            profileService.saveRolePermission(admin, true, PermissionType.ADMIN_COMPANY, ALL)
+            profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_PROFILES, ALL)
+            profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_USERS, ALL)
 		}
 
-        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_COMPANY, ALL)
-        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_PROFILES, ALL)
-        profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_USERS, ALL)
 
         // création de l'admin
         User userAdmin = User.findByLogin(Holders.config.superadmin.login)

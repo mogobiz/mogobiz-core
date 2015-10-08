@@ -181,7 +181,7 @@ class ImportService {
                             if (stateCode?.length() > 0) {
                                 CountryAdmin adm = CountryAdmin.findByCountryAndCode(country, stateCode)
                                 if (!adm) {
-                                    ObjectError serr = new ObjectError("CountryAdmin", "Invalid state code Code $countryCode / $stateCode")
+                                    ObjectError err = new ObjectError("CountryAdmin", "Invalid state code Code $countryCode / $stateCode")
                                     log.error(err)
                                     return [errors: [serr], sheet: "taxrate", line: rownum]
                                 }
@@ -209,7 +209,15 @@ class ImportService {
                             l.countryCode = countryCode ?: null
                             l.stateCode = stateCode ?: null
                             l.rate = rate.toFloat()
-                            if (l.validate()) {
+                            TaxRate tr = TaxRate.find {
+                                localTaxRates.uuid == l.uuid
+                            }
+                            if (tr.company != catalog.company) {
+                                ObjectError err = new ObjectError("Local Tax Rate with UUID $l.uuid exist for a different company $tr.company.code")
+                                log.error(err)
+                                return [errors: [serr], sheet: "taxrate", line: rownum]
+                            }
+                            else if (l.validate()) {
                                 l.save(flush: true)
                                 if (isNewLocalTaxRate) {
                                     t.addToLocalTaxRates(l)
@@ -461,16 +469,17 @@ class ImportService {
                             String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
                             String externalCode = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                             String path = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                            String description = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                            String keywords = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                            String hide = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                            String seo = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                            String google = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                            String deleted = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                            String position = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String description = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            String keywords = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                            String hide = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                            String seo = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                            String google = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                            String deleted = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
 
                             String[] paths = path.substring(1).split('/')
 
-                            int depth = paths.size()
+                            int depth = paths.length
                             if (depth == currentDepth) {
                                 Category parent = getParentCategoryFromPath(path.substring(1), catalog)
                                 Category cat = new Category()
@@ -480,6 +489,7 @@ class ImportService {
                                     cat.uuid = UUID.randomUUID().toString()
                                 cat.externalCode = externalCode
                                 cat.name = paths[depth - 1]
+                                cat.position = Double.parseDouble(position).intValue()
                                 cat.description = description
                                 cat.keywords = keywords
                                 cat.hide = hide.equalsIgnoreCase("true")
