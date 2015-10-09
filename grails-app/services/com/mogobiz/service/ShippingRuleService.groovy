@@ -28,15 +28,20 @@ class ShippingRuleService {
         if (seller?.company == null || cmd == null || !cmd.validate()) {
             throw new IllegalArgumentException()
         }
+        List<ShippingRule> shippingRules = ShippingRule.findAllByCompanyAndCountryCode(seller.company, cmd.countryCode)
 
-        ShippingRule shippingRule = ShippingRule.findByCompanyAndCountryCode(seller.company, cmd.countryCode)
-        if (shippingRule != null && (cmd.id == null || cmd.id != shippingRule.id)) {
-            shippingRule.errors.rejectValue("countryCode", "already.exist")
-            return shippingRule
+        ShippingRule foundRule = shippingRules.find {
+            (it.minAmount > cmd.minAmount || it.maxAmount >= cmd.minAmount) &&
+            (it.minAmount <= cmd.maxAmount) && (it.id != cmd.id || cmd.id == null)
+        }
+
+        if (foundRule != null) {
+            foundRule.errors.rejectValue("countryCode", "already.exist")
+            return foundRule
         }
 
         if (cmd.id != null) {
-            shippingRule = ShippingRule.get(cmd.id)
+            ShippingRule shippingRule = ShippingRule.get(cmd.id)
 
             if (shippingRule == null) {
                 shippingRule = new ShippingRule()
@@ -51,7 +56,7 @@ class ShippingRuleService {
                 shippingRule.delete()
             }
         }
-        shippingRule = new ShippingRule()
+        ShippingRule shippingRule = new ShippingRule()
         shippingRule.properties = cmd.properties
         shippingRule.company = seller.company
 
