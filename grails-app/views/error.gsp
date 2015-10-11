@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title><g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
+		<title>%{--
+  - Copyright (C) 2015 Mogobiz SARL. All rights reserved.
+  --}%
+
+<g:if env="development">Grails Runtime Exception</g:if><g:else>Error</g:else></title>
 		<meta name="layout" content="main">
 		<g:if env="development"><link rel="stylesheet" href="${resource(dir: 'css', file: 'errors.css')}" type="text/css"></g:if>
 	</head>

@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
+ */
+
 // license-header java merge-point
 /**
  * This is only generated once! It will never be overwritten.

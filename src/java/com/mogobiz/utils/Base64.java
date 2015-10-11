@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
+ */
+
 package com.mogobiz.utils;
 /**
  * <p>Encodes and decodes to and from Base64 notation.</p>

@@ -13,6 +13,10 @@ hibernate {
     singleSession = true // configure OSIV singleSession mode
 }
 
+/*
+ * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
+ */
+
 // environment specific settings
 environments {
     development {
