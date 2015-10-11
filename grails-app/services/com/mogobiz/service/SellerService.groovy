@@ -67,6 +67,7 @@ class SellerService {
 
         if(creation){
             companyService.createEsEnvAndCatalogAndProfiles(company, seller)
+            profileService.postUpdateUserProfiles(seller, true, true)
         }
 
         UsernamePasswordToken authToken = new UsernamePasswordToken(seller.login, seller.password)
