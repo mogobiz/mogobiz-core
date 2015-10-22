@@ -187,7 +187,7 @@ static transactional = false
         int countInserts = 0;
         // création des categories
         for (int i = 1; i <= level1; i++) {
-            commonService.createCategory("Main $i", null, mogobiz, performanceCatalog, 1, "hello, I am category Main $i from catalog ${performanceCatalog.name}");
+            commonService.createCategory("Main $i", null, mogobiz, performanceCatalog, 10 * i, "hello, I am category Main $i from catalog ${performanceCatalog.name}");
             Category cat1 = Category.findByNameAndCatalog("Main $i", performanceCatalog)
             commonService.createVariation("Couleur", 1, cat1, ["Blanc", "Rouge", "Noir"]);
             commonService.createVariation("Taille", 2, cat1, ["S", "M", "L"]);
@@ -204,7 +204,7 @@ static transactional = false
                         Catalog mogobizCatalog = Catalog.findByNameAndCompany("Performance Catalog", company)
                         Category cat = Category.findByNameAndCatalog("Main $i", mogobizCatalog)
                         TaxRate taxRate = TaxRate.findByNameAndCompany("TaxRate", company);
-                        Category subcat = commonService.createCategory("Sub $i$j", cat, company, mogobizCatalog, 1, "hello, I am category Sub $i$j from catalog ${mogobizCatalog.name}");
+                        Category subcat = commonService.createCategory("Sub $i$j", cat, company, mogobizCatalog, 10*j, "hello, I am category Sub $i$j from catalog ${mogobizCatalog.name}");
 
                         // création des variations
                         commonService.createTranslation(company, subcat.id, "en", '{"name": "SubName for en $i$j"}', "CATEGORY");

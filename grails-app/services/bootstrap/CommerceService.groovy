@@ -173,10 +173,10 @@ class CommerceService {
         }
 
         // création des categories
-        commonService.createCategory("Habillement", null, mogobiz, mogobizCatalog, 1, "vetements homme femme enfant");
-        Category parent = commonService.createCategory("Hightech", null, mogobiz, mogobizCatalog, 2);
-        commonService.createCategory("Télévisions", parent, mogobiz, mogobizCatalog, 1, "TV télé télévision HD");
-        commonService.createCategory("Cinéma", null, mogobiz, mogobizCatalog, 3);
+        commonService.createCategory("Habillement", null, mogobiz, mogobizCatalog, 10, "vetements homme femme enfant");
+        Category parent = commonService.createCategory("Hightech", null, mogobiz, mogobizCatalog, 20);
+        commonService.createCategory("Télévisions", parent, mogobiz, mogobizCatalog, 10, "TV télé télévision HD");
+        commonService.createCategory("Cinéma", null, mogobiz, mogobizCatalog, 30);
 
         // Récupération des éléménts nécessaires pour créer les autres entitées
         Company company = Company.findByCode("mogobiz");

@@ -103,7 +103,10 @@ class CategoryController {
                 company {
                     eq('id', seller.company.id)
                 }
-                if (parentId) {
+                catalog {
+                    eq('id', catalogId.toLong())
+                }
+                if (parentId != null && parentId.toLong() > 0) {
                     parent {
                         eq('id', parentId.toLong())
                     }
@@ -132,7 +135,19 @@ class CategoryController {
                 }
 
                 List<Category> categories = Category.withCriteria {
-                    parent { eq("id", parentId.toLong()) }
+                    company {
+                        eq('id', seller.company.id)
+                    }
+                    catalog {
+                        eq('id', catalogId.toLong())
+                    }
+                    if (parentId && parentId.toLong() > 0) {
+                        parent {
+                            eq('id', parentId.toLong())
+                        }
+                    } else {
+                        isNull('parent')
+                    }
                     order("position", "asc")
                 }
                 int pos = 0
@@ -168,10 +183,9 @@ class CategoryController {
             response.sendError 401
             return
         }
-        def company = seller.company
         def category = params['category']?.id ? Category.get(params['category']?.id) : null
         def par = params['category']?.parentId
-        if (category && category.company == company) {
+        if (category && category.company == seller.company) {
             long oldParentId = category.parent ? category.parent.id : -1
             long newParentId = par ? par.toLong() : -1
             int position = category.position
@@ -195,7 +209,19 @@ class CategoryController {
                 category.save(flush: true)
             }
             List<Category> categories = Category.withCriteria {
-                parent { eq("id", oldParentId) }
+                company {
+                    eq('id', seller.company.id)
+                }
+                catalog {
+                    eq('id', category.catalog.id)
+                }
+                if (oldParentId > 0) {
+                    parent {
+                        eq('id', oldParentId)
+                    }
+                } else {
+                    isNull('parent')
+                }
                 order("position", "asc")
             }
             int pos = 0
@@ -206,7 +232,19 @@ class CategoryController {
             }
             if (oldParentId != newParentId) {
                 categories = Category.withCriteria {
-                    parent { eq("id", newParentId) }
+                    company {
+                        eq('id', seller.company.id)
+                    }
+                    catalog {
+                        eq('id', category.catalog.id)
+                    }
+                    if (newParentId > 0) {
+                        parent {
+                            eq('id', newParentId)
+                        }
+                    } else {
+                        isNull('parent')
+                    }
                     order("position", "asc")
                 }
                 pos = 0
@@ -272,4 +310,5 @@ class CategoryController {
             response.sendError 403
         }
     }
+
 }
