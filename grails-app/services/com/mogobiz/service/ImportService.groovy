@@ -216,7 +216,7 @@ class ImportService {
                             TaxRate tr = TaxRate.find {
                                 localTaxRates.uuid == l.uuid
                             }
-                            if (tr.company != catalog.company) {
+                            if (tr != null && tr.company != catalog.company) {
                                 ObjectError err = new ObjectError("Local Tax Rate with UUID $l.uuid exist for a different company $tr.company.code")
                                 log.error(err)
                                 return [errors: [serr], sheet: "taxrate", line: rownum]
@@ -252,7 +252,7 @@ class ImportService {
                             String maxAmount = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
                             String price = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                             ShippingRule sr = ShippingRule.findByUuid(uuid)
-                            if (!sr) {
+                            if (sr == null) {
                                 sr = new ShippingRule()
                             }
                             sr.uuid = uuid ? uuid : UUID.randomUUID().toString()
