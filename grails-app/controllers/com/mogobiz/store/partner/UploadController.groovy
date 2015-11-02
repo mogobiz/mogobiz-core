@@ -198,6 +198,18 @@ class UploadController {
         }
     }
 
+
+    private List<Variation> getVariations(Category category) {
+        List<Variation> variations = Variation.findAllByCategory(category,[sort:'position',order:'asc'])
+        Category parent = category.parent
+        while (parent != null) {
+            variations.addAll(Variation.findAllByCategory(parent,[sort:'position',order:'asc']))
+            parent = parent.parent
+        }
+        return variations
+    }
+
+
     private processUploadResource(request, params, file) {
         log.debug("Processing Upload")
         def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
@@ -235,7 +247,7 @@ class UploadController {
             log.info(variationsAsString)
             def productId = params.product?.id as Long
             def category = productId ? Product.get(productId)?.category : null
-            def nbVariations = category ? Variation.findAllByCategory(category)?.size() : 0
+            def nbVariations = category ? getVariations(category)?.size() : 0
             if(nbVariations > 0){
                 def sb = new StringBuilder("__")
                 (0..nbVariations-1).each {
