@@ -18,6 +18,8 @@ import grails.util.Holders
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.crypto.hash.Sha256Hash
 
+import java.util.regex.Pattern
+
 /**
  * Controller utilis� pour g�rer le mot de passe des vendeurs
  *
@@ -67,6 +69,47 @@ class SellerPasswordController {
             }
         } else {
             response.sendError 404
+        }
+    }
+
+    /**
+     * Called to check if password meets requirements
+     * @param password
+     * @return
+     */
+    @Transactional(readOnly = true)
+    def isValidPassword(String password) {
+        boolean ok = _isValidPassword(password)
+        render ok as boolean;
+    }
+    private boolean _isValidPassword(String password) {
+        String pattern = grailsApplication.config.password.policy
+        Pattern p = Pattern.compile(pattern)
+        return p.matcher(password).matches();
+    }
+
+    /**
+     * called when a user updates his password
+     * @param id
+     * @return
+     */
+    @Transactional
+    def renewPassword(long id, String olPassword, String newPassword) {
+        User user = User.get(id)
+        if (user) {
+            def oldPwd = new Sha256Hash(olPassword)
+            println(newPassword)
+            println(user.password)
+            if (user.password == oldPwd.toString() &&  _isValidPassword(newPassword)) {
+                def newPwd = new Sha256Hash(newPassword)
+                user.password = newPwd.toString()
+                user.save(flush:true)
+                render true as boolean;
+            }
+            else {
+                println(_isValidPassword(newPassword))
+                response.sendError(401)
+            }
         }
     }
 
