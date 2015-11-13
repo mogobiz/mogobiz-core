@@ -106,8 +106,14 @@ class SellerPasswordController {
                 user.save(flush:true)
                 render true as boolean;
             }
-            else {
+            else if(user.password != oldPwd.toString()){
+                response.sendError(404)
+            }
+            else if(!_isValidPassword(newPassword)){
                 println(_isValidPassword(newPassword))
+                response.sendError(400)
+            }
+            else{
                 response.sendError(401)
             }
         }

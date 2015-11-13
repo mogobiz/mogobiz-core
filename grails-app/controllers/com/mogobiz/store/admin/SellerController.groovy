@@ -72,6 +72,7 @@ class SellerController {
             sellerService.setActiveCompany(seller, company)
             def map=[:]
             map.put("success", true)
+            map.put("company", company)
             withFormat {
                 json { render map as JSON }
             }
