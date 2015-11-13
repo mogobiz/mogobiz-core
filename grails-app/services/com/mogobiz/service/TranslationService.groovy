@@ -31,8 +31,8 @@ class TranslationService {
 	 * @param target
 	 * @return
 	 */
-	List<Map> list(long target) {
-		List<Translation> list = Translation.findAllByTarget(target);
+	List<Map> list(long target, String type) {
+		List<Translation> list = Translation.findAllByTargetAndType(target, type);
 		List<Map> result = [];
 		list.each { Translation t ->
 			result << t.asMapForJSON();
@@ -46,10 +46,10 @@ class TranslationService {
 	 * @param lang
 	 * @return
 	 */
-	AjaxResponse delete(long target, String lang) {
+	AjaxResponse delete(long target, String lang, String type) {
 		AjaxResponse result = new AjaxResponse()
 		
-		Translation t = Translation.findByTargetAndLang(target, lang);
+		Translation t = Translation.findByTargetAndLangAndType(target, lang, type);
 		if (t != null) {
 			t.delete()
 			result.success = true;
@@ -67,7 +67,7 @@ class TranslationService {
 	AjaxResponse update(User user, long target, String lang, String value, String type) {
 		AjaxResponse result = new AjaxResponse()
 
-		Translation t = Translation.findByTargetAndLang(target, lang);
+		Translation t = Translation.findByTargetAndLangAndType(target, type, lang);
 		if (t == null) {
 			t = new Translation(companyId: user.company.id, target: target, lang: lang, type: type)
 		}

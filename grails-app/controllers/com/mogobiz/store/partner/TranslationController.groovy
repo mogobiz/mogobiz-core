@@ -49,12 +49,13 @@ class TranslationController {
 		}
 
 		Long target = params.long("target")
-		if (target == null) {
+		String type = params["type"]
+		if (target == null || type == null) {
 			response.sendError HttpServletResponse.SC_BAD_REQUEST
 			return
 		}
 
-		render translationService.list(target) as JSON		
+		render translationService.list(target, type) as JSON
 	}
 	
 	/**
@@ -71,12 +72,13 @@ class TranslationController {
 
 		Long target = params.long("target")
 		String lang = params["language"]
-		if (target == null || lang == null) {
+		String type = params["type"]
+		if (target == null || lang == null || type == null) {
 			response.sendError HttpServletResponse.SC_BAD_REQUEST
 			return
 		}
 
-		AjaxResponse reponse = translationService.delete(target, lang);		
+		AjaxResponse reponse = translationService.delete(target, lang, type);
 		render reponse.asMap() as JSON		
 	}
 	
