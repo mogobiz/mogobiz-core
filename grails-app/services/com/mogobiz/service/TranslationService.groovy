@@ -49,7 +49,7 @@ class TranslationService {
 	AjaxResponse delete(long target, String lang, String type) {
 		AjaxResponse result = new AjaxResponse()
 		
-		Translation t = Translation.findByTargetAndLangAndType(target, lang, type);
+		Translation t = Translation.findByTargetTypeAndLang(target, type, lang);
 		if (t != null) {
 			t.delete()
 			result.success = true;
@@ -67,7 +67,7 @@ class TranslationService {
 	AjaxResponse update(User user, long target, String lang, String value, String type) {
 		AjaxResponse result = new AjaxResponse()
 
-		Translation t = Translation.findByTargetAndLangAndType(target, type, lang);
+		Translation t = Translation.findByTargetTypeAndLang(target, type, lang);
 		if (t == null) {
 			t = new Translation(companyId: user.company.id, target: target, lang: lang, type: type)
 		}

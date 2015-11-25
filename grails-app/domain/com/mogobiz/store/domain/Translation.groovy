@@ -87,6 +87,16 @@ class Translation
         companyId ( blank:false, nullable:false, unique:false)
     }
 
+    static com.mogobiz.store.domain.Translation findByTargetTypeAndLang(final long target, final java.lang.String type, final java.lang.String lang)
+    {
+        return Translation.findByTargetTypeAndLang("SELECT translation FROM Translation AS translation WHERE translation.target = :target AND translation.type = :type AND translation.lang = :lang", target, type, lang);
+    }
+
+    static com.mogobiz.store.domain.Translation findByTargetTypeAndLang(final java.lang.String queryString, final long target, final java.lang.String type, final java.lang.String lang)
+    {
+        def ret = Translation.executeQuery(queryString, [target:target,type:type,lang:lang]).iterator()
+        return ret.hasNext()?ret.next():null
+    }
 
     String toString(){return translationRender?.asString(this)}
 
