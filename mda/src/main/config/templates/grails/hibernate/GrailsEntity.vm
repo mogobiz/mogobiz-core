@@ -1,5 +1,5 @@
 ##
-##  authors: mourad.dachraoui@ebiznext.com, stephane.monciot@ebiznext.com
+##  authors: mourad.dachraoui@ebiznext.com, stephane.manciot@ebiznext.com
 ##  This macro will render any properties and associations.
 ##  $entity can be of type HibernateEntity or HibernateEmbeddedValue
 ##
