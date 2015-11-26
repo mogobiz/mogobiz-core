@@ -82,7 +82,6 @@ class Translation
         companyId ( blank:false, nullable:false, unique:false)
     }
 
-
     String toString(){return translationRender?.asString(this)}
 
     def beforeInsert = {
