@@ -152,11 +152,6 @@ class Company
      */
     com.mogobiz.store.domain.GoogleEnv googleEnv
 
-    /**
-     * 
-     */
-    com.mogobiz.store.domain.Warehouse warehouse 
-
     static embedded = [  'shippingCarriers' ]
 
     static transients = [ 'companyValidation', 'companyRender' ]
@@ -211,8 +206,6 @@ class Company
         googleContent column:"google_content_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         googleEnv column:"google_env_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
-
-        warehouse column:"warehouse_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -245,7 +238,6 @@ class Company
         location (nullable:true)
         googleContent (nullable:true)
         googleEnv (nullable:true)
-        warehouse (nullable:true)
     }
 
     static com.mogobiz.store.domain.Company findByName(final java.lang.String name)

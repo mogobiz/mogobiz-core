@@ -39,7 +39,12 @@ class Warehouse
     /**
      * 
      */
-    long pickDelayInMinutes     /**
+    long pickDelayInMinutes 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Company company 
+    /**
      * 
      */
     com.mogobiz.geolocation.domain.Location shipFrom
@@ -70,6 +75,8 @@ class Warehouse
         pickDelayInMinutes column:"pick_delay_in_minutes",insertable:true,updateable:true,lazy:false,cache:false
 
 
+        company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
         shipFrom column:"ship_from_fk",cascade :'delete',insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
@@ -80,6 +87,7 @@ class Warehouse
         name ( blank:false, nullable:false, unique:false)
         externalCode (nullable:true, unique:false)
         pickDelayInMinutes ( blank:false, nullable:false, unique:false)
+        company (nullable:true)
         shipFrom (nullable:true)
     }
 
