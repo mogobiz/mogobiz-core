@@ -5,6 +5,7 @@
 package com.mogobiz.store.domain
 
 import com.mogobiz.ValidationBase
+import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.SecureCodec
 
 /**
@@ -17,10 +18,14 @@ class CompanyValidation
     def beforeInsert(com.mogobiz.store.domain.Company entity) {
         if (entity.aesPassword == null)
             entity.aesPassword = SecureCodec.genKey()
+        if (!entity.code) entity.code = IperUtil.normalizeName(entity.name)
+        else entity.code = IperUtil.normalizeName(entity.code)
         super.beforeInsert(entity)
     }
 
     def beforeUpdate(com.mogobiz.store.domain.Company entity) {
+        if (!entity.code) entity.code = IperUtil.normalizeName(entity.name)
+        else entity.code = IperUtil.normalizeName(entity.code)
         super.beforeUpdate(entity)
     }
 

@@ -111,11 +111,9 @@ class CompanyService
         }
     }
 
-
     Map save(Company company) {
-        if (!company.code)
-            company.code = IperUtil.normalizeName(company.name)
-        company.code = company.code.toLowerCase()
+        if (!company.code) company.code = IperUtil.normalizeName(company.name)
+        else company.code = IperUtil.normalizeName(company.code)
         Company exist = Company.findByCode(company.code)
         if (exist) {
             throw new CompanyAlreadyExistException()

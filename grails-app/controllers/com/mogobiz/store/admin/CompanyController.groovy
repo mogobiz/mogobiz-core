@@ -166,8 +166,7 @@ class CompanyController {
 
     @Transactional(readOnly = true)
     def isNameNew() {
-        def normalizedName = IperUtil.normalizeName(params['name'])
-        def exist = Company.findByName(normalizedName)
+        def exist = Company.findByName(params['name'])
         def map = [:]
         map.put("result", exist ? "error" : "success")
         withFormat {
