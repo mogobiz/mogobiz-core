@@ -4,7 +4,6 @@ import grails.validation.Validateable
 
 /**
  *
- * Created by smanciot on 05/03/15.
  */
 @Validateable
 class UserProfileCommand {

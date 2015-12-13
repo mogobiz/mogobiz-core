@@ -27,7 +27,6 @@ import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  *
- * Created by smanciot on 10/02/15.
  */
 class ProfileController {
 

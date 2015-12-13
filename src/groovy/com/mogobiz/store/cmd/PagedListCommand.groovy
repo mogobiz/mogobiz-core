@@ -1,7 +1,6 @@
 package com.mogobiz.store.cmd
 
 /**
- * Created by yoannbaudy on 25/02/14.
  */
 public class PagedListCommand {
     Long pageSize;

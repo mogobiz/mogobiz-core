@@ -128,6 +128,7 @@
     <resource>com.mogobiz.store.domain.Variation</resource>
     <resource>com.mogobiz.store.domain.VariationValue</resource>
     <resource>com.mogobiz.store.domain.Warehouse</resource>
+    <resource>com.mogobiz.store.domain.WarehouseStock</resource>
     <resource>com.mogobiz.store.domain.Wishlist</resource>
     <resource>com.mogobiz.auth.AuthRealm</resource>
     <resource>bootstrap.CommerceService</resource>

@@ -5,7 +5,6 @@
 package com.mogobiz.store.vo;
 
 /**
- * Created by hayssams on 26/06/14.
  */
 public class Country {
     private long id;

@@ -7,7 +7,6 @@ package com.mogobiz.hibernate;
 import java.sql.Types;
 
 /**
- * Created by hayssams on 18/09/14.
  */
 public class OracleDialect extends org.hibernate.dialect.Oracle10gDialect {
     public OracleDialect() {

@@ -5,7 +5,6 @@ import org.grails.databinding.converters.ValueConverter
 
 /**
  *
- * Created by smanciot on 05/03/15.
  */
 @Log4j
 class PermissionTypeConverter implements ValueConverter{

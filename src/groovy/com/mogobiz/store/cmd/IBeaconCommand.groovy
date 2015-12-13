@@ -3,7 +3,6 @@ package com.mogobiz.store.cmd
 import grails.validation.Validateable
 
 /**
- * Created by yoannbaudy on 24/04/14.
  */
 @Validateable
 class IBeaconCommand {

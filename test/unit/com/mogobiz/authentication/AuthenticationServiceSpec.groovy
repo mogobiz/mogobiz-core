@@ -31,7 +31,6 @@ import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  *
- * Created by smanciot on 03/03/15.
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(AuthenticationService)

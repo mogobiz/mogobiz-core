@@ -6,7 +6,6 @@ import spock.lang.Specification
 
 /**
  *
- * Created by smanciot on 05/03/15.
  */
 @TestMixin(GrailsUnitTestMixin)
 class ProfileUtilsSpec extends Specification{

@@ -10,7 +10,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 
 /**
- * Created by hayssams on 21/07/14.
  */
 public class SymmetricCrypt {
     static public String encrypt(String clearText, String cryptoSecret, String cryptoAlgorithm) throws Exception {

@@ -15,7 +15,6 @@ import org.hibernate.criterion.Projection
 import org.hibernate.transform.ResultTransformer
 
 /**
- * Created by yoannbaudy on 25/04/14.
  */
 class PagedResultList extends grails.orm.PagedResultList {
 

@@ -8,7 +8,6 @@ import java.util.regex.Pattern
 
 /**
  *
- * Created by smanciot on 03/03/15.
  */
 final class ProfileUtils {
 

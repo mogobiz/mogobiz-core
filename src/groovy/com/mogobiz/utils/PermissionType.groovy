@@ -2,7 +2,6 @@ package com.mogobiz.utils
 
 /**
  *
- * Created by smanciot on 03/03/15.
  */
 enum PermissionType {
 
