@@ -258,6 +258,13 @@ class ExportService {
 
         List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
         brandRownum = 1
+        final String resourcesPath = grailsApplication.config.resources.path
+        final String companyCode = Catalog.get(catalogId).company.code
+
+
+        Path brandLogosDir = Paths.get(outDir.getAbsolutePath(), "__brandlogos__")
+        brandLogosDir.toFile().mkdirs()
+        List<String> brandLogos = []
         brands.each {
             brandCellnum = 0
             Row branRow = brandSheet.createRow(brandRownum++)
@@ -265,7 +272,29 @@ class ExportService {
                 Cell brandCell = branRow.createCell(brandCellnum++)
                 brandCell.setCellValue(it)
             }
+            final String brandId = it.id.toString()
+            String brandLogodPath = "$resourcesPath/brands/logos/$companyCode"
+            Path resUrl = Paths.get(brandLogodPath)
+            if (Files.exists(resUrl)) {
+                new File(brandLogodPath).listFiles(new FilenameFilter() {
+                    @Override
+                    boolean accept(File f, String name) {
+                        return name.startsWith(brandId)
+                    }
+                }).each {
+                    try {
+                        Files.copy(it.toPath(), Paths.get(brandLogosDir.toString(), it.getName()))
+                        brandLogos.add(it.getName())
+                    }
+                    catch (IOException ioe) {
+                        println(resUrl + "->" + outDir.getAbsolutePath() + "/" + brandId)
+                        ioe.printStackTrace()
+                    }
+                }
+            }
         }
+
+        new File(brandLogosDir.toFile(), '__brandlogos__').text = brandLogos.join('\t')
         taxRownum = 1
         List<TaxRate> taxRates = TaxRate.findAllByCompany(Catalog.get(catalogId).company)
         taxRates.each { tax ->

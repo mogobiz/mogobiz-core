@@ -197,8 +197,8 @@ class BrandController {
             user = authenticationService.retrieveAuthenticatedUser() as Seller
         }
         String logoName = brandId.toString()
-        final resourcesPath = grailsApplication.config.resources.path
-        final companyCode = user.company.code
+        final String resourcesPath = grailsApplication.config.resources.path
+        final String companyCode = user.company.code
         String dir = "$resourcesPath/brands/logos/$companyCode/"
         String resourcesDir = "$resourcesPath/resources/$companyCode/"
         [dir, resourcesDir].each {

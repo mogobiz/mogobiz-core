@@ -33,6 +33,7 @@ import com.mogobiz.store.domain.VariationValue
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.ZipFileUtil
 import grails.util.Holders
+import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFCell
@@ -43,6 +44,8 @@ import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
 
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.concurrent.Future
@@ -446,6 +449,26 @@ class ImportService {
                     }
                 }
             }
+        }
+        File brandsDir = new File(dateDir, "__brandlogos__")
+        File brandLogosFile = Paths.get(brandsDir.getAbsolutePath(), "__brandlogos__").toFile()
+        final resourcesPath = grailsApplication.config.resources.path
+        final companyCode = catalog.company.code
+        String brandsTargetDir = "$resourcesPath/brands/logos/$companyCode/"
+        File d = new File(brandsTargetDir)
+        d.mkdirs()
+        if (brandLogosFile.exists()) {
+            brandLogosFile.text.split('\t').each {
+                File logoTargetFile = new File(brandsTargetDir, it)
+                File logoFile = new File(brandsDir, it)
+                String brandId = it.substring(0, it.indexOf('.'))
+                logoTargetFile.delete()
+                FileUtils.copyFile(logoFile, logoTargetFile)
+                String resourcesDir = "$resourcesPath/resources/$companyCode"
+                String logoName = brandId
+                FileUtils.copyFile(logoFile, new File("${resourcesDir}/$logoName"))
+            }
+
         }
 
 
