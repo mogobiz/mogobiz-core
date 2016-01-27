@@ -6,6 +6,7 @@ package com.mogobiz.service
 
 import com.mogobiz.ajax.AjaxResponse
 import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Translation
 import com.mogobiz.store.domain.User
 import grails.util.Holders
@@ -22,8 +23,12 @@ class TranslationService {
      * Returns a list of configurable languages ​​by the Partner application
      * @return
      */
-    List<String> languages() {
-        return Holders.config.application.languages
+    List<String> languages(Seller seller) {
+        String defaultLanguage = seller?.company?.defaultLanguage
+        def languages = Holders.config.application.languages;
+        return languages.findAll {String l ->
+            l != defaultLanguage
+        }
     }
 
     /**

@@ -33,7 +33,7 @@ class TranslationController {
 			return
 		}
 
-		render translationService.languages() as JSON
+		render translationService.languages(seller) as JSON
 	}
 	
 	/**
