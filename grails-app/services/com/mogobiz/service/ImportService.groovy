@@ -4,6 +4,7 @@
 
 package com.mogobiz.service
 
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Catalog
@@ -23,14 +24,17 @@ import com.mogobiz.store.domain.ReductionRule
 import com.mogobiz.store.domain.ReductionRuleType
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.ShippingRule
 import com.mogobiz.store.domain.Stock
 import com.mogobiz.store.domain.Tag
 import com.mogobiz.store.domain.TaxRate
 import com.mogobiz.store.domain.TicketType
+import com.mogobiz.store.domain.User
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
 import com.mogobiz.utils.IperUtil
+import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.ZipFileUtil
 import grails.util.Holders
 import org.apache.commons.io.FileUtils
@@ -44,7 +48,6 @@ import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
 
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -59,6 +62,7 @@ class ImportService {
     ResService resService
     def grailsApplication
     SessionFactory sessionFactory
+    ProfileService profileService
 
     int FLUSHSIZE = Holders.config.importCatalog.flushsize ?: 100
 
@@ -127,7 +131,9 @@ class ImportService {
         return impexDir
     }
 
-    Map ximport(Catalog catalog, ZipFile zipFile) {
+    Map ximport(long catalogId, long sellerId, ZipFile zipFile) {
+        User seller = Seller.get(sellerId)
+        Catalog catalog = Catalog.get(catalogId)
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File impexDir = getImportDir(now)
         ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
@@ -190,7 +196,7 @@ class ImportService {
                                 if (!adm) {
                                     ObjectError err = new ObjectError("CountryAdmin", "Invalid state code Code $countryCode / $stateCode")
                                     log.error(err)
-                                    return [errors: [serr], sheet: "taxrate", line: rownum]
+                                    return [errors: [err], sheet: "taxrate", line: rownum]
                                 }
                             }
                             if (!t) {
@@ -667,7 +673,7 @@ class ImportService {
         log.info("Importing products")
         Map<String, Product> products = new HashMap<String, Product>().asSynchronized()
         int countRows = prdSheet.getPhysicalNumberOfRows()
-        importProducts(brands, categories, sheets, prdSheet, taxRates, catalog, dateDir, products, 1, countRows)
+        importProducts(brands, categories, sheets, prdSheet, taxRates, catalog, dateDir, products, 1, countRows, seller)
 
         int countInserts = 0;
         log.info("Importing product features")
@@ -932,7 +938,7 @@ class ImportService {
     }
 
     @Transactional
-    Integer importProducts(Map<String, Brand> brands, Map<String, Category> categories, Map<String, XSSFSheet> sheets, XSSFSheet prdSheet, Map<String, TaxRate> taxRates, Catalog catalog, File dateDir, Map<String, Product> products, int startLine, int countLines) {
+    Integer importProducts(Map<String, Brand> brands, Map<String, Category> categories, Map<String, XSSFSheet> sheets, XSSFSheet prdSheet, Map<String, TaxRate> taxRates, Catalog catalog, File dateDir, Map<String, Product> products, int startLine, int countLines, Seller seller) {
         List<String[]> prodList = new ArrayList<>(countLines)
         log.info("Preloading products ...")
         for (int rownum = startLine; rownum < startLine + countLines; rownum++) {
@@ -1128,6 +1134,18 @@ class ImportService {
         futures.each {
             it.get()
         }
+
+        Category.findAllByCatalog(catalog).each { category ->
+            profileService.saveUserPermission(
+                    seller,
+                    true,
+                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                    catalog.company.id as String,
+                    catalog.id as String,
+                    category.id as String
+            )
+        }
+
         return countLines
     }
 

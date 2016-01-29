@@ -27,7 +27,6 @@ class ImpexController {
     CatalogService catalogService
     AuthenticationService authenticationService
     ImportService importService
-
     ProfileService profileService
 
     @Transactional
@@ -77,7 +76,7 @@ class ImpexController {
             }
         } else {
             log.info("EXPORT COULD NOT START")
-            render text:"Impex currently busy running", status:403
+            render text: "Impex currently busy running", status: 403
         }
     }
 
@@ -93,85 +92,91 @@ class ImpexController {
                 log.info("Uploading file ...")
                 def file = request.getFile('file')
                 if (file && !file.empty) {
-                    log.info("IMPORT STARTED")
-                    Date start = new Date()
-                    File tmpFile = File.createTempFile("import", ".zip")
-                    file.transferTo(tmpFile)
-                    Company company = seller.company
-                    def name = "impex"
-                    int countSales = 0
-                    Catalog catalog = null
-                    Catalog.withNewTransaction {
-                        catalog = Catalog.findByNameAndCompany(name, seller.company)
-                        if (catalog) {
-                            log.info("Purging catalog ...")
-                            countSales = catalogService.purge(catalog.id)
-                            log.info("Purge ended ...")
+                    try {
+                        log.info("IMPORT STARTED")
+                        Date start = new Date()
+                        File tmpFile = File.createTempFile("import", ".zip")
+                        file.transferTo(tmpFile)
+                        Company company = seller.company
+                        def name = "impex"
+                        int countSales = 0
+                        Catalog catalog = null
+                        Catalog.withNewTransaction {
+                            catalog = Catalog.findByNameAndCompany(name, seller.company)
+                            if (catalog) {
+                                log.info("Purging catalog ...")
+                                countSales = catalogService.purge(catalog.id)
+                                log.info("Purge ended ...")
+                            }
                         }
-                    }
-                    if (countSales == 0) {
-                        catalog = new Catalog()
-                        catalog.company = company
-                        catalog.name = name
-                        catalog.activationDate = new Date(2040 - 1900, 11, 31)
-                        catalog.uuid = UUID.randomUUID().toString()
-                        if (catalog.validate()) {
-                            Catalog.withNewTransaction {
-                                catalog.save(flush: true)
+                        if (countSales == 0) {
+                            catalog = new Catalog()
+                            catalog.company = company
+                            catalog.name = name
+                            catalog.activationDate = new Date(2040 - 1900, 11, 31)
+                            catalog.uuid = UUID.randomUUID().toString()
+                            if (catalog.validate()) {
+                                Catalog.withNewTransaction {
+                                    catalog.save(flush: true)
+                                }
+                            } else {
+                                System.out.println(catalog.errors)
+                                catalog = null
+                            }
+                        }
+
+                        if (countSales == 0 && catalog) {
+                            importService.ximport(catalog, new ZipFile(tmpFile))
+                            tmpFile.delete()
+                            withFormat {
+                                json { render catalog as JSON }
                             }
                         } else {
-                            System.out.println(catalog.errors)
-                            catalog = null
+                            tmpFile.delete()
+                            render text: "$countSales", status: 403
                         }
-                    }
 
-                    if (countSales == 0 && catalog) {
-                        importService.ximport(catalog, new ZipFile(tmpFile))
-                        tmpFile.delete()
-                        withFormat {
-                            json { render catalog as JSON }
-                        }
-                    } else {
-                        tmpFile.delete()
-                        render text:"$countSales", status:403
-                    }
-
-                    if(catalog){
-                        profileService.saveUserPermission(
-                                seller,
-                                true,
-                                PermissionType.UPDATE_STORE_CATALOG,
-                                company.id as String,
-                                catalog.id as String
-                        )
-                        Category.findAllByCatalog(catalog).each { category ->
+                        if (catalog) {
                             profileService.saveUserPermission(
                                     seller,
                                     true,
-                                    PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                                    PermissionType.UPDATE_STORE_CATALOG,
                                     company.id as String,
-                                    catalog.id as String,
-                                    category.id as String
+                                    catalog.id as String
                             )
+                            Category.findAllByCatalog(catalog).each { category ->
+                                profileService.saveUserPermission(
+                                        seller,
+                                        true,
+                                        PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                                        company.id as String,
+                                        catalog.id as String,
+                                        category.id as String
+                                )
+                            }
                         }
-                    }
 
-                    log.info("IMPORT FINISHED")
-                    Date end = new Date()
-                    log.info("IMPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
+                        log.info("IMPORT FINISHED")
+                        Date end = new Date()
+                        log.info("IMPORT DURATION (in seconds) =" + (end.getTime() - start.getTime()) / 1000)
+                    }
+                    finally {
+                        lock.unlock()
+                    }
                 } else {
+                    lock.unlock()
                     withFormat {
-                        html {render text:"Error: Missing input file", status:200 }
-                        json { render text:"Missing input file", status:401 }
+                        html { render text: "Error: Missing input file", status: 200 }
+                        json { render text: "Missing input file", status: 401 }
                     }
                 }
             }
-            finally {
+            catch (Throwable e) {
                 lock.unlock()
             }
         } else {
             log.info("IMPORT COULD NOT START")
-            render text:"Impex currently busy running", status:401
+            render text: "Impex currently busy running", status: 401
         }
     }
 }

@@ -110,7 +110,7 @@ class ExportService {
 
     }
 
-    File export(long catalogId, Category parent = null, boolean deleted = false) {
+    File export(long catalogId, File xlsFile, File zipFile, Category parent = null, boolean deleted = false) {
         int catRownum = 0
         int catfeatRownum = 0
         int varRownum = 0
@@ -251,16 +251,11 @@ class ExportService {
             couponUseCell.setCellValue(it)
         }
 
-        String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
-        File outDir = getExportDir(now)
-        File xlsFile = new File(outDir, "mogobiz.xlsx")
-        File zipFile = new File(outDir.getParentFile(), "mogobiz-${now}.zip")
-
         List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
         brandRownum = 1
         final String resourcesPath = grailsApplication.config.resources.path
         final String companyCode = Catalog.get(catalogId).company.code
-
+        File outDir = xlsFile.getParentFile()
 
         Path brandLogosDir = Paths.get(outDir.getAbsolutePath(), "__brandlogos__")
         brandLogosDir.toFile().mkdirs()
