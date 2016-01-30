@@ -93,7 +93,7 @@ class SuggestionsController {
             }
             company = seller.company
         }
-        List<Product> dbProducts = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and p.deleted = false and p.company = :company and d.id = :cid and p.name like :fullSearch order by p.name asc", [company: company, cid: cid, fullSearch: fullSearch], [max: 100])
+        List<Product> dbProducts = Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and p.deleted = false and p.company = :company and d.id = :cid and lower(p.name) like lower(:fullSearch) order by p.name asc", [company: company, cid: cid, fullSearch: fullSearch], [max: 100])
         dbProducts.each {
             println(it)
         }
