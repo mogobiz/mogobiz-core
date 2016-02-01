@@ -48,7 +48,8 @@ public class CommonService {
 		// permissions
 		Permission permission = Permission.findByTypeAndPossibleActions('org.apache.shiro.authz.permission.WildcardPermission', '*');
 		if (!permission) {
-			permission = saveEntity(new Permission(type:'org.apache.shiro.authz.permission.WildcardPermission', possibleActions:'*')) as Permission
+			permission = new Permission(type:'org.apache.shiro.authz.permission.WildcardPermission', possibleActions:'*')
+			saveEntity(permission)
             profileService.saveRolePermission(admin, true, PermissionType.ADMIN_COMPANY, ALL)
             profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_PROFILES, ALL)
             profileService.saveRolePermission(admin, true, PermissionType.ADMIN_STORE_USERS, ALL)
@@ -60,45 +61,53 @@ public class CommonService {
         if(userAdmin == null) {
             userAdmin = new User(login:Holders.config.superadmin.login, email:Holders.config.superadmin.email, password:Holders.config.superadmin.password, active:true)
             userAdmin.addToRoles(admin)
-            userAdmin = saveEntity(userAdmin) as User
+            saveEntity(userAdmin)
         }
 
         // création des variations google
         GoogleVariationType gender = GoogleVariationType.findByXtype('gender')
         if(gender == null){
-            gender = saveEntity(new GoogleVariationType(xtype: 'gender')) as GoogleVariationType
+            gender = new GoogleVariationType(xtype: 'gender')
+            saveEntity(gender)
         }
         ['male', 'female', 'unisex'].each {value ->
             GoogleVariationValue val = GoogleVariationValue.findByValueAndType(value, gender)
             if(val == null){
-                val = saveEntity(new GoogleVariationValue(value:value, type: gender)) as GoogleVariationValue
+                val = new GoogleVariationValue(value:value, type: gender)
+                saveEntity(val)
             }
         }
         GoogleVariationType age_group = GoogleVariationType.findByXtype('age group')
         if(age_group == null){
-            age_group = saveEntity(new GoogleVariationType(xtype: 'age group')) as GoogleVariationType
+            age_group = new GoogleVariationType(xtype: 'age group')
+            saveEntity(age_group)
         }
         ['adults', 'kids'].each {value ->
             GoogleVariationValue val = GoogleVariationValue.findByValueAndType(value, age_group)
             if(val == null){
-                val = saveEntity(new GoogleVariationValue(value:value, type: age_group)) as GoogleVariationValue
+                val = new GoogleVariationValue(value:value, type: age_group)
+                saveEntity(val)
             }
         }
         GoogleVariationType color = GoogleVariationType.findByXtype('color')
         if(color == null){
-            color = saveEntity(new GoogleVariationType(xtype: 'color')) as GoogleVariationType
+            color = new GoogleVariationType(xtype: 'color')
+            saveEntity(color)
         }
         GoogleVariationType size = GoogleVariationType.findByXtype('size')
         if(size == null){
-            size = saveEntity(new GoogleVariationType(xtype: 'size')) as GoogleVariationType
+            size = new GoogleVariationType(xtype: 'size')
+            saveEntity(size)
         }
         GoogleVariationType material = GoogleVariationType.findByXtype('material')
         if(material == null){
-            material = saveEntity(new GoogleVariationType(xtype: 'material')) as GoogleVariationType
+            material = new GoogleVariationType(xtype: 'material')
+            saveEntity(material)
         }
         GoogleVariationType pattern = GoogleVariationType.findByXtype('pattern')
         if(pattern == null){
-            pattern = saveEntity(new GoogleVariationType(xtype: 'pattern')) as GoogleVariationType
+            pattern = new GoogleVariationType(xtype: 'pattern')
+            saveEntity(pattern)
         }
 
         EsEnv.findAll().each {env ->
@@ -215,21 +224,20 @@ public class CommonService {
         // begin stuff to export bo entities for mogopay
         def all = Company.findByCode(ALL)
         if(!all){
-            all = saveEntity(new Company(code: ALL, name: "ALL", aesPassword: SecureCodec.genKey())) as Company
+            all = new Company(code: ALL, name: "ALL", aesPassword: SecureCodec.genKey())
+            saveEntity(all)
         }
         def esEnv = EsEnv.findByCompanyAndName(all, "mogopay")
         if(!esEnv){
-            esEnv =
-                    saveEntity(
-                            new EsEnv(company: all, name: "mogopay", cronExpr: "0 0 0 * * ?", url: Holders.config.mogopay?.elasticsearch?.serverURL as String, active: false)
-                    ) as EsEnv
+            esEnv = new EsEnv(company: all, name: "mogopay", cronExpr: "0 0 0 * * ?", url: Holders.config.mogopay?.elasticsearch?.serverURL as String, active: false)
+            saveEntity(esEnv)
         }
         profileService.saveUserPermission(
                 userAdmin,
                 true,
                 PermissionType.PUBLISH_BO_TO_MOGOPAY,
                 ALL,
-                esEnv?.id as String
+                esEnv.id as String
         )
         // end stuff to export bo entities for mogopay
 	}
@@ -238,7 +246,8 @@ public class CommonService {
 	{
 		Feature feature = Feature.findByNameAndValueAndProduct(name, value, product)
 		if (feature == null) {
-			feature = saveEntity(new Feature(name : name, position: position, uuid:UUID.randomUUID().toString(), value:value, product:product), flush) as Feature
+			feature = new Feature(name : name, position: position, uuid:UUID.randomUUID().toString(), value:value, product:product)
+			saveEntity(feature, flush)
 		}
 		return feature
 	}
@@ -248,7 +257,8 @@ public class CommonService {
 		Brand brand = Brand.findByNameAndCompany(name, company);
 		if (brand == null)
 		{
-			brand = saveEntity(new Brand(name: name, website: website, company: company, hide: hide)) as Brand
+			brand = new Brand(name: name, website: website, company: company, hide: hide);
+			saveEntity(brand);
 		}
 		return brand;
 	}
@@ -258,7 +268,8 @@ public class CommonService {
         Tag tag = Tag.findByName(name);
         if (tag == null)
         {
-            tag = saveEntity(new Tag(name: name, company:company)) as Tag
+            tag = new Tag(name: name, company:company);
+            saveEntity(tag);
         }
         return tag;
     }
@@ -270,7 +281,7 @@ public class CommonService {
         tr.value = builder.toString()
         tr.validate()
         if(!tr.hasErrors()){
-            tr = saveEntity(tr, false) as Translation
+            saveEntity(tr, false)
         }
         else{
             tr.errors.allErrors.each {
@@ -285,26 +296,29 @@ public class CommonService {
 		Variation variation = Variation.findByNameAndCategory(name, category);
 		if (variation == null)
 		{
-			variation = saveEntity(new Variation(name: name, position: position, hide: false, uuid: name, category: category)) as Variation
+			variation = new Variation(name: name, position: position, hide: false, uuid: name, category: category);
+            saveEntity(variation);
 
 			// création des valeurs possibles
 			listeValeurs.eachWithIndex { String valeur, int index ->
-				VariationValue variationValue = saveEntity(new VariationValue(value: valeur, position: index, variation:variation)) as VariationValue
+				VariationValue variationValue = new VariationValue(value: valeur, position: index, variation:variation);
+				saveEntity(variationValue);
 				variation.addToVariationValues(variationValue);
 			}
-            variation = saveEntity(variation) as Variation
+			saveEntity(variation);
 		}
 		return variation;
 	}
 
     public Suggestion createSuggestion(boolean required, int position, String discount, Product product, Product pack){
-        Suggestion suggestion = saveEntity(new Suggestion(
+        Suggestion suggestion = new Suggestion(
                 required:required,
                 position:position,
                 discount:discount,
                 product: product,
-                pack:pack)
-        ) as Suggestion
+                pack:pack
+        )
+        saveEntity(suggestion)
         return suggestion
     }
 
@@ -327,38 +341,36 @@ public class CommonService {
 		if (product == null)
 		{
             if (shipping) {
-                shipping = saveEntity(shipping) as Shipping
+                saveEntity(shipping)
             }
 
-			product = saveEntity(
-                    new Product(
-                            code: code,
-                            name: name,
-                            price: montant,
-                            description: description,
-                            descriptionAsText: description,
-                            xtype: xtype,
-                            state: ProductState.ACTIVE,
-                            startDate: getDateDebutAnnee(),
-                            stopDate: getDateFinAnnee(),
-                            startFeatureDate: getDateDebutMois(),
-                            stopFeatureDate: getDateFinMois(),
-                            calendarType: calendarType,
-                            sanitizedName: sanitizeUrlService.sanitizeWithDashes(name),
-                            company: company,
-                            brand: brand,
-                            category: category,
-                            shipping: shipping,
-                            taxRate: taxRate,
-                            keywords: keywords),
-                    flush
-            ) as Product
+			product = new Product(code: code,
+				name: name,
+				price: montant,
+				description: description,
+				descriptionAsText: description,
+				xtype: xtype,
+				state: ProductState.ACTIVE,
+				startDate: getDateDebutAnnee(),
+				stopDate: getDateFinAnnee(),
+				startFeatureDate: getDateDebutMois(),
+				stopFeatureDate: getDateFinMois(),
+				calendarType: calendarType,
+				sanitizedName: sanitizeUrlService.sanitizeWithDashes(name),
+				company: company,
+				brand: brand,
+				category: category,
+                shipping: shipping,
+                taxRate: taxRate,
+                keywords: keywords
+			);
+			saveEntity(product, flush);
 
             if(!tags?.isEmpty()){
                 tags.each {
                     product.addToTags(it)
                 }
-                product = saveEntity(product) as Product
+                saveEntity(product)
             }
 		}
 		return product;
@@ -369,28 +381,20 @@ public class CommonService {
 		Translation translation = Translation.findByTargetAndLang(target, lang);
 		if (translation == null)
 		{
-			translation = saveEntity(new Translation(companyId: company.id, target: target, lang: lang, value: value, type: type), flush) as Translation
+			translation = new Translation(companyId: company.id, target: target, lang: lang, value: value, type: type);
+			saveEntity(translation, flush);
 		}
-		return translation
+		return translation;
 	}
 
 	public IntraDayPeriod createIntraDayPeriod(Product product, Calendar startDate, Calendar endDate, boolean weekday1, boolean weekday2, boolean weekday3, boolean weekday4, boolean weekday5, boolean weekday6, boolean weekday7) {
 		IntraDayPeriod period = IntraDayPeriod.findByStartDateAndProduct(startDate, product);
 		if (period == null) {
-			period = saveEntity(
-                    new IntraDayPeriod(
-                            startDate: startDate,
-                            endDate: endDate,
-                            weekday1: false,
-                            weekday2: false,
-                            weekday3: false,
-                            weekday4: false,
-                            weekday5: false,
-                            weekday6: true,
-                            weekday7: true,
-                            product: product
-                    )
-            ) as IntraDayPeriod
+			period = new IntraDayPeriod(startDate: startDate, endDate: endDate,
+				weekday1: false, weekday2: false, weekday3: false, weekday4: false, weekday5: false, weekday6: true, weekday7: true,
+				product: product
+			);
+			saveEntity(period);
 		}
 		return period
 	}
@@ -400,82 +404,68 @@ public class CommonService {
 		TicketType sku = TicketType.findByNameAndProduct(name, produit);
 		if (sku == null)
 		{
-			Stock stock = saveEntity(new Stock(stock: Math.max(0, nombreEnStock), stockUnlimited: (nombreEnStock == -1L))) as Stock
+			Stock stock = new Stock(stock: Math.max(0, nombreEnStock), stockUnlimited: (nombreEnStock == -1));
+			saveEntity(stock);
 
-			sku = new TicketType(
-                    sku:UUID.randomUUID().toString(),
-                    name: name,
-                    price: montant,
-                    minOrder: 1,
-                    maxOrder: 10,
-                    product: produit,
-                    stock: stock,
-                    startDate: produit.startDate,
-                    stopDate: produit.stopDate
-            )
+			sku = new TicketType(sku:UUID.randomUUID().toString(), name: name, price: montant, minOrder: 1, maxOrder: 10, product: produit, stock: stock, startDate: produit.startDate, stopDate: produit.stopDate);
 			if (variation1 != null)
 			{
-				sku.variation1 = VariationValue.findByValue(variation1)
+				sku.variation1 = VariationValue.findByValue(variation1);
 			}
 			if (variation2 != null)
 			{
-				sku.variation2 = VariationValue.findByValue(variation2)
+				sku.variation2 = VariationValue.findByValue(variation2);
 			}
 			if (variation3 != null)
 			{
-				sku.variation3 = VariationValue.findByValue(variation3)
+				sku.variation3 = VariationValue.findByValue(variation3);
 			}
-			sku = saveEntity(sku, flush) as TicketType
+			saveEntity(sku, flush);
 		}
-		return sku
+		return sku;
 	}
 
     public BOCart createBOCart(Company company, String transactionUUID) {
         BOCart boCart = BOCart.findByTransactionUuid(transactionUUID)
         if(boCart == null){
-            boCart = saveEntity(
-                    new BOCart(
-                            transactionUuid : transactionUUID,
-                            buyer: "yoann.baudy@ebiznext.com",
-                            date : Calendar.getInstance(),
-                            price : 10000,
-                            status : TransactionStatus.PENDING,
-                            currencyCode : "EUR",
-                            currencyRate : 0.01,
-                            company: company
-                    )
-            ) as BOCart
+            boCart = new BOCart(
+                    transactionUuid : transactionUUID,
+                    buyer: "yoann.baudy@ebiznext.com",
+                    date : Calendar.getInstance(),
+                    price : 10000,
+                    status : TransactionStatus.PENDING,
+                    currencyCode : "EUR",
+                    currencyRate : 0.01,
+                    company: company
+            )
+            saveEntity(boCart);
         }
-        return boCart
+        return boCart;
     }
 
     public BOCartItem createBOCartItem(BOCart boCart, Product product, TicketType ticketType, Calendar startDate, Calendar endDate, RegisteredCartItemVO registeredCartItem) {
         // Création du BOProduct correspondant au produit principal
-        BOProduct boProduct = saveEntity(
-                new BOProduct(
-                        principal : true,
-                        product : product,
-                        price : 10000
-                )
-        ) as BOProduct
+        BOProduct boProduct = new BOProduct(
+                principal : true,
+                product : product,
+                price : 10000)
+        saveEntity(boProduct);
 
         if (registeredCartItem != null) {
             // Création des BOTicketType (SKU)
-            BOTicketType boTicket = saveEntity(
-                    new BOTicketType(
-                            quantity : 1,
-                            price : 10000,
-                            ticketType : ticketType.name,
-                            firstname : registeredCartItem.firstname,
-                            lastname : registeredCartItem.lastname,
-                            email : registeredCartItem.email,
-                            phone : registeredCartItem.phone,
-                            birthdate : registeredCartItem.birthdate?.getTime(),
-                            startDate : startDate,
-                            endDate : endDate,
-                            bOProduct : boProduct
-                    )
-            ) as BOTicketType
+            BOTicketType boTicket = new BOTicketType(
+                    quantity : 1,
+                    price : 10000,
+                    ticketType : ticketType.name,
+                    firstname : registeredCartItem.firstname,
+                    lastname : registeredCartItem.lastname,
+                    email : registeredCartItem.email,
+                    phone : registeredCartItem.phone,
+                    birthdate : registeredCartItem.birthdate?.getTime(),
+                    startDate : startDate,
+                    endDate : endDate,
+                    bOProduct : boProduct)
+            saveEntity(boTicket);
 
             //génération du qr code uniquement pour les services
             if (product.xtype == ProductType.SERVICE)
@@ -491,27 +481,26 @@ public class CommonService {
                 String qrCodeBase64 = Base64.encode(output.toByteArray())
                 boTicket.qrcode = qrCodeBase64
                 boTicket.qrcodeContent = qrCodeContent
-                boTicket = saveEntity(boTicket) as BOTicketType
             }
+            saveEntity(boTicket);
         }
 
         //create Sale
-        return saveEntity(
-                new BOCartItem(
-                        code : "SALE_" + boCart.id + "_" + boProduct.id,
-                        price: 10000,
-                        tax: 0,
-                        endPrice: 10000,
-                        totalPrice: 10000,
-                        totalEndPrice: 10000,
-                        hidden : false,
-                        quantity : 1,
-                        startDate : product.startDate,
-                        endDate : product.stopDate,
-                        bOCart : boCart,
-                        bOProducts : [boProduct]
-                )
-        ) as BOCartItem
+        BOCartItem sale = new BOCartItem(
+                code : "SALE_" + boCart.id + "_" + boProduct.id,
+                price: 10000,
+                tax: 0,
+                endPrice: 10000,
+                totalPrice: 10000,
+                totalEndPrice: 10000,
+                hidden : false,
+                quantity : 1,
+                startDate : product.startDate,
+                endDate : product.stopDate,
+                bOCart : boCart,
+                bOProducts : [boProduct])
+        saveEntity(sale);
+        return sale;
     }
 
 	/**
@@ -522,7 +511,8 @@ public class CommonService {
 	public Role createRole(RoleName roleName) {
 		Role role = Role.findByName(roleName)
 		if (role == null) {
-			role = saveEntity(new Role(name:roleName)) as Role
+			role = new Role(name:roleName)
+			saveEntity(role)
 		}
 		return role
 	}
@@ -542,7 +532,7 @@ public class CommonService {
 		if (category == null) {
 			category = new Category(name : nom, sanitizedName: sanitizeUrlService.sanitizeWithDashes(nom), catalog:catalog, company : company, parent:parent, uuid:UUID.randomUUID().toString(), position:position)
             category.keywords = keywords
-			category = saveEntity(category) as Category
+			saveEntity(category)
 		}
         return category
 	}
@@ -570,7 +560,7 @@ public class CommonService {
             coupon.ticketTypes = ticketTypes
             coupon.rules = rules
             rules?.each { ReductionRule rule ->
-                rule = saveEntity(rule) as ReductionRule
+                saveEntity(rule)
             }
             coupon.description = description
             coupon.startDate = Calendar.getInstance()
@@ -578,32 +568,29 @@ public class CommonService {
             endDate.add(Calendar.DAY_OF_YEAR, 7)
             coupon.endDate = endDate
             coupon.anonymous = anonymous
-            coupon = saveEntity(coupon) as Coupon
+            saveEntity(coupon)
         }
         return coupon
     }
 
     public ShippingRule createShippingRule(Company company, String countryCode, long minAmount, long maxAmount, String price ){
-        return saveEntity(
-                new ShippingRule(
-                        company : company,
-                        countryCode: countryCode,
-                        minAmount: minAmount,
-                        maxAmount: maxAmount,
-                        price: price
-                )
-        ) as ShippingRule
+        ShippingRule shippingRule = new ShippingRule(
+                company : company,
+                countryCode: countryCode,
+                minAmount: minAmount,
+                maxAmount: maxAmount,
+                price: price
+        )
+        saveEntity(shippingRule)
+        shippingRule
     }
 
-	public def saveEntity(def entite, boolean flush = true)
+	public void saveEntity(def entite, boolean flush = true)
 	{
 		String msg = "";
 		if (entite.validate())
 		{
-            if(!entite.id){
-                entite = entite.create()
-            }
-			return entite.save(flush: flush)
+			entite.save(flush: flush)
 		}
 		else
 		{
