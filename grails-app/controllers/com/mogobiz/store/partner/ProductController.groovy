@@ -254,22 +254,27 @@ class ProductController {
 
         if (tagName != null && tagName.length() > 0) {
             Product product = params['product']?.id ? Product.findById(params['product']?.id, [fetch: [tags: 'join']]) : null
-            if (product) {
+            if (product && (product.company.id == seller.company.id)) {
+                def company = product.company
                 def tag = product.tags.find { tag ->
                     tag.name.toLowerCase() == tagName.toLowerCase()
                 }
 
                 if (!tag) {
-                    tag = Tag.findByCompanyAndNameIlike(product.company, tagName)
-                    if (!tag)
-                    tag= new Tag(name: tagName, company: seller.company)
-                    tag.save()
-                    product.addToTags(tag)
-                    product.save(flush:true)
-                    withFormat {
-                        html tags: product.tags
-                        xml { render product.tags as XML }
-                        json { render product.tags as JSON }
+                    tag = Tag.findByCompanyAndNameIlike(company, tagName)
+                    if (!tag){
+                        tag= new Tag(name: tagName, company: company)
+                        tag.save()
+                        product.addToTags(tag)
+                        product.save(flush:true)
+                        withFormat {
+                            html tags: product.tags
+                            xml { render product.tags as XML }
+                            json { render product.tags as JSON }
+                        }
+                    }
+                    else{
+                        response.sendError 400
                     }
                 }
             } else {
