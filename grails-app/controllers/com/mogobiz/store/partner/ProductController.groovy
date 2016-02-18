@@ -264,7 +264,7 @@ class ProductController {
                     tag = Tag.findByCompanyAndNameIlike(company, tagName)
                     if (!tag) {
                         tag = new Tag(name: tagName, company: company)
-                        tag.save(flush: true)
+                        tag.save()
                     }
                     product.addToTags(tag)
                     product.save(flush:true)
