@@ -77,7 +77,11 @@ public class TicketTypeController {
             if (catalogId) {
                 ticketTypes = ticketTypes.findAll { it.product.category.catalog.id == catalogId }
             }
-            render ticketTypes as JSON
+            def ret = []
+            ticketTypes.each { ticket ->
+                ret.add(ticket.asMapForJSON())
+            }
+            render ret as JSON
         } else {
             response.sendError 404
         }

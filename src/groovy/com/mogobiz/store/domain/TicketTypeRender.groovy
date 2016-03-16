@@ -27,6 +27,7 @@ class TicketTypeRender
                 'availabilityDate',
 				'product',
 				'product.id',
+				'product.name',
 				'sku',
                 'nbSales',
 				'stock',
