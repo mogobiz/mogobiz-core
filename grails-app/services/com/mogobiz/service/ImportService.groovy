@@ -44,6 +44,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
 import grails.transaction.Transactional
@@ -105,7 +106,7 @@ class ImportService {
             cal.setTime(date)
             return cal
         }
-        catch (Exception e) {
+        catch (Exception ignored) {
             return null
         }
     }
@@ -528,7 +529,7 @@ class ImportService {
                                 cat.hide = hide.equalsIgnoreCase("true")
                                 cat.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(cat.name) : seo
                                 cat.googleCategory = google
-                                cat.deleted = deleted.toLowerCase().equals("false") ? false : true
+                                cat.deleted = !deleted.toLowerCase().equals("false")
                                 cat.catalog = catalog
                                 cat.company = catalog.company
                                 cat.parent = parent
@@ -883,11 +884,11 @@ class ImportService {
                             t.nbSales = sales.toDouble().toLong()
                             t.startDate = getCalendar(startDate)
                             t.stopDate = getCalendar(stopDate)
-                            t.xprivate = xprivate.toLowerCase().equals("false") ? false : true
+                            t.xprivate = !xprivate.toLowerCase().equals("false")
                             t.stock = new Stock()
                             if (remainingStock?.length() > 0) {
-                                t.stock.stockUnlimited = unlimitedStock.toLowerCase().equals("false") ? false : true
-                                t.stock.stockOutSelling = outsellStock.toLowerCase().equals("false") ? false : true
+                                t.stock.stockUnlimited = !unlimitedStock.toLowerCase().equals("false")
+                                t.stock.stockOutSelling = !outsellStock.toLowerCase().equals("false")
                                 t.stock.stock = remainingStock.toDouble().toLong()
                             }
                             t.description = description
@@ -933,7 +934,7 @@ class ImportService {
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
-        ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+        ThreadLocal<Map> propertyInstanceMap = DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP as ThreadLocal<Map>
         propertyInstanceMap.get().clear()
     }
 
@@ -1056,7 +1057,7 @@ class ImportService {
                             p.description = description
                             p.descriptionAsText = descriptionAsText
                             p.nbSales = sales.toDouble().toLong()
-                            p.stockDisplay = displayStock.toLowerCase().equals("false") ? false : true
+                            p.stockDisplay = !displayStock.toLowerCase().equals("false")
                             p.calendarType = ProductCalendar.valueOf(calendar)
                             p.startDate = getCalendar(startDate)
                             p.stopDate = getCalendar(stopDate)
@@ -1153,7 +1154,7 @@ class ImportService {
         try {
             new SimpleDateFormat("yyyy-MM-dd").parse(date)
         }
-        catch (ParseException e) {
+        catch (ParseException ignored) {
             d
         }
     }
