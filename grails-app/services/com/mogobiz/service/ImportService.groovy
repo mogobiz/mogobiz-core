@@ -226,9 +226,9 @@ class ImportService {
                                 localTaxRates.uuid == l.uuid
                             }
                             if (tr != null && tr.company != catalog.company) {
-                                ObjectError err = new ObjectError("Local Tax Rate with UUID $l.uuid exist for a different company $tr.company.code")
+                                ObjectError err = new ObjectError("LocalTaxRate", "Local Tax Rate with UUID ${l?.uuid} exist for a different company ${tr?.company?.code}")
                                 log.error(err)
-                                return [errors: [serr], sheet: "taxrate", line: rownum]
+                                return [errors: [err.toString()], sheet: "taxrate", line: rownum]
                             }
                             else if (l.validate()) {
                                 l.save(flush: true)
