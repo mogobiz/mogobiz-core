@@ -359,7 +359,7 @@ class ImportService {
                                 }
                                 rr.uuid = uuid ? uuid : UUID.randomUUID().toString()
                                 rr.xtype = ReductionRuleType.valueOf(xtype)
-                                rr.quantityMin == qMin.length() > 0 ? qMin.toFloat().toLong() : null
+                                rr.quantityMin = qMin.length() > 0 ? qMin.toFloat().toLong() : null
                                 rr.quantityMax = qMax.length() > 0 ? qMax.toFloat().toLong() : null
                                 rr.discount = discount.length() > 0 ? discount : null
                                 rr.xPurchased = xpurchased.length() > 0 ? xpurchased.toFloat().toLong() : null
