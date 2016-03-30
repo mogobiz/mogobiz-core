@@ -71,7 +71,7 @@ public class TicketTypeController {
                     }
                 }
                 if (params['name']) {
-                    ilike('sku', '%' + params['name'] + '%')
+                    ilike('name', '%' + params['name'] + '%')
                 }
             }
             if (catalogId) {
