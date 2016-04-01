@@ -260,14 +260,14 @@ class ExportService {
         Path brandLogosDir = Paths.get(outDir.getAbsolutePath(), "__brandlogos__")
         brandLogosDir.toFile().mkdirs()
         List<String> brandLogos = []
-        brands.each {
+        brands.each {brand ->
             brandCellnum = 0
             Row branRow = brandSheet.createRow(brandRownum++)
-            toArray(it).each {
+            toArray(brand).each {
                 Cell brandCell = branRow.createCell(brandCellnum++)
                 brandCell.setCellValue(it)
             }
-            final String brandId = it.id.toString()
+            final String brandId = brand.id.toString()
             String brandLogodPath = "$resourcesPath/brands/logos/$companyCode"
             Path resUrl = Paths.get(brandLogodPath)
             if (Files.exists(resUrl)) {
@@ -278,18 +278,19 @@ class ExportService {
                     }
                 }).each {
                     try {
-                        Files.copy(it.toPath(), Paths.get(brandLogosDir.toString(), it.getName()))
-                        brandLogos.add(it.getName())
+                        final name = it.getName().replace(brandId, brand.name)
+                        Files.copy(it.toPath(), Paths.get(brandLogosDir.toString(), name))
+                        brandLogos.add(name)
                     }
                     catch (IOException ioe) {
-                        println(resUrl + "->" + outDir.getAbsolutePath() + "/" + brandId)
+                        log.error(resUrl + "->" + outDir.getAbsolutePath() + "/" + brand.name)
                         ioe.printStackTrace()
                     }
                 }
             }
         }
-
         new File(brandLogosDir.toFile(), '__brandlogos__').text = brandLogos.join('\t')
+
         taxRownum = 1
         List<TaxRate> taxRates = TaxRate.findAllByCompany(Catalog.get(catalogId).company)
         taxRates.each { tax ->
@@ -534,8 +535,8 @@ class ExportService {
             products.each { prd ->
                 int prdCellnum = 0
                 Row prdRow = prdSheet.createRow(prdRownum++)
-                println(prd)
-                println("-->" + prdRownum)
+                log.debug(prd)
+                log.debug("-->" + prdRownum)
                 toArray(prd, catRownum).each { col ->
                     Cell prdCell = prdRow.createCell(prdCellnum++)
                     if (prdCellnum <= 2)

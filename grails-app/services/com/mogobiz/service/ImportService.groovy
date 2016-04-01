@@ -466,14 +466,19 @@ class ImportService {
         d.mkdirs()
         if (brandLogosFile.exists()) {
             brandLogosFile.text.split('\t').each {
-                File logoTargetFile = new File(brandsTargetDir, it)
-                File logoFile = new File(brandsDir, it)
-                String brandId = it.substring(0, it.indexOf('.'))
-                logoTargetFile.delete()
-                FileUtils.copyFile(logoFile, logoTargetFile)
-                String resourcesDir = "$resourcesPath/resources/$companyCode"
-                String logoName = brandId
-                FileUtils.copyFile(logoFile, new File("${resourcesDir}/$logoName"))
+                String brandName = it.substring(0, it.indexOf('.'))
+                final brand = Brand.findByNameAndCompany(brandName, catalog.company)
+                if(brand){
+                    File logoTargetFile = new File(brandsTargetDir, it.replace(brandName, brand.id.toString()))
+                    File logoFile = new File(brandsDir, it)
+                    logoTargetFile.delete()
+                    FileUtils.copyFile(logoFile, logoTargetFile)
+                    String resourcesDir = "$resourcesPath/resources/$companyCode"
+                    FileUtils.copyFile(logoFile, new File("${resourcesDir}/${brand.id}"))
+                }
+                else{
+                    log.warn("could not find brand for name -> $brandName")
+                }
             }
 
         }
