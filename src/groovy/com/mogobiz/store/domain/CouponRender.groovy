@@ -20,7 +20,7 @@ class CouponRender
                 "catalogs", "catalogs.id", "catalogs.name",
                 "categories", "categories.id", "categories.name",
                 "products", "products.id", "products.name",
-                "ticketTypes", "ticketTypes.id", "ticketTypes.name", "ticketTypes.product", "ticketTypes.product.name",
+                "ticketTypes", "ticketTypes.id", "ticketTypes.name", "ticketTypes.product", "ticketTypes.product.name", "ticketTypes.product.company", "ticketTypes.product.company.name",
                 "rules", "rules.xtype", "rules.quantityMin", "rules.quantityMax", "rules.discount", "rules.xPurchased", "rules.yOffered"
         ], entity)
     }

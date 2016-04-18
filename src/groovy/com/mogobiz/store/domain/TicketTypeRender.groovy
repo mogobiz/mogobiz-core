@@ -28,6 +28,8 @@ class TicketTypeRender
 				'product',
 				'product.id',
 				'product.name',
+				'product.company',
+				'product.company.name',
 				'sku',
                 'nbSales',
 				'stock',
