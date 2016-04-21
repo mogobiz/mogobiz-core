@@ -84,7 +84,7 @@ class SuggestionsController {
         def products = []
         Company company = params['company']?.id ? Company.get(params['company'].id as long) : null
         long cid = params.long("catalog.id")
-        String fullSearch = params['fullSearch'] + "%"
+        String fullSearch = "%" + params['fullSearch'] + "%"
         if (!authenticationService.canAdminAllStores()) {
             def seller = request.seller ? request.seller : authenticationService.retrieveAuthenticatedSeller()
             if (seller == null || company == null || seller.company.id != company.id) {
