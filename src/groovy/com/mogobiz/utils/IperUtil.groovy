@@ -1,12 +1,7 @@
 package com.mogobiz.utils
 
-import com.maxmind.geoip2.DatabaseReader
-import com.maxmind.geoip2.model.CityResponse
-import grails.util.Holders
 import org.apache.commons.lang.StringUtils
-import grails.util.Holders.*
 import org.codehaus.groovy.grails.commons.ApplicationAttributes
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 
 import java.text.DateFormat
@@ -20,15 +15,12 @@ import java.text.SimpleDateFormat
 import com.mogobiz.store.domain.DatePeriod
 import com.mogobiz.store.domain.IntraDayPeriod
 import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.ProductCalendar
 import com.mogobiz.store.domain.Resource
-import com.mogobiz.store.domain.TicketType
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.geolocation.domain.Poi
 import com.mogobiz.geolocation.domain.PoiType
 import com.mogobiz.geolocation.domain.VisibilityType
 import com.mogobiz.json.RenderUtil
-import com.restfb.types.Post
 
 /**
  * classe utilitaire
@@ -303,8 +295,8 @@ class IperUtil {
         }
         return excluded
     }
-    public static String normalizeName(String companyName) {
-        return Normalizer.normalize(companyName, Normalizer.Form.NFD)
+    public static String normalizeName(String name) {
+        return Normalizer.normalize(name, Normalizer.Form.NFD)
                 .replaceAll("\\s", "-").replaceAll("\\p{IsM}+", "").replaceAll("[^a-zA-Z0-9-]", "");
     }
 

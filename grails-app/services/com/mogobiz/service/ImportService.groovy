@@ -420,6 +420,7 @@ class ImportService {
 
         log.info("Importing brands")
         Map<String, Brand> brands = new HashMap<>()
+        Map<String, Brand> brandNameLogos = new HashMap<>()
         // Brand
         Brand.withNewTransaction {
             for (int rownum = 1; rownum < brandSheet.getPhysicalNumberOfRows(); rownum++) {
@@ -435,8 +436,9 @@ class ImportService {
                         String description = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                         String hide = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
 
-                        if (!Brand.findByNameAndCompany(name, catalog.company)) {
-                            Brand b = new Brand()
+                        Brand b = Brand.findByNameAndCompany(name, catalog.company)
+                        if (!b) {
+                            b = new Brand()
                             b.company = catalog.company
                             b.uuid = uuid ? uuid : UUID.randomUUID().toString()
                             b.name = name
@@ -448,10 +450,13 @@ class ImportService {
                             if (b.validate()) {
                                 b.save(flush: true)
                                 brands.put(name, b)
+                                brandNameLogos.put(IperUtil.normalizeName(name), b)
                             } else {
                                 b.errors.allErrors.each { log.error(it) }
                                 return [errors: b.errors.allErrors, sheet: "cat-feature", line: rownum]
                             }
+                        } else {
+                            brandNameLogos.put(IperUtil.normalizeName(name), b)
                         }
                     }
                 }
@@ -466,10 +471,10 @@ class ImportService {
         d.mkdirs()
         if (brandLogosFile.exists()) {
             brandLogosFile.text.split('\t').each {
-                String brandName = it.substring(0, it.indexOf('.'))
-                final brand = Brand.findByNameAndCompany(brandName, catalog.company)
+                String brandNameLogo = it.substring(0, it.indexOf('.'))
+                final brand = brandNameLogos.get(brandNameLogo)
                 if(brand){
-                    File logoTargetFile = new File(brandsTargetDir, it.replace(brandName, brand.id.toString()))
+                    File logoTargetFile = new File(brandsTargetDir, it.replace(brandNameLogo, brand.id.toString()))
                     File logoFile = new File(brandsDir, it)
                     logoTargetFile.delete()
                     FileUtils.copyFile(logoFile, logoTargetFile)
@@ -477,7 +482,7 @@ class ImportService {
                     FileUtils.copyFile(logoFile, new File("${resourcesDir}/${brand.id}"))
                 }
                 else{
-                    log.warn("could not find brand for name -> $brandName")
+                    log.warn("could not find brand for name -> $brandNameLogo")
                 }
             }
 

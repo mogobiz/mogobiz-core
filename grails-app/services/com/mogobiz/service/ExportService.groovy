@@ -278,7 +278,8 @@ class ExportService {
                     }
                 }).each {
                     try {
-                        final name = it.getName().replace(brandId, brand.name)
+                        String brandNameLogo = IperUtil.normalizeName(brand.name)
+                        final name = it.getName().replace(brandId, brandNameLogo)
                         Files.copy(it.toPath(), Paths.get(brandLogosDir.toString(), name))
                         brandLogos.add(name)
                     }
