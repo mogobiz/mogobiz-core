@@ -77,6 +77,8 @@ class ProductRender
 				'category',
 				'category.id',
 				'category.name',
+				'category.catalog',
+				'category.catalog.name',
 				// tags
 				'tags',
 				'tags.id',

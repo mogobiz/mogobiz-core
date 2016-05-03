@@ -18,9 +18,9 @@ class CouponRender
         return RenderUtil.asMapForJSON(["id", "name", "code", "pastille","active", "numberOfUses", "startDate", "endDate", "catalogWise", "anonymous",
                 "consumed", "description",
                 "catalogs", "catalogs.id", "catalogs.name",
-                "categories", "categories.id", "categories.name",
-                "products", "products.id", "products.name",
-                "ticketTypes", "ticketTypes.id", "ticketTypes.name", "ticketTypes.product", "ticketTypes.product.name", "ticketTypes.product.company", "ticketTypes.product.company.name",
+                "categories", "categories.id", "categories.name", "categories.catalog", "categories.catalog.name",
+                "products", "products.id", "products.name", "products.category", "products.category.catalog", "products.category.catalog.name",
+                "ticketTypes", "ticketTypes.id", "ticketTypes.name", "ticketTypes.product", "ticketTypes.product.name", "ticketTypes.product.category", "ticketTypes.product.category.catalog", "ticketTypes.product.category.catalog.name",
                 "rules", "rules.xtype", "rules.quantityMin", "rules.quantityMax", "rules.discount", "rules.xPurchased", "rules.yOffered"
         ], entity)
     }

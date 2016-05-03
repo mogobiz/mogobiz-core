@@ -35,7 +35,7 @@ class CategoryController {
                 withFormat {
                     html category: category
                     xml { render category as XML }
-                    json { render category as JSON }
+                    json { render category.asMapForJSON() as JSON }
                 }
             } else {
                 response.sendError 404
@@ -52,7 +52,13 @@ class CategoryController {
             withFormat {
                 html categories: categories
                 xml { render categories as XML }
-                json { render categories as JSON }
+                json {
+                    def ret = []
+                    categories.each { c ->
+                        ret.add(c.asMapForJSON())
+                    }
+                    render ret as JSON
+                }
             }
         } else if (catalogId) {
             List<Category> categories = Category.withCriteria {
@@ -71,7 +77,13 @@ class CategoryController {
             withFormat {
                 html categories: categories
                 xml { render categories as XML }
-                json { render categories as JSON }
+                json {
+                    def ret = []
+                    categories.each { c ->
+                        ret.add(c.asMapForJSON())
+                    }
+                    render ret as JSON
+                }
             }
         } else {
             List<Category> categories = Category.withCriteria {
@@ -83,7 +95,11 @@ class CategoryController {
                     ilike('name', '%' + params['name'] + '%')
                 }
             }
-            render categories as JSON
+            def ret = []
+            categories.each { c ->
+                ret.add(c.asMapForJSON())
+            }
+            render ret as JSON
         }
     }
 
