@@ -13,33 +13,38 @@ class CategoryValidation
     extends ValidationBase<Category>
 {
 
-    def beforeInsert(com.mogobiz.store.domain.Category entity) {
+    def beforeInsert(Category entity) {
         super.beforeInsert(entity)
+        entity.fullpath = retrieveCategoryPath(entity)
     }
 
-    def beforeUpdate(com.mogobiz.store.domain.Category entity) {
+    def beforeUpdate(Category entity) {
         super.beforeUpdate(entity)
+        entity.fullpath = retrieveCategoryPath(entity)
     }
 
-    def beforeDelete(com.mogobiz.store.domain.Category entity) {
+    def beforeDelete(Category entity) {
         super.beforeDelete(entity)
     }
 
-    def afterInsert(com.mogobiz.store.domain.Category entity) {
+    def afterInsert(Category entity) {
         super.afterInsert(entity)
     }
 
-    def afterUpdate(com.mogobiz.store.domain.Category entity) {
+    def afterUpdate(Category entity) {
         super.afterUpdate(entity)
     }
 
-    def afterDelete(com.mogobiz.store.domain.Category entity) {
+    def afterDelete(Category entity) {
         super.afterDelete(entity)
     }
 
-    def onLoad(com.mogobiz.store.domain.Category entity) {
+    def onLoad(Category entity) {
         super.onLoad(entity)
     }
 
-
+    static String retrieveCategoryPath(Category cat, String path = cat?.sanitizedName){
+        def parent = cat?.parent
+        parent ? retrieveCategoryPath(parent, parent.sanitizedName + '/' + path) : path
+    }
 }
