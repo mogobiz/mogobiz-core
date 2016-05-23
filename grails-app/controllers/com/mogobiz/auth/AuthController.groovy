@@ -77,7 +77,7 @@ class AuthController {
                 ex.printStackTrace()
                 log.info "Authentication failure for data '${params.data}'."
                 flash.message = ex.getMessage()
-                response.sendError 403
+                response.sendError(403, flash.message)
             }
 
         } else {
