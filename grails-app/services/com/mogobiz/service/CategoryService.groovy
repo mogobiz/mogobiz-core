@@ -38,10 +38,10 @@ class CategoryService {
 
     String path(Category cat) {
         def res = []
-        res.push(cat.name)
+        res.push(cat.sanitizedName)
         while (cat.parent) {
             cat = cat.parent
-            res.add(0, cat.name)
+            res.add(0, cat.sanitizedName)
         }
         return "/" + res.join("/")
     }
