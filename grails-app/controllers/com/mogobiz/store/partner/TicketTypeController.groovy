@@ -77,8 +77,10 @@ public class TicketTypeController {
                     }
                 }
             }
-            if (catalogId) {
-                ticketTypes = ticketTypes.findAll { it.product.category.catalog.id == catalogId }
+
+            ticketTypes = ticketTypes.findAll {
+                it.product.category.catalog.deleted == false &&
+                        (catalogId == null || it.product.category.catalog.id == catalogId)
             }
             def ret = []
             ticketTypes.each { ticket ->

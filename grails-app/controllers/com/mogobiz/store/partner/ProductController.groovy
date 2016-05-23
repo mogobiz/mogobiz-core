@@ -125,11 +125,16 @@ class ProductController {
                 if (params['name']) {
                     ilike('name', '%' + params['name'] + '%')
                 }
-                if (idCategory != null) {
-                    category { eq('id', idCategory) }
-                }
-                if (catalogue != null) {
-                    category { eq("catalog", catalogue)}
+                category {
+                    if (idCategory != null) {
+                        eq('id', idCategory)
+                    }
+                    catalog {
+                        if (catalogue != null) {
+                            eq('id', catalogue.id)
+                        }
+                        eq('deleted', false)
+                    }
                 }
                 order(params.orderBy ? params.orderBy : "name", params.orderDirection ? params.orderDirection : "asc")
             }

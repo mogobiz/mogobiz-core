@@ -46,6 +46,7 @@ class CategoryController {
                 company {
                     eq('id', seller.company.id)
                 }
+                catalog { eq('deleted', false) }
                 parent { eq('id', par) }
                 order("position", "asc")
             }
@@ -70,6 +71,7 @@ class CategoryController {
                     ilike('name', '%' + params['name'] + '%')
                 }
                 catalog { eq('id', catalogId) }
+                catalog { eq('deleted', false) }
                 if (allCategories.equals("false"))
                     isNull('parent')
                 order("position", "asc")
@@ -91,6 +93,7 @@ class CategoryController {
                 company {
                     eq('id', seller.company.id)
                 }
+                catalog { eq('deleted', false) }
                 if (params['name']) {
                     ilike('name', '%' + params['name'] + '%')
                 }
