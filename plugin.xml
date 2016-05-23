@@ -29,6 +29,7 @@
     <resource>com.mogobiz.store.partner.CatalogController</resource>
     <resource>com.mogobiz.store.partner.CategoryController</resource>
     <resource>com.mogobiz.store.partner.CouponController</resource>
+    <resource>com.mogobiz.store.partner.CurrencyController</resource>
     <resource>com.mogobiz.store.partner.DownloadableController</resource>
     <resource>com.mogobiz.store.partner.EsEnvController</resource>
     <resource>com.mogobiz.store.partner.FeatureController</resource>

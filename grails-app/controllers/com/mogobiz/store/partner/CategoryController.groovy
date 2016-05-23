@@ -14,7 +14,7 @@ import grails.converters.XML
 import grails.transaction.Transactional
 
 /**
- * Controller utilisé pour gérer les categories 
+ * Controller utilisé pour gérer les categories
  */
 class CategoryController {
     AuthenticationService authenticationService
@@ -272,6 +272,11 @@ class CategoryController {
                     it.position = pos
                     it.save(flush: true)
                 }
+                // update all children full path
+                retrieveChildren(category, new HashSet<Category>()).each {
+                    it.fullpath = null
+                    it.save(flush: true)
+                }
             }
         }
         withFormat {
@@ -328,6 +333,14 @@ class CategoryController {
         } else {
             response.sendError 403
         }
+    }
+
+    private def retrieveChildren = {Category cat, Set<Category> cats ->
+        cats << cat
+        cat.children?.each {
+            retrieveChildren(it, cats)
+        }
+        cats
     }
 
 }
