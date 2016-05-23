@@ -180,7 +180,7 @@ class ImportService {
                         String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                         if (cell.length() > 0) {
                             String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
-                            uuid = uuid.trim().length() > 0 ?: UUID.randomUUID().toString()
+                            uuid = uuid.trim().length() > 0 ? uuid : UUID.randomUUID().toString()
                             String name = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                             String countryCode = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
                             String stateCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
