@@ -57,25 +57,25 @@ class AuthRealm {
         def username = authToken.username
         // Null username is invalid
         if (username == null) {
-            throw new AccountException('Null usernames are not allowed by this realm.')
+            throw new AccountException('logIn.errors.null.username')
         }
         // Get the user with the given username. If the user is not
         // found, then they don't have an account and we throw an
         // exception.
         def user = User.findByLogin(username)
         if (!user) {
-            throw new UnknownAccountException("No account found for user $username")
+            throw new UnknownAccountException("logIn.errors.account.not.found")
         }
         // check if the account has been disabled
         if (!user.active) {
-            throw new DisabledAccountException("Account for user $username has been disabled")
+            throw new DisabledAccountException("logIn.errors.account.disabled")
         }
         // Now check the user's password against the hashed value stored
         // in the database.
         def account = new SimpleAccount(username, user.password, "AuthRealm")
         if (!user.autosign) {
             if (!credentialMatcher.doCredentialsMatch(authToken, account)) {
-                throw new IncorrectCredentialsException("Invalid password for $username")
+                throw new IncorrectCredentialsException("logIn.errors.password.invalid")
             }
         } else {
             user.autosign = false
