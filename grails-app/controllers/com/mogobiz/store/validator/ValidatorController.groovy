@@ -4,6 +4,7 @@
 
 package com.mogobiz.store.validator
 
+import com.mogobiz.auth.AuthRealm
 import com.mogobiz.store.domain.BOProduct;
 import com.mogobiz.store.domain.BOTicketType;
 import com.mogobiz.store.domain.Company
@@ -38,6 +39,7 @@ class ValidatorController {
 	@Transactional
 	def loginValidator() {
 		SecurityUtils.subject?.logout()
+		AuthRealm.unlinkUserAndSessionId(session.id)
 		def user = null
 		def authToken = new UsernamePasswordToken(params.username, params.password)
 		try {

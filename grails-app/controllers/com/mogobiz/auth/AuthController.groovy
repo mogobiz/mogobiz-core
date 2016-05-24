@@ -126,6 +126,7 @@ class AuthController {
     def signOut() {
         // Log the user out of the application.
         SecurityUtils.subject?.logout()
+        AuthRealm.unlinkUserAndSessionId(session.id)
         // Redirect to the home page.
         redirect(uri: '/')
     }
