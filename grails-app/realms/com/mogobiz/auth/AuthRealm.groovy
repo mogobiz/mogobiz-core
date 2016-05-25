@@ -26,34 +26,23 @@ import java.lang.reflect.Constructor
 class AuthRealm {
 
     private static HashMap<String, String> sessionIdByUser = new HashMap<String, String>()
-    private static HashMap<String, String> userBySessionId = new HashMap<String, String>()
 
-    public static boolean linkUserAndSessionId(String user, String sessionId) {
-        boolean result = false;
-        synchronized (userBySessionId) {
-            synchronized (sessionIdByUser) {
-                String actualSessionId = sessionIdByUser.get(user);
-                if (actualSessionId == null || actualSessionId.equals(sessionId)) {
-                    sessionIdByUser.put(user, sessionId)
-                    userBySessionId.put(sessionId, user)
-                    result = true;
-                }
-            }
+    public static void linkUserAndSessionId(String user, String sessionId) {
+        synchronized (sessionIdByUser) {
+            sessionIdByUser.put(user, sessionId)
         }
-        return result;
     }
 
-    public static void unlinkUserAndSessionId(String sessionId) {
-        synchronized (userBySessionId) {
-            synchronized (sessionIdByUser) {
-                String user = userBySessionId.remove(sessionId);
-                if (user != null) {
-                    String actualSessionId = sessionIdByUser.get(user);
-                    if (actualSessionId != null && actualSessionId.equals(sessionId)) {
-                        sessionIdByUser.remove(user)
-                    }
-                }
-            }
+    /**
+     * Renvoie true si aucune session n'est associé au user ou si la session correspond à celle associée au user
+     * @param user
+     * @param sessionId
+     * @return
+     */
+    public static boolean checkUserAndSessionId(String user, String sessionId) {
+        synchronized (sessionIdByUser) {
+            String actualSessionId = sessionIdByUser.get(user);
+            return (actualSessionId == null || actualSessionId.equals(sessionId) )
         }
     }
 
@@ -111,9 +100,8 @@ class AuthRealm {
             if (!credentialMatcher.doCredentialsMatch(authToken, account)) {
                 throw new IncorrectCredentialsException("logIn.errors.password.invalid")
             }
-        } else if (!linkUserAndSessionId(user.login, RequestContextHolder.currentRequestAttributes().getSessionId())) {
-            throw new AccountException("logIn.errors.already.logged")
         } else {
+            linkUserAndSessionId(user.login, RequestContextHolder.currentRequestAttributes().getSessionId())
             user.autosign = false
             user.save(flush: true)
         }

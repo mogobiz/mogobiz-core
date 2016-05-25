@@ -39,7 +39,6 @@ class ValidatorController {
 	@Transactional
 	def loginValidator() {
 		SecurityUtils.subject?.logout()
-		AuthRealm.unlinkUserAndSessionId(session.id)
 		def user = null
 		def authToken = new UsernamePasswordToken(params.username, params.password)
 		try {

@@ -76,11 +76,9 @@ class AuthController {
             catch (Exception ex) {
                 ex.printStackTrace()
                 log.info "Authentication failure for data '${params.data}'."
-                flash.message = g.message(code: ex.getMessage())
-                redirect(action: 'errorLogin')
-
+                flash.codeMessage = ex.message
+                redirect(action: 'errorLogin', params: [codeMessage: ex.message])
             }
-
         } else {
             // Log the user in the application.
             UsernamePasswordToken authToken = new UsernamePasswordToken(params.username.toString(), params.password.toString())
@@ -127,7 +125,6 @@ class AuthController {
     def signOut() {
         // Log the user out of the application.
         SecurityUtils.subject?.logout()
-        AuthRealm.unlinkUserAndSessionId(session.id)
         // Redirect to the home page.
         redirect(uri: '/')
     }
@@ -138,6 +135,7 @@ class AuthController {
 
 // Just show the "errorLogin.gsp" view.
     def errorLogin() {
+        //flash.message = g.message(code: "logIn.errors.already.logged")
     }
 
 // prepare login view for redirection.
