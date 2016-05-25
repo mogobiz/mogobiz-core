@@ -76,8 +76,8 @@ class AuthController {
             catch (Exception ex) {
                 ex.printStackTrace()
                 log.info "Authentication failure for data '${params.data}'."
-                flash.message = g.message(code: ex.getMessage(),args: ["${params.username}"])//"Invalid username and/or password"
-                redirect(action: 'errorLogin', params: [username: params.username])
+                flash.message = g.message(code: ex.getMessage())
+                redirect(action: 'errorLogin')
 
             }
 
