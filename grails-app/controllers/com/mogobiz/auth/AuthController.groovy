@@ -76,8 +76,9 @@ class AuthController {
             catch (Exception ex) {
                 ex.printStackTrace()
                 log.info "Authentication failure for data '${params.data}'."
-                String message = g.message(code: ex.getMessage(),args: ["${params.username}"])
-                response.sendError (403, message)
+                flash.message = g.message(code: ex.getMessage(),args: ["${params.username}"])//"Invalid username and/or password"
+                redirect(action: 'errorLogin', params: [username: params.username])
+
             }
 
         } else {
