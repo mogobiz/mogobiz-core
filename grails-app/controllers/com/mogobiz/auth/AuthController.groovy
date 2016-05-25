@@ -136,6 +136,10 @@ class AuthController {
     def unauthorized() {
     }
 
+// Just show the "errorLogin.gsp" view.
+    def errorLogin() {
+    }
+
 // prepare login view for redirection.
     def login() {
         SavedRequest sRequest = WebUtils.getSavedRequest(request)
