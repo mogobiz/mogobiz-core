@@ -40,7 +40,7 @@ class ShippingRuleService {
         }
 
         if (foundRule != null) {
-            foundRule.errors.rejectValue("countryCode", "already.exist")
+            foundRule.errors.rejectValue("minAmount", "company.shipping.rule.errors.invalidInterval")
             return foundRule
         }
 

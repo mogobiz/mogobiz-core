@@ -15,6 +15,7 @@ import com.mogobiz.store.domain.ShippingRule
 import grails.converters.JSON
 import grails.orm.PagedResultList
 import grails.transaction.Transactional
+import org.springframework.validation.Errors
 
 import javax.servlet.http.HttpServletResponse
 
@@ -51,6 +52,7 @@ class ShippingRuleController {
 
         try {
             ShippingRule shippingRule = shippingRuleService.save(seller, cmd)
+            Errors errs =shippingRule.errors
             AjaxResponse r = ajaxResponseService.prepareResponse(shippingRule, shippingRule?.asMapForJSON())
             render r.asMap() as JSON
         }
