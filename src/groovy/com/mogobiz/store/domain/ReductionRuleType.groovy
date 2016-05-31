@@ -8,7 +8,7 @@ package com.mogobiz.store.domain;
  */
 enum ReductionRuleType
 {
-DISCOUNT("DISCOUNT"), X_PURCHASED_Y_OFFERED("X_PURCHASED_Y_OFFERED")
+DISCOUNT("DISCOUNT"), X_PURCHASED_Y_OFFERED("X_PURCHASED_Y_OFFERED"), CUSTOM("CUSTOM")
     private java.lang.String value
     private ReductionRuleType(java.lang.String value){
         this.value = value
