@@ -204,7 +204,7 @@ class ImportService {
                             if (!t) {
                                 t = new TaxRate()
                                 t.company = catalog.company
-                                t.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                                t.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                                 t.name = name
                                 if (t.validate())
                                     t.save(flush: true)
@@ -265,7 +265,7 @@ class ImportService {
                             if (sr == null) {
                                 sr = new ShippingRule()
                             }
-                            sr.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            sr.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             sr.countryCode = countryCode
                             sr.minAmount = minAmount.toFloat().toLong()
                             sr.maxAmount = maxAmount.toFloat().toLong()
@@ -308,7 +308,7 @@ class ImportService {
                             if (!coupon) {
                                 coupon = new Coupon()
                             }
-                            coupon.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             coupon.name = name
                             coupon.code = code
                             coupon.active = active.equalsIgnoreCase("true")
@@ -358,7 +358,7 @@ class ImportService {
                                 if (!rr) {
                                     rr = new ReductionRule()
                                 }
-                                rr.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                                rr.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                                 rr.xtype = ReductionRuleType.valueOf(xtype)
                                 rr.quantityMin = qMin.length() > 0 ? qMin.toFloat().toLong() : null
                                 rr.quantityMax = qMax.length() > 0 ? qMax.toFloat().toLong() : null
@@ -440,7 +440,7 @@ class ImportService {
                         if (!b) {
                             b = new Brand()
                             b.company = catalog.company
-                            b.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            b.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             b.name = name
                             b.website = website
                             b.facebooksite = facebook
@@ -577,7 +577,7 @@ class ImportService {
 
 
                         Feature f = new Feature()
-                        f.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        f.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                         f.category = categories.get(catpath) //getCategoryFromPath(catpath, catalog)
                         f.externalCode = externalCode
                         f.domain = domain
@@ -616,7 +616,7 @@ class ImportService {
 
 
                         Variation v = new Variation()
-                        v.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        v.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                         v.category = categories.get(catpath) //getCategoryFromPath(catpath, catalog)
                         v.externalCode = externalCode
                         v.name = name
@@ -656,7 +656,7 @@ class ImportService {
 
 
                         VariationValue v = new VariationValue()
-                        v.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        v.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                         v.variation = variations.get(catpath + "*" + varname)
                         // Variation.findByNameAndCategory(varname, categories.get(catpath)) // getCategoryFromPath(catpath, catalog))
 
@@ -715,7 +715,7 @@ class ImportService {
                         }
                         if (!created) {
                             Feature f = new Feature()
-                            f.uuid = uuid ?: UUID.randomUUID().toString()
+                            f.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             f.product = product
                             f.externalCode = externalCode
                             f.domain = domain
@@ -760,7 +760,7 @@ class ImportService {
 
                         ProductProperty pp = new ProductProperty()
                         Category category = categories.get(catpath) //getCategoryFromPath(catpath, catalog)
-                        pp.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                        pp.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                         pp.product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog: catalog.id, code: prdcode, category: category.id]).get(0)
                         pp.name = name
                         pp.value = value
@@ -883,7 +883,7 @@ class ImportService {
 
                             Product prod = products.get(prdcode)
                             TicketType t = new TicketType()
-                            t.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            t.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             t.product = prod ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
                             t.externalCode = externalCode
                             t.sku = sku
@@ -1057,7 +1057,7 @@ class ImportService {
                                 }
                             }
                             p.company = catalog.company
-                            p.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            p.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             p.externalCode = externalCode
                             p.code = code
                             p.name = name
