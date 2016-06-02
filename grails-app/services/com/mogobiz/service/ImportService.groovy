@@ -228,10 +228,10 @@ class ImportService {
                             }
                             if (tr != null && tr.company != catalog.company) {
                                 ObjectError err = new ObjectError("LocalTaxRate", "Local Tax Rate with UUID ${l?.uuid} exist for a different company ${tr?.company?.code}")
-                                log.error(err)
-                                return [errors: [err.toString()], sheet: "taxrate", line: rownum]
+                                log.warn(err)
+                                l.uuid = UUID.randomUUID().toString()
                             }
-                            else if (l.validate()) {
+                            if (l.validate()) {
                                 l.save(flush: true)
                                 if (isNewLocalTaxRate) {
                                     t.addToLocalTaxRates(l)
@@ -1052,7 +1052,7 @@ class ImportService {
                             } else {
                                 tr = taxRates.get(taxRateName)
                                 if (tr == null) {
-                                    tr = TaxRate.findByName(taxRateName)
+                                    tr = TaxRate.findByNameAndCompany(taxRateName, company)
                                     taxRates.put(taxRateName, tr)
                                 }
                             }
