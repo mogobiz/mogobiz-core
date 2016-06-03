@@ -7,7 +7,6 @@ package com.mogobiz.store.partner
 import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.Company
-import com.mogobiz.elasticsearch.client.ESClient
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
@@ -22,8 +21,6 @@ class CatalogController {
     AuthenticationService authenticationService
 
     ProfileService profileService
-
-    static client = ESClient.instance
 
     @Transactional(readOnly = true)
     def show() {
