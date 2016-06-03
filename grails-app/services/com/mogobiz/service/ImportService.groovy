@@ -8,6 +8,7 @@ import com.mogobiz.authentication.ProfileService
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Brand
 import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Country
 import com.mogobiz.store.domain.CountryAdmin
 import com.mogobiz.store.domain.Coupon
@@ -135,6 +136,7 @@ class ImportService {
     Map ximport(long catalogId, long sellerId, ZipFile zipFile) {
         User seller = Seller.get(sellerId)
         Catalog catalog = Catalog.get(catalogId)
+        Company company = catalog.company
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File impexDir = getImportDir(now)
         ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
@@ -304,7 +306,7 @@ class ImportService {
                             String anonymous = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
                             String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
                             String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByUuid(uuid)
+                            Coupon coupon = Coupon.findByUuidAndCompany(uuid, company)
                             if (!coupon) {
                                 coupon = new Coupon()
                             }
@@ -352,7 +354,7 @@ class ImportService {
                             String discount = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                             String xpurchased = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
                             String yoffered = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, couponCode)
+                            Coupon coupon = Coupon.findByCompanyAndCode(company, couponCode)
                             if (coupon) {
                                 ReductionRule rr = ReductionRule.findByUuid(uuid)
                                 if (!rr) {
@@ -390,12 +392,12 @@ class ImportService {
                     if (row != null) {
                         String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                         if (cell.length() > 0) {
-                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+//                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                             String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
                             String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
                             String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                             String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByUuid(uuid)
+                            Coupon coupon = Coupon.findByCompanyAndCode(company, code)
                             if (coupon) {
                                 if (catUuid.length() > 0) {
                                     coupon.addToCategories(Category.findByUuid(catUuid))
