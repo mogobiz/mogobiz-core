@@ -306,11 +306,22 @@ class ImportService {
                             String anonymous = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
                             String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
                             String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByUuidAndCompany(uuid, company)
+                            Coupon coupon = Coupon.findByUuid(uuid)
+                            boolean uuidSet = false
+                            if(coupon?.company != company){
+                                coupon = Coupon.findByCompanyAndCode(company, code)
+                                if(!coupon){
+                                    coupon = new Coupon()
+                                    coupon.uuid = UUID.randomUUID().toString()
+                                }
+                                uuidSet = true
+                            }
                             if (!coupon) {
                                 coupon = new Coupon()
                             }
-                            coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                            if(!uuidSet){
+                                coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                            }
                             coupon.name = name
                             coupon.code = code
                             coupon.active = active.equalsIgnoreCase("true")
