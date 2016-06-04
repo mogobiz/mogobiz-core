@@ -136,7 +136,6 @@ class ImportService {
     Map ximport(long catalogId, long sellerId, ZipFile zipFile) {
         User seller = Seller.get(sellerId)
         Catalog catalog = Catalog.get(catalogId)
-        Company company = catalog.company
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File impexDir = getImportDir(now)
         ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
@@ -308,8 +307,8 @@ class ImportService {
                             String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
                             Coupon coupon = Coupon.findByUuid(uuid)
                             boolean uuidSet = false
-                            if(coupon?.company != company){
-                                coupon = Coupon.findByCompanyAndCode(company, code)
+                            if(coupon?.company != catalog.company){
+                                coupon = Coupon.findByCompanyAndCode(catalog.company, code)
                                 if(!coupon){
                                     coupon = new Coupon()
                                     coupon.uuid = UUID.randomUUID().toString()
@@ -365,7 +364,7 @@ class ImportService {
                             String discount = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                             String xpurchased = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
                             String yoffered = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByCompanyAndCode(company, couponCode)
+                            Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, couponCode)
                             if (coupon) {
                                 ReductionRule rr = ReductionRule.findByUuid(uuid)
                                 if (!rr) {
@@ -408,7 +407,7 @@ class ImportService {
                             String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
                             String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                             String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByCompanyAndCode(company, code)
+                            Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, code)
                             if (coupon) {
                                 if (catUuid.length() > 0) {
                                     coupon.addToCategories(Category.findByUuid(catUuid))
@@ -1065,7 +1064,7 @@ class ImportService {
                             } else {
                                 tr = taxRates.get(taxRateName)
                                 if (tr == null) {
-                                    tr = TaxRate.findByNameAndCompany(taxRateName, company)
+                                    tr = TaxRate.findByNameAndCompany(taxRateName, catalog.company)
                                     taxRates.put(taxRateName, tr)
                                 }
                             }
