@@ -8,7 +8,6 @@ import com.mogobiz.authentication.ProfileService
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.PermissionType
-import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.shiro.crypto.hash.Sha256Hash
 import org.hibernate.SessionFactory

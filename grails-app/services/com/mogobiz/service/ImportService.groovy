@@ -4,39 +4,11 @@
 
 package com.mogobiz.service
 
-import com.mogobiz.authentication.ProfileService
-import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Brand
-import com.mogobiz.store.domain.Catalog
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Country
-import com.mogobiz.store.domain.CountryAdmin
-import com.mogobiz.store.domain.Coupon
-import com.mogobiz.store.domain.Feature
-import com.mogobiz.store.domain.FeatureValue
-import com.mogobiz.store.domain.LocalTaxRate
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Product2Resource
-import com.mogobiz.store.domain.ProductCalendar
-import com.mogobiz.store.domain.ProductProperty
-import com.mogobiz.store.domain.ProductState
-import com.mogobiz.store.domain.ProductType
-import com.mogobiz.store.domain.ReductionRule
-import com.mogobiz.store.domain.ReductionRuleType
-import com.mogobiz.store.domain.Resource
-import com.mogobiz.store.domain.ResourceType
-import com.mogobiz.store.domain.Seller
-import com.mogobiz.store.domain.ShippingRule
-import com.mogobiz.store.domain.Stock
-import com.mogobiz.store.domain.Tag
-import com.mogobiz.store.domain.TaxRate
-import com.mogobiz.store.domain.TicketType
-import com.mogobiz.store.domain.User
-import com.mogobiz.store.domain.Variation
-import com.mogobiz.store.domain.VariationValue
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.ZipFileUtil
+import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Row
@@ -46,25 +18,23 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
-import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
-import grails.transaction.Transactional
+import org.springframework.validation.ObjectError
 
 import java.nio.file.Paths
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.concurrent.Future
 import java.util.zip.ZipFile
-import org.springframework.validation.ObjectError
 
 @Transactional
 class ImportService {
 
-    SanitizeUrlService sanitizeUrlService
-    ResService resService
+    def sanitizeUrlService
+    def resService
     def grailsApplication
-    SessionFactory sessionFactory
-    ProfileService profileService
+    def sessionFactory
+    def profileService
 
     int FLUSHSIZE = Holders.config.importCatalog.flushsize ?: 100
 

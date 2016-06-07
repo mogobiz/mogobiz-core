@@ -16,7 +16,7 @@ import com.mogobiz.utils.IperUtil
 
 class ResService {
     def grailsApplication
-    SanitizeUrlService sanitizeUrlService
+    def sanitizeUrlService
 
     def uploadResource(Company company, Resource resource, File file, String contentType) {
         String resourcesPath = grailsApplication.config.resources.path

@@ -1,26 +1,22 @@
-/*
+    /*
  * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
  */
 
 package com.mogobiz.store.partner
 
-import grails.transaction.Transactional
+    import com.mogobiz.ajax.AjaxResponse
+    import grails.converters.JSON
+    import grails.transaction.Transactional
 
-import javax.servlet.http.HttpServletResponse;
+    import javax.servlet.http.HttpServletResponse
 
-import grails.converters.JSON
-
-import com.mogobiz.service.TranslationService;
-import com.mogobiz.ajax.AjaxResponse;
-import com.mogobiz.authentication.AuthenticationService;
-
-/**
+    /**
  * Translation manager controller
  */
 class TranslationController {
 
-	AuthenticationService authenticationService
-	TranslationService translationService;
+	def authenticationService
+	def translationService;
 	
 	/**
 	 * Returns a list of configurable languages ​​by the Partner application

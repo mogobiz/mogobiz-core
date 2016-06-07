@@ -11,9 +11,6 @@ import com.mogobiz.store.cmd.coupon.CouponCreateUpdateCommand
 import com.mogobiz.store.cmd.coupon.CouponListCommand
 import com.mogobiz.store.domain.Coupon
 import com.mogobiz.store.domain.Seller
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.service.CouponService
 import grails.converters.JSON
 import grails.orm.PagedResultList
 import grails.transaction.Transactional
@@ -23,9 +20,9 @@ import javax.servlet.http.HttpServletResponse
 
 class CouponController {
 
-    CouponService couponService;
-    AjaxResponseService ajaxResponseService
-    AuthenticationService authenticationService
+    def couponService;
+    def ajaxResponseService
+    def authenticationService
 
     @Transactional(readOnly = true)
     def list(CouponListCommand cmd) {

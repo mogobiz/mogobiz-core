@@ -10,14 +10,14 @@ package com.mogobiz.ajax
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.utils.Page
 import grails.orm.PagedResultList
-import org.springframework.context.MessageSource
+
 /**
  * @author smanciot
  *
  */
 class AjaxResponseService {
 	
-	MessageSource messageSource
+	def messageSource
 
     Page preparePage(PagedResultList pagedList, PagedListCommand cmd, Closure transform) {
         return preparePage(pagedList, pagedList.totalCount, cmd, transform)

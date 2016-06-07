@@ -4,23 +4,20 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.authentication.ProfileService
+import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
-
-import com.mogobiz.store.domain.Catalog
-import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Seller
 import grails.transaction.Transactional
 
 class CatalogController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
-    ProfileService profileService
+    def profileService
 
     @Transactional(readOnly = true)
     def show() {

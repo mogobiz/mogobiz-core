@@ -6,18 +6,9 @@ import com.google.gdata.client.authn.oauth.OAuthHmacSha1Signer
 import com.google.gdata.client.youtube.YouTubeQuery
 import com.google.gdata.client.youtube.YouTubeService
 import com.google.gdata.data.PlainTextConstruct
-import com.google.gdata.data.media.MediaStreamSource;
-import com.google.gdata.data.media.mediarss.MediaCategory
-import com.google.gdata.data.media.mediarss.MediaDescription
-import com.google.gdata.data.media.mediarss.MediaKeywords
-import com.google.gdata.data.media.mediarss.MediaPlayer
-import com.google.gdata.data.media.mediarss.MediaTitle
-import com.google.gdata.data.youtube.CommentEntry
-import com.google.gdata.data.youtube.VideoEntry
-import com.google.gdata.data.youtube.VideoFeed
-import com.google.gdata.data.youtube.YouTubeMediaGroup
-import com.google.gdata.data.youtube.YouTubeNamespace
-import com.google.gdata.data.youtube.YtPublicationState
+import com.google.gdata.data.media.MediaStreamSource
+import com.google.gdata.data.media.mediarss.*
+import com.google.gdata.data.youtube.*
 import com.google.gdata.util.ServiceException
 
 /**

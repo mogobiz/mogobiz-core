@@ -1,19 +1,7 @@
 package com.mogobiz.authentication
 
 import bootstrap.CommonService
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Permission
-import com.mogobiz.store.domain.PermissionValidation
-import com.mogobiz.store.domain.Profile
-import com.mogobiz.store.domain.ProfilePermission
-import com.mogobiz.store.domain.Role
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.RolePermission
-import com.mogobiz.store.domain.RolePermissionValidation
-import com.mogobiz.store.domain.RoleValidation
-import com.mogobiz.store.domain.User
-import com.mogobiz.store.domain.UserPermission
-import com.mogobiz.store.domain.UserValidation
+import com.mogobiz.store.domain.*
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -27,7 +15,8 @@ import org.codehaus.groovy.grails.plugins.codecs.HexCodec
 import org.codehaus.groovy.grails.plugins.codecs.SHA256BytesCodec
 import spock.lang.Specification
 
-import static com.mogobiz.utils.ProfileUtils.*
+import static com.mogobiz.utils.ProfileUtils.ALL
+import static com.mogobiz.utils.ProfileUtils.WILDCARD_PERMISSION
 
 /**
  *

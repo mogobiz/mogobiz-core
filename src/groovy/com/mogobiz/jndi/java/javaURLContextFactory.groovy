@@ -1,10 +1,10 @@
 package com.mogobiz.jndi.java
 
-import javax.naming.Context;
-import javax.naming.Name;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-import javax.naming.spi.ObjectFactory;
+import javax.naming.Context
+import javax.naming.Name
+import javax.naming.NamingException
+import javax.naming.spi.InitialContextFactory
+import javax.naming.spi.ObjectFactory
 
 class javaURLContextFactory implements InitialContextFactory, ObjectFactory {
 	

@@ -6,19 +6,19 @@ package bootstrap
 
 import com.mogobiz.authentication.ProfileService
 import com.mogobiz.service.CountryImportService
-import com.mogobiz.store.domain.*
 import com.mogobiz.service.SanitizeUrlService
+import com.mogobiz.store.domain.*
 import com.mogobiz.store.vo.RegisteredCartItemVO
+import com.mogobiz.tools.QRCodeUtils
 import com.mogobiz.utils.DateUtilitaire
 import com.mogobiz.utils.IperUtil
-import com.mogobiz.tools.QRCodeUtils
 import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.util.Holders
 import groovy.json.JsonBuilder
 
-import static com.mogobiz.utils.ProfileUtils.*
+import static com.mogobiz.utils.ProfileUtils.ALL
 
 public class CommonService {
 

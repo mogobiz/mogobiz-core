@@ -4,11 +4,9 @@
 
 package com.mogobiz.service
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.authentication.ProfileService
-import com.mogobiz.store.domain.*
+import com.mogobiz.store.domain.Company
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.tools.RandomPassword
-import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import com.mogobiz.utils.SymmetricCrypt
 import grails.converters.JSON
@@ -23,9 +21,9 @@ class SellerService {
 
     def grailsApplication
     def emailConfirmationService
-    AuthenticationService authenticationService
-    CompanyService companyService
-    ProfileService profileService
+    def authenticationService
+    def companyService
+    def profileService
 
 
     def setActiveCompany(Seller seller, Company company) {

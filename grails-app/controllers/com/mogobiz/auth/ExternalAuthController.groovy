@@ -7,17 +7,15 @@
  */
 package com.mogobiz.auth
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.store.domain.GoogleEnv
-import grails.converters.JSON
-
-import com.mogobiz.utils.SecurityUtils
-import com.mogobiz.store.domain.AccountType
-import com.mogobiz.store.domain.Company;
-import com.mogobiz.store.domain.ExternalAuthLogin
 import com.mogobiz.facebook.FBClient
+import com.mogobiz.store.domain.AccountType
+import com.mogobiz.store.domain.Company
+import com.mogobiz.store.domain.ExternalAuthLogin
+import com.mogobiz.store.domain.GoogleEnv
+import com.mogobiz.utils.SecurityUtils
 import com.restfb.exception.FacebookException
 import com.restfb.types.User
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 /**
@@ -30,7 +28,7 @@ import grails.transaction.Transactional
 class ExternalAuthController {
 	def grailsApplication
 
-    AuthenticationService authenticationService
+    def authenticationService
 
 /*
  * Authentification au sein d'iper 2010 via OAuth

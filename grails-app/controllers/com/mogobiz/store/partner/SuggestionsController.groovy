@@ -7,12 +7,11 @@
  */
 package com.mogobiz.store.partner
 
-import grails.converters.JSON
-import grails.transaction.Transactional
-
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Suggestion
+import grails.converters.JSON
+import grails.transaction.Transactional
 
 class SuggestionsController {
 

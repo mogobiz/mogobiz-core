@@ -4,7 +4,6 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.GoogleVariationType
 import com.mogobiz.store.domain.GoogleVariationValue
 import grails.converters.JSON
@@ -14,7 +13,7 @@ import grails.transaction.Transactional
 
 class GoogleVariationController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
     @Transactional(readOnly = true)
     def show(String type) {

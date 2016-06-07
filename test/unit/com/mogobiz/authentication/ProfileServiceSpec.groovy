@@ -4,28 +4,13 @@ import bootstrap.CommonService
 import com.mogobiz.geolocation.domain.Location
 import com.mogobiz.geolocation.domain.LocationValidation
 import com.mogobiz.service.SanitizeUrlService
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.CompanyValidation
-import com.mogobiz.store.domain.Permission
-import com.mogobiz.store.domain.PermissionValidation
-import com.mogobiz.store.domain.Profile
-import com.mogobiz.store.domain.ProfilePermission
-import com.mogobiz.store.domain.ProfilePermissionValidation
-import com.mogobiz.store.domain.ProfileValidation
-import com.mogobiz.store.domain.Role
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.RolePermission
-import com.mogobiz.store.domain.RoleValidation
-import com.mogobiz.store.domain.User
-import com.mogobiz.store.domain.UserPermission
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.PermissionType
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-import static com.mogobiz.utils.ProfileUtils.ALL
-import static com.mogobiz.utils.ProfileUtils.WILDCARD_PERMISSION
-import static com.mogobiz.utils.ProfileUtils.computePermission
+import static com.mogobiz.utils.ProfileUtils.*
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions

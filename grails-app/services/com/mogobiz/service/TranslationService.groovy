@@ -5,7 +5,6 @@
 package com.mogobiz.service
 
 import com.mogobiz.ajax.AjaxResponse
-import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Translation
 import com.mogobiz.store.domain.User
@@ -17,7 +16,7 @@ import grails.util.Holders
 class TranslationService {
     static transactional = true
 
-    AjaxResponseService ajaxResponseService;
+    def ajaxResponseService;
 
     /**
      * Returns a list of configurable languages ​​by the Partner application

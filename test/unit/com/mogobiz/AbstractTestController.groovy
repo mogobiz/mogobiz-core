@@ -1,22 +1,10 @@
 package com.mogobiz
 
-import com.mogobiz.store.domain.Brand;
-import com.mogobiz.store.domain.Catalog;
-import com.mogobiz.store.domain.Category;
-import com.mogobiz.store.domain.Company;
-import com.mogobiz.store.domain.Product;
-import com.mogobiz.store.domain.ProductCalendar;
-import com.mogobiz.store.domain.ProductState;
-import com.mogobiz.store.domain.ProductType;
-import com.mogobiz.store.domain.Seller;
-import com.mogobiz.store.domain.Stock;
-import com.mogobiz.store.domain.TicketType;
-import com.mogobiz.store.domain.Translation;
-import com.mogobiz.authentication.AuthenticationService;
-
-import grails.test.mixin.Mock;
-import grails.test.mixin.TestMixin;
-import grails.test.mixin.support.GrailsUnitTestMixin;
+import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.store.domain.*
+import grails.test.mixin.Mock
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Company, Seller, Catalog, Brand, Category, Product, TicketType, Stock, Translation])

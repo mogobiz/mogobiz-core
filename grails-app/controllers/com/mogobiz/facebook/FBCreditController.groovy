@@ -4,9 +4,8 @@
 
 package com.mogobiz.facebook
 
-import grails.converters.JSON;
-
 import com.mogobiz.store.domain.Product
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 class FBCreditController

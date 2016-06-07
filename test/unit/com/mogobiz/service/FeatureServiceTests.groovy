@@ -1,14 +1,9 @@
 package com.mogobiz.service
 
-
-
 import grails.converters.JSON
-import grails.test.mixin.*
-import groovyx.net.http.*
-
+import grails.test.mixin.TestFor
+import groovyx.net.http.HTTPBuilder
 import org.codehaus.groovy.grails.web.json.JSONObject
-
-import com.mogobiz.service.FeatureService
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions

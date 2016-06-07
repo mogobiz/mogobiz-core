@@ -9,21 +9,15 @@
  */
 package com.mogobiz.service
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.authentication.ProfileService
 import com.mogobiz.exceptions.CompanyAlreadyExistException
 import com.mogobiz.exceptions.InvalidDomainObjectException
-import com.mogobiz.store.domain.Catalog;
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.EsEnv
-import com.mogobiz.store.domain.Profile
-import com.mogobiz.store.domain.Seller
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import grails.util.Holders
 
-import static com.mogobiz.utils.ProfileUtils.*
+import static com.mogobiz.utils.ProfileUtils.ALL
 
 /**
  * Management service compagnies
@@ -32,9 +26,9 @@ class CompanyService
 {
     def grailsApplication
 
-    AuthenticationService authenticationService
+    def authenticationService
 
-    ProfileService profileService
+    def profileService
 
 	/**
 	 * This methode returns company's informations

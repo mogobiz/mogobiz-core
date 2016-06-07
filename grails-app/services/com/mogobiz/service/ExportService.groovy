@@ -7,7 +7,6 @@ package com.mogobiz.service
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.DataValidationConstraint
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellRangeAddressList
@@ -24,8 +23,8 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class ExportService {
-    CategoryService categoryService
-    FeatureService featureService
+    def categoryService
+    def featureService
     def grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide"]

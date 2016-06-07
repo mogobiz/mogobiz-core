@@ -9,20 +9,20 @@ import com.mogobiz.store.domain.CountryAdmin
 import com.mogobiz.tools.CsvLine
 import grails.util.Holders
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
-import org.hibernate.SessionFactory
 import rx.Observable
 import rx.functions.Action0
 import rx.functions.Action1
 import rx.functions.Func1
 import rx.observables.BlockingObservable
 
-import static com.mogobiz.tools.Reader.*
+import static com.mogobiz.tools.Reader.getTrim
+import static com.mogobiz.tools.Reader.parseCsvFile
 
 class CountryImportService {
 
     boolean transactional = true
 
-    SessionFactory sessionFactory
+    def sessionFactory
 
     def cleanUpGorm() {
         def session = sessionFactory.currentSession

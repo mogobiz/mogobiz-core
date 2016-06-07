@@ -4,18 +4,11 @@
 
 package com.mogobiz.auth
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.authentication.ProfileService
-import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.cmd.PermissionCommand
 import com.mogobiz.store.cmd.ProfileCommand
 import com.mogobiz.store.cmd.UserPermissionCommand
 import com.mogobiz.store.cmd.UserProfileCommand
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Profile
-import com.mogobiz.store.domain.Role
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.User
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
@@ -30,11 +23,11 @@ import static com.mogobiz.utils.ProfileUtils.*
  */
 class ProfileController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
-    ProfileService profileService
+    def profileService
 
-    SanitizeUrlService sanitizeUrlService
+    def sanitizeUrlService
 
     @Transactional
     def index(Long idStore){

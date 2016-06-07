@@ -4,16 +4,9 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.service.FeatureService
-import com.mogobiz.store.domain.FeatureValue
+import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.converters.XML
-
-import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Feature
-import com.mogobiz.store.domain.Product
 import grails.transaction.Transactional
 
 /**
@@ -23,8 +16,8 @@ import grails.transaction.Transactional
  *
  */
 class FeatureController {
-	AuthenticationService authenticationService
-	FeatureService featureService
+	def authenticationService
+	def featureService
 
 	@Transactional(readOnly = true)
 	def show() {

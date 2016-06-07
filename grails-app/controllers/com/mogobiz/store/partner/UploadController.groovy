@@ -7,14 +7,10 @@
  */
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.facebook.FBClient
 import com.mogobiz.google.PicasaClient
 import com.mogobiz.google.YouTubeClient
 import com.mogobiz.json.RenderUtil
-import com.mogobiz.service.ResService
-import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.transaction.Transactional
@@ -23,18 +19,17 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import static com.mogobiz.constant.IperConstant.QUEUE_NS
 import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
 
-
 /**
  * @author stephane.manciot@ebiznext.com
  *
  */
 class UploadController {
 
-    AjaxResponseService ajaxResponseService
+    def ajaxResponseService
     def grailsApplication
-    SanitizeUrlService sanitizeUrlService
-    ResService resService
-    AuthenticationService authenticationService
+    def sanitizeUrlService
+    def resService
+    def authenticationService
 
     @Transactional(readOnly = true)
     def retrievePictures() {

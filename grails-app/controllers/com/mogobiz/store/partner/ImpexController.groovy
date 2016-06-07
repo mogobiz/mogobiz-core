@@ -4,11 +4,6 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.authentication.ProfileService
-import com.mogobiz.service.CatalogService
-import com.mogobiz.service.ExportService
-import com.mogobiz.service.ImportService
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
@@ -23,11 +18,11 @@ import java.util.zip.ZipFile
 
 class ImpexController {
 
-    ExportService exportService
-    CatalogService catalogService
-    AuthenticationService authenticationService
-    ImportService importService
-    ProfileService profileService
+    def exportService
+    def catalogService
+    def authenticationService
+    def importService
+    def profileService
 
     @Transactional
     def purge() {

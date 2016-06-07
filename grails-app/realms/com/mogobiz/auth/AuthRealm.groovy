@@ -7,13 +7,9 @@
  */
 package com.mogobiz.auth
 
-import com.mogobiz.store.domain.ProfilePermission
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.RolePermission
-import com.mogobiz.store.domain.User
-import com.mogobiz.store.domain.UserPermission
+import com.mogobiz.store.domain.*
 import org.apache.shiro.authc.*
-import org.apache.shiro.authc.credential.*
+import org.apache.shiro.authc.credential.CredentialsMatcher
 import org.apache.shiro.authz.Permission
 import org.springframework.web.context.request.RequestContextHolder
 

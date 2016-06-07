@@ -4,22 +4,18 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.service.CategoryService
-import grails.converters.JSON
-import grails.converters.XML
-
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
+import grails.converters.JSON
+import grails.converters.XML
 import grails.transaction.Transactional
 
 class VariationController {
-    AuthenticationService authenticationService
-	AjaxResponseService ajaxResponseService
-	CategoryService categoryService
+    def authenticationService
+	def ajaxResponseService
+	def categoryService
 
 	private List<Variation> getVariations(Category category) {
 		List<Variation> variations = Variation.findAllByCategory(category,[sort:'position',order:'asc'])

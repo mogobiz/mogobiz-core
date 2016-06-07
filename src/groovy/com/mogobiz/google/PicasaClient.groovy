@@ -23,14 +23,7 @@ import com.google.gdata.data.Link
 import com.google.gdata.data.PlainTextConstruct
 import com.google.gdata.data.media.MediaStreamSource
 import com.google.gdata.data.media.mediarss.MediaContent
-import com.google.gdata.data.photos.AlbumEntry
-import com.google.gdata.data.photos.AlbumFeed
-import com.google.gdata.data.photos.CommentEntry
-import com.google.gdata.data.photos.GphotoEntry
-import com.google.gdata.data.photos.GphotoFeed
-import com.google.gdata.data.photos.PhotoEntry
-import com.google.gdata.data.photos.TagEntry
-import com.google.gdata.data.photos.UserFeed
+import com.google.gdata.data.photos.*
 import com.google.gdata.util.ServiceException
 
 /**

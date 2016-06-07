@@ -4,18 +4,17 @@
 
 package com.mogobiz.store.admin
 
+import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.service.TaxRateService
+import com.mogobiz.store.domain.Company
+import com.mogobiz.store.domain.LocalTaxRate
+import com.mogobiz.store.domain.TaxRate
+import com.mogobiz.store.domain.User
 import grails.converters.JSON
 import grails.transaction.Transactional
 
-import javax.servlet.http.HttpServletResponse;
-
-import com.mogobiz.store.domain.Company;
-import com.mogobiz.store.domain.LocalTaxRate;
-import com.mogobiz.store.domain.TaxRate;
-import com.mogobiz.store.domain.User;
-import com.mogobiz.ajax.AjaxResponseService;
-import com.mogobiz.authentication.AuthenticationService;
+import javax.servlet.http.HttpServletResponse
 
 class TaxRateController {
 

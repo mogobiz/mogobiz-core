@@ -1,16 +1,18 @@
 package com.mogobiz.store.service
+
 import bootstrap.CommonService
-import com.mogobiz.store.cmd.coupon.CouponCreateUpdateCommand
-import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.service.CouponService
+import com.mogobiz.service.SanitizeUrlService
+import com.mogobiz.store.cmd.coupon.CouponCreateUpdateCommand
+import com.mogobiz.store.domain.*
 import com.mogobiz.store.vo.CartItemVO
 import com.mogobiz.store.vo.CartVO
 import com.mogobiz.store.vo.CouponVO
-import com.mogobiz.service.CouponService
-import com.mogobiz.store.domain.*
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
+
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */

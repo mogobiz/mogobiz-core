@@ -1,12 +1,11 @@
 package com.mogobiz.jndi
 
+import com.mogobiz.jndi.java.javaURLContextFactory
 import grails.util.GrailsUtil
 
 import javax.naming.Context
-import javax.naming.InitialContext;
+import javax.naming.InitialContext
 import javax.naming.NamingException
-
-import com.mogobiz.jndi.java.javaURLContextFactory;
 
 class IperJndiContext extends InitialContext {
 

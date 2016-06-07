@@ -1,11 +1,10 @@
 package com.mogobiz.store.service
 
-import com.mogobiz.AbstractTestService;
-import com.mogobiz.store.domain.Catalog;
+import com.mogobiz.AbstractTestService
+import com.mogobiz.service.CatalogService
+import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Company
-import com.mogobiz.service.CatalogService;
-import grails.test.mixin.Mock;
-
+import grails.test.mixin.Mock
 
 @Mock([Company, Catalog])
 class CatalogServiceTests extends AbstractTestService {
