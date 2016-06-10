@@ -22,14 +22,17 @@ import static com.mogobiz.utils.ProfileUtils.ALL
 
 public class CommonService {
 
-	SanitizeUrlService sanitizeUrlService
+	def sanitizeUrlService
 
-    ProfileService profileService
+    def profileService
 
-    CountryImportService countryImportService
+    def countryImportService
+
+    def translationService
 
     def destroy() {}
 	def init() {
+
         // import countries
         final codes = (Holders.config.importCountries?.codes as String)?.split(',')?.collect{it.trim().toUpperCase()} ?: ['DE','ES','FR','GB','US']
         final countryCodes = Country.findAll().collect {it.code}

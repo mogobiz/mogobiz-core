@@ -40,9 +40,14 @@ class ExportService {
     final List<String> couponHeaders = ["uuid", "name", "code", "active", "number-of-uses", "start-date", "end-date", "catalog-wise", "for-sale", "description", "anonymous", "pastille", "consumed"]
     final List<String> reductionRuleHeaders = ["coupon-code", "uuid", "xtype", "quantity-min", "quantity-max", "discount", "xpurchased", "yoffered"]
     final List<String> couponUseHeaders = ["uuid", "code", "category-uuid", "product-uuid", "sku-uuid", "target-name"]
+    final List<String> translationHeaders = ["uuid", "target", "lang", "value", "type"]
+
+    List<String> toArray(Translation it) {
+        [it.uuid, ""+it.target, it.lang, it.value, it.type]
+    }
 
     List<String> toArray(Coupon it) {
-        [it.uuid, it.name, it.code, it.active, it.numberOfUses, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.endDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.endDate.getTime()) : "", it.catalogWise, it.forSale, it.description, it.anonymous, it.pastille, it.consumed]
+        [it.uuid, it.name, it.code, ""+it.active, ""+it.numberOfUses, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.endDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.endDate.getTime()) : "", ""+it.catalogWise, ""+it.forSale, it.description, ""+it.anonymous, it.pastille, ""+it.consumed]
     }
 
     List<String> toArray(ReductionRule it, String couponCode) {
@@ -50,27 +55,27 @@ class ExportService {
     }
 
     List<String> toArray(ShippingRule it) {
-        [it.uuid, it.countryCode, it.minAmount, it.maxAmount, it.price]
+        [it.uuid, it.countryCode, ""+it.minAmount, ""+it.maxAmount, it.price]
     }
 
     List<String> toArray(Brand it) {
-        [it.uuid, it.name, it.website, it.facebooksite, it.twitter, it.description, it.hide]
+        [it.uuid, it.name, it.website, it.facebooksite, it.twitter, it.description, ""+it.hide]
     }
 
     List<String> toArray(Category it) {
-        [it.uuid, it.externalCode, categoryService.path(it), it.position.toString(), it.description, it.keywords, it.hide, it.sanitizedName, it.googleCategory, it.deleted]
+        [it.uuid, it.externalCode, categoryService.path(it), ""+it.position, it.description, it.keywords, ""+it.hide, it.sanitizedName, it.googleCategory, ""+it.deleted]
     }
 
     List<String> toArrayForCat(Feature it, int catRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, null, null, it.uuid, it.externalCode, it.domain, it.name, it.value, it.hide]
+        ["category!A" + catRowNum, "category!C" + catRowNum, null, null, it.uuid, it.externalCode, it.domain, it.name, it.value, ""+it.hide]
     }
 
     List<String> toArrayForPrd(Feature it, int catRowNum, int prdRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.domain, it.name, it.value?.indexOf("||||") >= 0 ? it.value.substring(it.value.indexOf("||||") + 4) : it.value, it.hide]
+        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.domain, it.name, it.value?.indexOf("||||") >= 0 ? it.value.substring(it.value.indexOf("||||") + 4) : it.value, ""+it.hide]
     }
 
     List<String> toArray(Variation it, int catRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode, it.name, it.googleVariationType, it.hide]
+        ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode, it.name, it.googleVariationType, ""+it.hide]
     }
 
     List<String> toArray(VariationValue it, int catRowNum, int varRowNum) {
@@ -78,13 +83,13 @@ class ExportService {
     }
 
     List<String> toArray(Product it, int catRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode ?: "", it.code, it.name, it.xtype, it.price, it.state, it.description ?: "", it.nbSales, it.stockDisplay, it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : "", it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : "", it.sanitizedName, it.tags.collect {
+        ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode ?: "", it.code, it.name, ""+it.xtype, it.price, it.state, it.description ?: "", ""+it.nbSales, ""+it.stockDisplay, ""+it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : "", it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : "", it.sanitizedName, it.tags.collect {
             it.name
         }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate ? it.taxRate.name : "", new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated)]
     }
 
     List<String> toArray(TicketType it, int catRowNum, int prdRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.sku, it.name, it.price, it.minOrder, it.maxOrder, it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.xprivate, it.stock ? it.stock.stock : "", it.stock ? it.stock.stockUnlimited : "", it.stock ? it.stock.stockOutSelling : "", it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : "", it.gtin, it.mpn, it.variation1?.variation?.name, it.variation1?.value, it.variation2?.variation?.name, it.variation2?.value, it.variation3?.variation?.name, it.variation3?.value]
+        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.sku, it.name, ""+it.price, ""+it.minOrder, ""+it.maxOrder, ""+it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.xprivate, it.stock ? it.stock.stock : "", it.stock ? it.stock.stockUnlimited : "", it.stock ? it.stock.stockOutSelling : "", it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : "", it.gtin, it.mpn, it.variation1?.variation?.name, it.variation1?.value, it.variation2?.variation?.name, it.variation2?.value, it.variation3?.variation?.name, it.variation3?.value]
     }
 
     List<String> toArray(ProductProperty it, int catRowNum, int prdRowNum) {
@@ -92,7 +97,7 @@ class ExportService {
     }
 
     List<String> toArray(LocalTaxRate it, String name) {
-        [it.uuid, name, it.countryCode ?: "", it.stateCode ?: "", it.rate, it.active]
+        [it.uuid, name, it.countryCode ?: "", it.stateCode ?: "", ""+it.rate, ""+it.active]
     }
 
 
@@ -250,6 +255,26 @@ class ExportService {
             couponUseCell.setCellValue(it)
         }
 
+        XSSFSheet transSheet = workbook.createSheet("translation");
+        int transRownum = 0
+        Row transRow = transSheet.createRow(transRownum++)
+        int transCellnum = 0
+        translationHeaders.each {
+            Cell transCell = transRow.createCell(transCellnum++)
+            transCell.setCellValue(it)
+        }
+
+
+        List<Translation> translations = Translation.findAllByCatalog(Catalog.get(catalogId))
+        translations.each { trans ->
+            transCellnum = 0
+            Row tranRow = transSheet.createRow(transRownum++)
+            toArray(trans).each {
+                Cell transCell = tranRow.createCell(transCellnum++)
+                transCell.setCellValue(it)
+            }
+        }
+
         List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
         brandRownum = 1
         final String resourcesPath = grailsApplication.config.resources.path
@@ -259,7 +284,7 @@ class ExportService {
         Path brandLogosDir = Paths.get(outDir.getAbsolutePath(), "__brandlogos__")
         brandLogosDir.toFile().mkdirs()
         List<String> brandLogos = []
-        brands.each {brand ->
+        brands.each { brand ->
             brandCellnum = 0
             Row branRow = brandSheet.createRow(brandRownum++)
             toArray(brand).each {
@@ -389,7 +414,7 @@ class ExportService {
         }
 
         doExport(catalogId, workbook, parent, deleted, [catRownum, catfeatRownum, varRownum, varValRownum, prdRownum, prdFeatRownum, skuRownum, prdPropRownum], outDir)
-        //Write the workbook in file system
+        // Write the workbook in file system
         FileOutputStream out = new FileOutputStream(xlsFile);
         workbook.write(out);
         out.close();
@@ -517,10 +542,10 @@ class ExportService {
                     }
                 }
                 List<VariationValue> values = VariationValue.findAllByVariation(varit)
-                values.each {
+                values.each { valit ->
                     int varValCellnum = 0
                     Row varValRow = varValSheet.createRow(varValRownum++)
-                    toArray(it, catRownum, varRownum).each {
+                    toArray(valit, catRownum, varRownum).each {
                         Cell varValCell = varValRow.createCell(varValCellnum++)
                         if (varValCellnum <= 4)
                             varValCell.setCellFormula(it)
