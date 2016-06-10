@@ -47,7 +47,16 @@ class Translation
     /**
      * 
      */
+    java.lang.String targetUuid 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Catalog catalog 
+
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Company company 
 
     static transients = [ 'translationValidation', 'translationRender' ]
 
@@ -74,9 +83,12 @@ class Translation
         value column:"value",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         type column:"type",insertable:true,updateable:true,lazy:false,cache:false
         companyId column:"company_id",insertable:true,updateable:true,lazy:false,cache:false
+        targetUuid column:"target_uuid",insertable:true,updateable:true,lazy:false,cache:false
 
 
         catalog column:"catalog_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -87,7 +99,9 @@ class Translation
         value ( blank:false, nullable:false, unique:false)
         type (nullable:true, unique:false)
         companyId ( blank:false, nullable:false, unique:false)
+        targetUuid (nullable:true, unique:false)
         catalog (nullable:true)
+        company (nullable:true)
     }
 
 

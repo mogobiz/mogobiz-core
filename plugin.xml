@@ -38,7 +38,6 @@
     <resource>com.mogobiz.store.partner.GoogleVariationController</resource>
     <resource>com.mogobiz.store.partner.GoogleVariationMappingsController</resource>
     <resource>com.mogobiz.store.partner.IbeaconController</resource>
-    <resource>com.mogobiz.store.partner.ImpexController</resource>
     <resource>com.mogobiz.store.partner.IntraDayPeriodController</resource>
     <resource>com.mogobiz.store.partner.PartnerController</resource>
     <resource>com.mogobiz.store.partner.ProductController</resource>
