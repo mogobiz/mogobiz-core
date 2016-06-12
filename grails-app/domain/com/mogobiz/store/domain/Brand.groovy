@@ -66,6 +66,11 @@ class Brand
     /**
      *
      */
+    java.lang.String i18n
+
+    /**
+     *
+     */
     com.mogobiz.store.domain.Brand parent
 
     static transients = [ 'brandValidation', 'brandRender' ]
@@ -95,7 +100,7 @@ class Brand
         hide column:"hide",insertable:true,updateable:true,lazy:false,cache:false
         description column:"description",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         twitter column:"twitter",insertable:true,updateable:true,lazy:false,cache:false
-
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
@@ -113,6 +118,7 @@ class Brand
         hide ( blank:false, nullable:false, unique:false)
         description (nullable:true, unique:false)
         twitter (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
         company ( blank:false, nullable:false)
         ibeacon (nullable:true)
         parent (nullable:true)

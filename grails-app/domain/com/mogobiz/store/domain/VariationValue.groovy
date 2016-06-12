@@ -43,6 +43,10 @@ class VariationValue
     /**
      * 
      */
+    java.lang.String i18n 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Variation variation 
 
     static transients = [ 'variationValueValidation', 'variationValueRender' ]
@@ -69,6 +73,7 @@ class VariationValue
         value column:"value",insertable:true,updateable:true,lazy:false,cache:false
         position column:"position",insertable:true,updateable:true,lazy:false,cache:false
         googleVariationValue column:"google_variation_value",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         variation column:"variation_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -81,6 +86,7 @@ class VariationValue
         value ( blank:false, nullable:false, unique:false)
         position ( blank:false, nullable:false, unique:false)
         googleVariationValue (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
         variation ( blank:false, nullable:false)
     }
 

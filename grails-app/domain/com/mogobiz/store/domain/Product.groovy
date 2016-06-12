@@ -146,6 +146,14 @@ class Product
     /**
      * 
      */
+    java.lang.String i18n
+    /**
+     *
+     */
+    java.lang.Boolean publishable
+    /**
+     *
+     */
     com.mogobiz.geolocation.domain.Poi poi
 
     /**
@@ -250,6 +258,8 @@ class Product
         downloadMaxDelay column:"download_max_delay",insertable:true,updateable:true,lazy:false,cache:false
         returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
         stockAvailable column:"stock_available",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        publishable column:"publishable",insertable:true,updateable:true,lazy:false,cache:false
 
         poi column:"poi_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
@@ -309,6 +319,8 @@ class Product
         shipping (nullable:true)
         taxRate (nullable:true)
         ibeacon (nullable:true)
+        i18n (nullable:true, unique:false)
+        publishable (nullable:true, unique:false)
     }
 
 

@@ -63,6 +63,10 @@ class Catalog
     /**
      * 
      */
+    java.lang.String i18n 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'catalogValidation', 'catalogRender' ]
@@ -94,6 +98,7 @@ class Catalog
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
         xcatalog column:"xcatalog",insertable:true,updateable:true,lazy:false,cache:false
         returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -111,6 +116,7 @@ class Catalog
         deleted ( blank:false, nullable:false, unique:false)
         xcatalog (nullable:true, unique:false)
         returnMaxDelay ( blank:false, nullable:false, unique:false)
+        i18n (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 
