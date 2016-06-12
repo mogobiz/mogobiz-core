@@ -226,35 +226,6 @@ class TranslationService {
                 case "POI":
                     Poi poi = Poi.findById(target)
                     break;
-                case "OTHER":
-                    Feature feature = Feature.findById(target)
-                    Catalog cat = feature?.product?.category?.catalog
-                    String newType = null
-                    if (cat == null) {
-                        cat = feature?.category?.catalog
-                    }
-                    if (cat) {
-                        newType = "FEATURE"
-                    }
-
-                    ProductProperty pp = ProductProperty.findById(target)
-                    if (cat == null) {
-                        cat = pp?.product?.category?.catalog
-                        if (cat) {
-                            newType = "PRODUCT_PROPERTY"
-                        }
-                    }
-
-                    if (cat == null) {
-                        Brand brand = Brand.findById(target)
-                        if (brand)
-                            newType = "BRAND"
-                    }
-
-                    if (newType != null)
-                        it.type = newType
-                    it.catalog = cat
-                    break;
                 default:
                     break;
             }
