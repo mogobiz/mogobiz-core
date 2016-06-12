@@ -98,6 +98,8 @@
     <resource>com.mogobiz.store.domain.Ibeacon</resource>
     <resource>com.mogobiz.store.domain.IntraDayPeriod</resource>
     <resource>com.mogobiz.store.domain.LocalTaxRate</resource>
+    <resource>com.mogobiz.store.domain.MiraklEnv</resource>
+    <resource>com.mogobiz.store.domain.MiraklSync</resource>
     <resource>com.mogobiz.store.domain.Notation</resource>
     <resource>com.mogobiz.store.domain.Permission</resource>
     <resource>com.mogobiz.store.domain.Price</resource>

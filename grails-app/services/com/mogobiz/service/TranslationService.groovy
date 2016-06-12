@@ -88,57 +88,57 @@ class TranslationService {
             case "CATALOG":
                 Catalog cat = Catalog.findById(target)
                 cat?.i18n = transToken
-                cat.save(flush: true)
+                cat?.save(flush: true)
                 break;
             case "CATEGORY":
                 Category ct = Category.findById(target)
                 ct?.i18n = transToken
-                ct.save(flush: true)
+                ct?.save(flush: true)
                 break;
             case "PRODUCT":
                 Product p = Product.findById(target)
                 p?.i18n = transToken
-                p.save(flush: true)
+                p?.save(flush: true)
                 break;
             case "TICKET_TYPE":
                 TicketType tt = TicketType.findById(target)
                 tt?.i18n = transToken
-                tt.save(flush: true)
+                tt?.save(flush: true)
                 break;
             case "VARIATION":
                 Variation v = Variation.findById(target)
                 v?.i18n = transToken
-                v.save(flush: true)
+                v?.save(flush: true)
                 break;
             case "BRAND":
                 Brand b = Brand.findById(target)
                 b?.i18n = transToken
-                b.save(flush: true)
+                b?.save(flush: true)
                 break;
             case "VARIATION_VALUE":
                 VariationValue vv = VariationValue.findById(target)
                 vv?.i18n = transToken
-                vv.save(flush: true)
+                vv?.save(flush: true)
                 break;
             case "COUPON":
                 Coupon c = Coupon.findById(target)
                 c?.i18n = transToken
-                c.save(flush: true)
+                c?.save(flush: true)
                 break;
             case "FEATURE":
                 Feature f = Feature.findById(target)
                 f?.i18n = transToken
-                f.save(flush: true)
+                f?.save(flush: true)
                 break;
             case "PRODUCT_PROPERTY":
                 ProductProperty pp = ProductProperty.findById(target)
                 pp?.i18n = transToken
-                pp.save(flush: true)
+                pp?.save(flush: true)
                 break;
             case "POI":
                 Poi poi = Poi.findById(target)
                 poi?.i18n = transToken
-                poi.save(flush: true)
+                poi?.save(flush: true)
                 break;
             default:
                 log.error("Unkown Translation Type $type")
