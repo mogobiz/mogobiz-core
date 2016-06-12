@@ -1,17 +1,8 @@
 package com.mogobiz.utils
 
-
+import com.mogobiz.store.domain.*
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.crypto.hash.Sha256Hash
-
-import com.mogobiz.store.domain.AccountType
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.ExternalAccount
-import com.mogobiz.store.domain.Permission
-import com.mogobiz.store.domain.Role
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.Seller
-import com.mogobiz.store.domain.UserPermission
 
 class SecurityUtils {
 	public static Seller extractSeller(String login, String password, AccountType accountType, String externalId, String token, String tokenSecret,

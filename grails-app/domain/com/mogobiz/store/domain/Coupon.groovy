@@ -77,6 +77,10 @@ class Coupon
     /**
      * 
      */
+    java.lang.String i18n 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static hasMany = [ categories:com.mogobiz.store.domain.Category , products:com.mogobiz.store.domain.Product , ticketTypes:com.mogobiz.store.domain.TicketType ,  rules:com.mogobiz.store.domain.ReductionRule , catalogs:com.mogobiz.store.domain.Catalog ]
@@ -113,6 +117,7 @@ class Coupon
         anonymous column:"anonymous",insertable:true,updateable:true,lazy:false,cache:false
         pastille column:"pastille",insertable:true,updateable:true,lazy:false,cache:false
         consumed column:"consumed",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         categories column:"categories_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -143,6 +148,7 @@ class Coupon
         anonymous ( blank:false, nullable:false, unique:false)
         pastille (nullable:true, unique:false)
         consumed ( blank:false, nullable:false, unique:false)
+        i18n (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 

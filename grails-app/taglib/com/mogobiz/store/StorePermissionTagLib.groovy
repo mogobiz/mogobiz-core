@@ -9,7 +9,7 @@ import com.mogobiz.utils.PermissionType
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
 
-import static com.mogobiz.utils.ProfileUtils.*
+import static com.mogobiz.utils.ProfileUtils.computeStorePermission
 
 class StorePermissionTagLib {
 

@@ -150,6 +150,15 @@ class TicketType
      */
     com.mogobiz.store.domain.Resource picture
 
+    /**
+     *
+     */
+    java.lang.String i18n
+    /**
+     *
+     */
+    java.lang.Boolean publishable
+
     static embedded = [  'stock' ]
 
     static transients = [ 'ticketTypeValidation', 'ticketTypeRender' ]
@@ -196,7 +205,8 @@ class TicketType
         filename column:"filename",insertable:true,updateable:true,lazy:false,cache:false
         available column:"available",insertable:true,updateable:true,lazy:false,cache:false
         byDateTimes column:"by_date_times",insertable:true,updateable:true,lazy:false,type:"text",cache:false
-
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        publishable column:"publishable",insertable:true,updateable:true,lazy:false,cache:false
 
         variation1 column:"variation1_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
@@ -236,6 +246,8 @@ class TicketType
         product ( blank:false, nullable:false)
         variation3 (nullable:true)
         picture (nullable:true)
+        i18n (nullable:true, unique:false)
+        publishable (nullable:true, unique:false)
     }
 
     static java.util.Collection findSalableByProduct(final long idProduct)

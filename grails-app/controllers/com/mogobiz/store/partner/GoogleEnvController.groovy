@@ -4,7 +4,6 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.GoogleEnv
 import grails.converters.JSON
 import grails.converters.XML
@@ -12,7 +11,7 @@ import grails.transaction.Transactional
 
 class GoogleEnvController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
     def grailsApplication
 

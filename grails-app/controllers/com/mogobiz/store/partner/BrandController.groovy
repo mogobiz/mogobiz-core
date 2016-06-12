@@ -7,13 +7,7 @@
  */
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.store.domain.Brand
-import com.mogobiz.store.domain.BrandProperty
-import com.mogobiz.store.domain.Ibeacon
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Seller
+import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -25,9 +19,9 @@ import org.apache.commons.io.FileUtils
  */
 class BrandController {
 
-    AjaxResponseService ajaxResponseService
+    def ajaxResponseService
 
-    AuthenticationService authenticationService
+    def authenticationService
 
     static final int BUFFER_SIZE = 2048
 

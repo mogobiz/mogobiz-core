@@ -9,9 +9,9 @@
  */
 package com.mogobiz.service
 
-import com.mogobiz.store.domain.Brand;
-import com.mogobiz.store.domain.Product;
-import com.mogobiz.store.domain.ProductState;
+import com.mogobiz.store.domain.Brand
+import com.mogobiz.store.domain.Product
+import com.mogobiz.store.domain.ProductState
 
 /**
  * Management service brands

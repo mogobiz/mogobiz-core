@@ -1,11 +1,10 @@
 package com.mogobiz.grails
 
-import grails.util.Holders;
+import grails.util.Holders
+import org.grails.databinding.converters.ValueConverter
 
-import java.text.ParseException;
+import java.text.ParseException
 import java.text.SimpleDateFormat
-
-import org.grails.databinding.converters.ValueConverter;
 
 class CalendarValueConverter implements ValueConverter {
 

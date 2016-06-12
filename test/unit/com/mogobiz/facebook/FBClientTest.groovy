@@ -3,17 +3,16 @@
  */
 package com.mogobiz.facebook
 
-import static org.junit.Assert.*
-
+import com.restfb.Connection
+import com.restfb.json.JsonObject
+import com.restfb.types.Album
+import com.restfb.types.Comment
+import com.restfb.types.Photo
+import com.restfb.types.Post
 import org.junit.Before
 import org.junit.Test
 
-import com.restfb.Connection
-import com.restfb.types.Album
-import com.restfb.types.Photo
-import com.restfb.types.Comment
-import com.restfb.types.Post
-import com.restfb.json.JsonObject;
+import static org.junit.Assert.*
 
 /**
  * @author stephane.manciot@ebiznext.com

@@ -1,6 +1,6 @@
 package com.mogobiz.payment
 
-import grails.test.*
+import grails.test.ControllerUnitTestCase
 
 class GenericPaymentControllerTests extends ControllerUnitTestCase {
     protected void setUp() {

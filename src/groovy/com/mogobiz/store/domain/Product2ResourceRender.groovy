@@ -4,8 +4,8 @@
 //
 package com.mogobiz.store.domain
 
+import com.mogobiz.RenderBase
 import com.mogobiz.json.RenderUtil
-import com.mogobiz.RenderBase;
 
 /**
  *

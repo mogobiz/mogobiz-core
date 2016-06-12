@@ -4,9 +4,7 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.authentication.ProfileService
-import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
@@ -17,8 +15,8 @@ import grails.transaction.Transactional
  * Controller utilisé pour gérer les categories
  */
 class CategoryController {
-    AuthenticationService authenticationService
-    SanitizeUrlService sanitizeUrlService
+    def authenticationService
+    def sanitizeUrlService
 
     ProfileService profileService
 

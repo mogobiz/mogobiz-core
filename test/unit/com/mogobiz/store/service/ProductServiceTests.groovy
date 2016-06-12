@@ -1,19 +1,10 @@
 package com.mogobiz.store.service
 
 import com.mogobiz.AbstractTestService
-import com.mogobiz.store.domain.Brand
-import com.mogobiz.store.domain.Catalog
-import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.LocalTaxRate;
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Product2Resource;
-import com.mogobiz.store.domain.ProductState
-import com.mogobiz.store.domain.TaxRate;
-import com.mogobiz.store.domain.Translation
+import com.mogobiz.service.ProductService
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.Page
-import com.mogobiz.service.ProductService;
-import grails.test.mixin.Mock;
+import grails.test.mixin.Mock
 
 @Mock([Company, Catalog, Category, Brand, LocalTaxRate, TaxRate, Translation, Product, Product2Resource])
 class ProductServiceTests extends AbstractTestService {

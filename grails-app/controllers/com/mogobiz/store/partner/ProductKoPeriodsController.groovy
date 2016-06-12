@@ -4,15 +4,13 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import grails.converters.JSON
-import grails.converters.XML
-
+import com.mogobiz.constant.IperConstant
+import com.mogobiz.json.RenderUtil
 import com.mogobiz.store.domain.DatePeriod
 import com.mogobiz.store.domain.Product
-import com.mogobiz.constant.IperConstant;
-import com.mogobiz.json.RenderUtil
-import grails.transaction.Transactional;
+import grails.converters.JSON
+import grails.converters.XML
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -20,7 +18,7 @@ import grails.transaction.Transactional;
  */
 class ProductKoPeriodsController {
 
-	AjaxResponseService ajaxResponseService
+	def ajaxResponseService
 
 	def authenticationService
 

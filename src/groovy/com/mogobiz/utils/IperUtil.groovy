@@ -1,26 +1,19 @@
 package com.mogobiz.utils
 
-import org.apache.commons.lang.StringUtils
-import org.codehaus.groovy.grails.commons.ApplicationAttributes
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
-
-import java.text.DateFormat
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.text.Normalizer
-import java.text.NumberFormat
-import java.text.ParseException;
-import java.text.SimpleDateFormat
-
-import com.mogobiz.store.domain.DatePeriod
-import com.mogobiz.store.domain.IntraDayPeriod
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Resource
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.geolocation.domain.Poi
 import com.mogobiz.geolocation.domain.PoiType
 import com.mogobiz.geolocation.domain.VisibilityType
 import com.mogobiz.json.RenderUtil
+import com.mogobiz.store.domain.DatePeriod
+import com.mogobiz.store.domain.IntraDayPeriod
+import com.mogobiz.store.domain.Product
+import com.mogobiz.store.domain.Resource
+import org.apache.commons.lang.StringUtils
+import org.codehaus.groovy.grails.commons.ApplicationAttributes
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+
+import java.text.*
 
 /**
  * classe utilitaire

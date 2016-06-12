@@ -4,33 +4,25 @@
 
 package com.mogobiz.service
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.utils.IperUtil
-
-import static com.mogobiz.constant.IperConstant.*
-
-import grails.events.Listener
-import grails.util.Holders
-
-import javax.activation.MimetypesFileTypeMap
-
-import org.grails.plugin.platform.events.EventMessage
-
-import com.mogobiz.store.domain.AccountType
-import com.mogobiz.store.domain.ExternalAccount
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Resource
-import com.mogobiz.store.domain.ResourceType
-import com.mogobiz.store.domain.User
 import com.mogobiz.facebook.FBClient
 import com.mogobiz.google.PicasaClient
 import com.mogobiz.google.YouTubeClient
+import com.mogobiz.store.domain.*
 import com.mogobiz.twitter.TwitterClient
+import com.mogobiz.utils.IperUtil
+import grails.events.Listener
+import grails.util.Holders
+import org.grails.plugin.platform.events.EventMessage
+
+import javax.activation.MimetypesFileTypeMap
+
+import static com.mogobiz.constant.IperConstant.QUEUE_NS
+import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
 
 class QueueSocialService {
 	boolean transactional = false
 
-    AuthenticationService authenticationService
+    def authenticationService
 
 	@Listener(topic=QUEUE_SOCIAL, namespace=QUEUE_NS)
 	def onEvent(EventMessage ev) {

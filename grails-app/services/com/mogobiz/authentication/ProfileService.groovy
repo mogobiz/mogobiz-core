@@ -4,18 +4,7 @@
 
 package com.mogobiz.authentication
 
-import com.mogobiz.service.SanitizeUrlService
-import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Permission
-import com.mogobiz.store.domain.Profile
-import com.mogobiz.store.domain.ProfilePermission
-import com.mogobiz.store.domain.Role
-import com.mogobiz.store.domain.RoleName
-import com.mogobiz.store.domain.RolePermission
-import com.mogobiz.store.domain.Seller
-import com.mogobiz.store.domain.User
-import com.mogobiz.store.domain.UserPermission
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.PermissionType
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -27,7 +16,7 @@ import static com.mogobiz.utils.ProfileUtils.*
 @Transactional
 class ProfileService {
 
-    SanitizeUrlService sanitizeUrlService
+    def sanitizeUrlService
 
     /**
      *

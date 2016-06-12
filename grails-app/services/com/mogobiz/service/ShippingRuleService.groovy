@@ -6,7 +6,6 @@ package com.mogobiz.service
 
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.cmd.ShippingRuleCommand
-import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.ShippingRule
 import grails.orm.PagedResultList

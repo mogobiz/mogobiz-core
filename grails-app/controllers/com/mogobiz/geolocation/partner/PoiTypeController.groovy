@@ -6,10 +6,7 @@ package com.mogobiz.geolocation.partner
 
 import com.mogobiz.geolocation.domain.PoiType
 import grails.converters.JSON
-import grails.converters.XML
 import grails.transaction.Transactional
-
-import java.util.HashMap
 
 /**
  * Controller utilis� pour g�rer les types des pois

@@ -10,8 +10,8 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class ExportCsvService {
-    CategoryService categoryService
-    FeatureService featureService
+    def categoryService
+    def featureService
     def grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide"]

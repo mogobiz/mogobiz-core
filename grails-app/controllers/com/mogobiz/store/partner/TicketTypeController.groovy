@@ -4,27 +4,20 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService;
+import com.mogobiz.constant.IperConstant
+import com.mogobiz.json.RenderUtil
+import com.mogobiz.store.domain.*
+import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
-
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.ProductCalendar
-import com.mogobiz.store.domain.Stock;
-import com.mogobiz.store.domain.StockCalendar;
-import com.mogobiz.store.domain.TicketType
-import com.mogobiz.store.domain.VariationValue;
-import com.mogobiz.constant.IperConstant;
-import com.mogobiz.json.RenderUtil;
-import com.mogobiz.utils.IperUtil
-import grails.transaction.Transactional;
+import grails.transaction.Transactional
 
 /**
  * @version $Id $
  *
  */
 public class TicketTypeController {
-    AjaxResponseService ajaxResponseService
+    def ajaxResponseService
 
     def authenticationService
 

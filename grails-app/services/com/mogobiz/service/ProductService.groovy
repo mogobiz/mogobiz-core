@@ -9,39 +9,23 @@
  */
 package com.mogobiz.service
 
-import com.mogobiz.common.client.BulkResponse
-import com.mogobiz.common.client.Client
-import com.mogobiz.common.client.ClientConfig
-import com.mogobiz.common.rivers.spi.AbstractRiver
-import com.mogobiz.common.rivers.spi.RiverConfig
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.elasticsearch.rivers.ESRivers
 import com.mogobiz.elasticsearch.rivers.spi.ESRiver
-import com.mogobiz.json.RenderUtil
 import com.mogobiz.store.domain.*
 import com.mogobiz.store.exception.CurrencyRateException
-import com.mogobiz.store.exception.InsufficientStockException
 import com.mogobiz.store.exception.ProductNotFoundException
 import com.mogobiz.utils.Html2Text
 import com.mogobiz.utils.IperUtil
-import com.mogobiz.utils.Page
-import grails.orm.PagedResultList
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
-import rx.observables.BlockingObservable
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-import scala.concurrent.duration.Duration
-
-import java.util.concurrent.TimeUnit
 
 /**
  *
  */
 class ProductService
 {
-	SanitizeUrlService sanitizeUrlService
-	TaxRateService taxRateService
+	def sanitizeUrlService
+	def taxRateService
 
     ESRiver river = ESRivers.instance.loadRiver("product")
 

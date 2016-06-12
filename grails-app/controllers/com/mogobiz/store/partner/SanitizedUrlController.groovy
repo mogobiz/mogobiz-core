@@ -4,13 +4,12 @@
 
 package com.mogobiz.store.partner
 
-import grails.transaction.Transactional
-
-import javax.servlet.http.HttpServletResponse
-
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Resource
+import grails.transaction.Transactional
+
+import javax.servlet.http.HttpServletResponse
 
 class SanitizedUrlController {
 	@Transactional(readOnly = true)

@@ -47,6 +47,10 @@ class Variation
     /**
      * 
      */
+    java.lang.String i18n 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Category category 
 
     static hasMany = [  variationValues:com.mogobiz.store.domain.VariationValue ]
@@ -76,6 +80,7 @@ class Variation
         position column:"position",insertable:true,updateable:true,lazy:false,cache:false
         hide column:"hide",insertable:true,updateable:true,lazy:false,cache:false
         googleVariationType column:"google_variation_type",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         category column:"category_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -91,6 +96,7 @@ class Variation
         position ( blank:false, nullable:false, unique:false)
         hide ( blank:false, nullable:false, unique:false)
         googleVariationType (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
         category (nullable:true)
     }
 

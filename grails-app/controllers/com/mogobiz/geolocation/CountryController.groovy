@@ -4,17 +4,14 @@
 
 package com.mogobiz.geolocation
 
-import com.mogobiz.service.CountryService
+import com.mogobiz.store.exception.CountryException
 import grails.converters.JSON
-import grails.transaction.Transactional
 
-import javax.servlet.http.HttpServletResponse;
-
-import com.mogobiz.store.exception.CountryException;
+import javax.servlet.http.HttpServletResponse
 
 class CountryController {
 
-	CountryService countryService
+	def countryService
 	
 	/**
 	 * List all countries

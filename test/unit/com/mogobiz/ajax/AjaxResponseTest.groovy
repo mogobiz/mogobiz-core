@@ -1,11 +1,10 @@
-package com.mogobiz.ajax;
+package com.mogobiz.ajax
 
-import grails.test.GrailsUnitTestCase;
+import grails.test.GrailsUnitTestCase
+import org.junit.Before
+import org.junit.Test
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 class AjaxResponseTest extends GrailsUnitTestCase {
 
