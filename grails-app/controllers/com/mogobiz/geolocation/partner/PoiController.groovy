@@ -11,6 +11,7 @@ import com.mogobiz.geolocation.domain.Poi
 import com.mogobiz.geolocation.domain.VisibilityType
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Resource
+import com.mogobiz.store.domain.Translation
 import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
@@ -109,6 +110,7 @@ class PoiController {
 					product.poi = null
 					product.save()
 				}
+                Translation.findAllByTarget(poi.id).each { it.delete() }
 				poi.delete(flush:true)
 			}
 		}

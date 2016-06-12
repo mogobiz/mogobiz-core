@@ -49,7 +49,7 @@ class BrandController {
             if (!brands) {
                 brands = []
             }
-            def mc = [ compare: {a,b-> a.name.compareTo(b.name)} ] as Comparator
+            def mc = [compare: { a, b -> a.name.compareTo(b.name) }] as Comparator
             Collections.sort(brands, mc)
             withFormat {
                 html brands: brands
@@ -133,6 +133,7 @@ class BrandController {
         if (brand && brand.company == company) {
             def products = Product.executeQuery('FROM Product p JOIN p.brand b WHERE b=:brand', [brand: brand])
             if (products.isEmpty()) {
+                Translation.findAllByTarget(brand.id).each { it.delete() }
                 brand.delete()
             }
         }

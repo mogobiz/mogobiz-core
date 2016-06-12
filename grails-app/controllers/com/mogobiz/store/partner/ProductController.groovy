@@ -385,6 +385,7 @@ class ProductController {
         }
         ProductProperty productProperty = ProductProperty.get(id)
         if (productProperty && productProperty.product.company == seller.company) {
+            Translation.findAllByTarget(productProperty.id).each { it.delete() }
             productProperty.delete(flush: true)
             render([success: true] as Map) as JSON
             return

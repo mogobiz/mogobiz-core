@@ -4,12 +4,14 @@
 
 package com.mogobiz.service
 
+import com.mogobiz.geolocation.domain.Poi
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.ZipFileUtil
 import grails.transaction.Transactional
 import grails.util.Holders
+import groovy.json.JsonOutput
 import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellReference
@@ -92,6 +94,101 @@ class ImportService {
             return vv
         }
         return null
+    }
+
+    protected void updateTranslationForTarget(Catalog catalog, Company company, long target, String type, String i18n) {
+        i18n.split("\\|\\|\\|\\|", -1).each { byLangStr ->
+            if (byLangStr != null && byLangStr.length() > 0) {
+                String[] byLang = byLangStr.split("\\|\\|\\|", -1)
+                String lang = byLang[0]
+                String[] kvs = byLang[1].split("\\|\\|")
+                Map map = [:]
+                kvs.each { kvStr ->
+                    String[] kv = kvStr.split("__")
+                    String key = kv[0]
+                    String value = kv[1]
+                    map.put(key, value)
+                }
+                Translation t = new Translation(companyId: company.id, target: target, lang: lang, type: type, catalog: catalog, company: company, value: JsonOutput.toJson(map))
+                t.save(flush: true)
+            }
+        }
+    }
+
+    protected void updateTranslation(long target, String type, String i18n) {
+        Translation.findAllByTargetAndType(target, type).each { it.delete() }
+//        if (t == null) {
+//            t = new Translation(companyId: user.company.id, target: target, lang: lang, type: type, catalog: catalog, company: user.company)
+//        }
+
+        switch (type) {
+            case "CATALOG":
+                Catalog catalog = Catalog.findById(target)
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "CATEGORY":
+                Category category = Category.findById(target)
+                Catalog catalog = category.catalog
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "PRODUCT":
+                Product product = Product.findById(target)
+                Catalog catalog = product.category.catalog
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "TICKET_TYPE":
+                TicketType tt = TicketType.findById(target)
+                Catalog catalog = tt.product.category.catalog
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "VARIATION":
+                Variation v = Variation.findById(target)
+                Catalog catalog = v.category.catalog
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "BRAND":
+                Brand b = Brand.findById(target)
+                Catalog catalog = null
+                Company company = b.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "VARIATION_VALUE":
+                VariationValue vv = VariationValue.findById(target)
+                Catalog catalog = vv.variation.category.catalog
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "COUPON":
+                Coupon c = Coupon.findById(target)
+                Catalog catalog = null
+                Company company = c.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "FEATURE":
+                Feature f = Feature.findById(target)
+                Catalog catalog = f.product?.category?.catalog
+                if (!catalog)
+                    catalog = f.category?.catalog
+                Company company = catalog?.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "PRODUCT_PROPERTY":
+                ProductProperty pp = ProductProperty.findById(target)
+                Catalog catalog = pp.product.category.catalog
+                Company company = catalog.company
+                updateTranslationForTarget(catalog, company, target, type, i18n)
+                break;
+            case "POI":
+                Poi poi = Poi.findById(target)
+                break;
+            default:
+                break;
+        }
     }
 
     public File getImportDir(String now) {
@@ -275,11 +372,12 @@ class ImportService {
                             String anonymous = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
                             String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
                             String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
+                            String i18n = row.getCell(13, Row.CREATE_NULL_AS_BLANK).toString()
                             Coupon coupon = Coupon.findByUuid(uuid)
                             boolean uuidSet = false
-                            if(coupon?.company != catalog.company){
+                            if (coupon?.company != catalog.company) {
                                 coupon = Coupon.findByCompanyAndCode(catalog.company, code)
-                                if(!coupon){
+                                if (!coupon) {
                                     coupon = new Coupon()
                                     coupon.uuid = UUID.randomUUID().toString()
                                 }
@@ -288,7 +386,7 @@ class ImportService {
                             if (!coupon) {
                                 coupon = new Coupon()
                             }
-                            if(!uuidSet){
+                            if (!uuidSet) {
                                 coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
                             }
                             coupon.name = name
@@ -304,8 +402,10 @@ class ImportService {
                             coupon.pastille = pastille
                             coupon.consumed = consumed.length() > 0 ? consumed.toFloat().toLong() : null
                             coupon.company = catalog.company
+                            coupon.i18n = i18n
                             if (coupon.validate()) {
                                 coupon.save(flush: true)
+                                updateTranslation(coupon.id, "COUPON", i18n)
 
                             } else {
                                 coupon.errors.allErrors.each { log.error(it) }
@@ -417,6 +517,7 @@ class ImportService {
                         String twitter = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                         String description = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                         String hide = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                        String i18n = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
 
                         Brand b = Brand.findByNameAndCompany(name, catalog.company)
                         if (!b) {
@@ -429,8 +530,10 @@ class ImportService {
                             b.twitter = twitter
                             b.description = description
                             b.hide = hide.equalsIgnoreCase("true")
+                            b.i18n = i18n
                             if (b.validate()) {
                                 b.save(flush: true)
+                                updateTranslation(b.id, "BRAND", i18n)
                                 brands.put(name, b)
                                 brandNameLogos.put(IperUtil.normalizeName(name), b)
                             } else {
@@ -455,15 +558,14 @@ class ImportService {
             brandLogosFile.text.split('\t').each {
                 String brandNameLogo = it.substring(0, it.indexOf('.'))
                 final brand = brandNameLogos.get(brandNameLogo)
-                if(brand){
+                if (brand) {
                     File logoTargetFile = new File(brandsTargetDir, it.replace(brandNameLogo, brand.id.toString()))
                     File logoFile = new File(brandsDir, it)
                     logoTargetFile.delete()
                     FileUtils.copyFile(logoFile, logoTargetFile)
                     String resourcesDir = "$resourcesPath/resources/$companyCode"
                     FileUtils.copyFile(logoFile, new File("${resourcesDir}/${brand.id}"))
-                }
-                else{
+                } else {
                     log.warn("could not find brand for name -> $brandNameLogo")
                 }
             }
@@ -502,6 +604,7 @@ class ImportService {
                             String seo = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
                             String google = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
                             String deleted = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                            String i18n = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
 
                             String[] paths = path.substring(1).split('/')
 
@@ -525,8 +628,10 @@ class ImportService {
                                 cat.catalog = catalog
                                 cat.company = catalog.company
                                 cat.parent = parent
+                                cat.i18n = i18n
                                 if (cat.validate()) {
                                     cat.save(flush: true)
+                                    updateTranslation(cat.id, "CATEGORY", i18n)
                                     categories.put(path, cat)
                                 } else {
                                     cat.errors.allErrors.each { log.error(it) }
@@ -556,6 +661,7 @@ class ImportService {
                         String name = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
                         String value = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
                         String hide = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                        String i18n = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
 
 
                         Feature f = new Feature()
@@ -566,8 +672,10 @@ class ImportService {
                         f.name = name
                         f.value = value
                         f.hide = hide.equalsIgnoreCase("true")
+                        f.i18n = i18n
                         if (f.validate()) {
                             f.save(flush: true)
+                            updateTranslation(f.id, "FEATURE", i18n)
                             features.put(uuid, f)
                         } else {
                             f.errors.allErrors.each { log.error(it) }
@@ -595,6 +703,7 @@ class ImportService {
                         String name = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                         String google = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                         String hide = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                        String i18n = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
 
 
                         Variation v = new Variation()
@@ -605,8 +714,10 @@ class ImportService {
                         v.googleVariationType = google
                         v.position = row.getRowNum()
                         v.hide = hide.equalsIgnoreCase("true")
+                        v.i18n = i18n
                         if (v.validate()) {
                             v.save(flush: false)
+                            updateTranslation(v.id, "VARIATION", i18n)
                             variations.put(catpath + "*" + name, v)
                         } else {
                             v.errors.allErrors.each { log.error(it) }
@@ -635,6 +746,7 @@ class ImportService {
                         String externalCode = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                         String value = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
                         String google = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                        String i18n = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
 
 
                         VariationValue v = new VariationValue()
@@ -649,8 +761,10 @@ class ImportService {
                         v.value = value
                         v.googleVariationValue = google
                         v.position = row.getRowNum()
+                        v.i18n = i18n
                         if (v.validate()) {
                             v.save(flush: true)
+                            updateTranslation(v.id, "VARIATION_VALUE", i18n)
                             variationValues.put(catpath + "*" + varname + "*" + value, v)
                         } else {
                             v.errors.allErrors.each { log.error(it) }
@@ -685,6 +799,8 @@ class ImportService {
                         String name = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
                         String value = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
                         String hide = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                        String i18n = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+
                         Product product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
                         boolean created = false
                         if (uuid) {
@@ -704,8 +820,10 @@ class ImportService {
                             f.name = name
                             f.value = value
                             f.hide = hide
+                            f.i18n = i18n
                             if (f.validate()) {
                                 f.save(flush: false)
+                                updateTranslation(f.id, "FEATURE", i18n)
                             } else {
                                 f.errors.allErrors.each { log.error(it) }
                                 return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
@@ -738,6 +856,7 @@ class ImportService {
                         String uuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                         String name = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
                         String value = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                        String i18n = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
 
 
                         ProductProperty pp = new ProductProperty()
@@ -746,9 +865,11 @@ class ImportService {
                         pp.product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog: catalog.id, code: prdcode, category: category.id]).get(0)
                         pp.name = name
                         pp.value = value
-                        if (pp.validate())
+                        pp.i18n = i18n
+                        if (pp.validate()) {
                             pp.save(flush: false)
-                        else {
+                            updateTranslation(pp.id, "PRODUCT_PROPERTY", i18n)
+                        } else {
                             pp.errors.allErrors.each { log.error(it) }
                             return [errors: pp.errors.allErrors, sheet: "product-property", line: rownum]
                         }
@@ -800,12 +921,13 @@ class ImportService {
                     String variationValue2 = row.getCell(25, Row.CREATE_NULL_AS_BLANK).toString()
                     String variationName3 = row.getCell(26, Row.CREATE_NULL_AS_BLANK).toString()
                     String variationValue3 = row.getCell(27, Row.CREATE_NULL_AS_BLANK).toString()
+                    String i18n = row.getCell(28, Row.CREATE_NULL_AS_BLANK).toString()
 
                     String[] cols = [
                             catuuid, catpath, prduuid, prdcode, uuid, externalCode, sku, name, price, minorder, maxorder,
                             sales, startDate, stopDate, xprivate, remainingStock, unlimitedStock, outsellStock, description,
                             availability, googleGtin, googleMpn, variationName1, variationValue1,
-                            variationName2, variationValue2, variationName3, variationValue3
+                            variationName2, variationValue2, variationName3, variationValue3, i18n
                     ]
                     skuList.add(cols)
                 }
@@ -862,6 +984,7 @@ class ImportService {
                             String variationValue2 = cols[25]
                             String variationName3 = cols[26]
                             String variationValue3 = cols[27]
+                            String i18n = cols[28]
 
                             Product prod = products.get(prdcode)
                             TicketType t = new TicketType()
@@ -899,10 +1022,12 @@ class ImportService {
                             if (vv3)
                                 t.variation3 = vv3
 
+                            t.i18n = i18n
 
-                            if (t.validate())
+                            if (t.validate()) {
                                 t.save(flush: false)
-                            else {
+                                updateTranslation(t.id, "TICKET_TYPE", i18n)
+                            } else {
                                 t.errors.allErrors.each { log.error(it) }
                                 return [errors: t.errors.allErrors, sheet: "sku", line: rownum]
                             }
@@ -966,10 +1091,11 @@ class ImportService {
                     String taxRateName = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
                     String dateCreated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
                     String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
+                    String i18n = row.getCell(24, Row.CREATE_NULL_AS_BLANK).toString()
                     String[] cols = [
                             catuuid, catpath, uuid, externalCode, code, name, xtype, price, state, description,
                             sales, displayStock, calendar, startDate, stopDate, startFeatDate, stopFeatDate, seo,
-                            tags, keywords, brandName, taxRateName, dateCreated, lastUpdated
+                            tags, keywords, brandName, taxRateName, dateCreated, lastUpdated, i18n
                     ]
                     prodList.add(cols)
                 }
@@ -1025,6 +1151,7 @@ class ImportService {
                             String taxRateName = cols[21]
                             String dateCreated = cols[22]
                             String lastUpdated = cols[23]
+                            String i18n = cols[24]
 
                             Product p = new Product()
                             p.category = categories.get(catpath)
@@ -1076,9 +1203,11 @@ class ImportService {
                                     p.addToTags(tag)
                                 }
                             }
+                            p.i18n = i18n
                             if (p.validate()) {
                                 IperUtil.withAutoTimestampSuppression(p) {
                                     p.save(flush: false)
+                                    updateTranslation(p.id, "PRODUCT", i18n)
                                 }
                                 products.put(p.code, p)
 
