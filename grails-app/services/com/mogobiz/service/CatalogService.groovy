@@ -115,6 +115,8 @@ class CatalogService {
             sql.execute("delete from variation  where category_fk  in (select id from category where catalog_fk = ${catalog.id})")
             log.info("delete from category where catalog_fk = ${catalog.id}")
             sql.execute("delete from category where catalog_fk = ${catalog.id}")
+            log.info("delete from xtranslation where catalog id = ${catalog.id}")
+            sql.execute("delete from xtranslation where catalog_fk = ${catalog.id}")
             log.info("delete from xcatalog where id = ${catalog.id}")
             sql.execute("delete from xcatalog where id = ${catalog.id}")
 		}

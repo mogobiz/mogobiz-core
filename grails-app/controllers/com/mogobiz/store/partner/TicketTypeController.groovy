@@ -238,12 +238,14 @@ public class TicketTypeController {
             if (sc != null) {
                 if (sc.sold == 0) {
                     sc.delete()
+                    Translation.findAllByTarget(ticketType.id).each { it.delete() }
                     ticketType.delete()
                 } else {
                     response.sendError 401
                     return
                 }
             } else {
+                Translation.findAllByTarget(ticketType.id).each { it.delete() }
                 ticketType.delete()
             }
         }

@@ -8,6 +8,7 @@ import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Seller
+import com.mogobiz.store.domain.Translation
 import com.mogobiz.utils.PermissionType
 import grails.converters.JSON
 import grails.converters.XML
@@ -117,6 +118,7 @@ class CatalogController {
         if (catalog && catalog.company == company) {
             List<Category> categories = Category.executeQuery('FROM Category c JOIN c.catalog d WHERE d=:catalog', [catalog: catalog])
             if (categories.isEmpty()) {
+                Translation.findAllByTarget(catalog.id).each { it.delete() }
                 catalog.delete()
             } else {
                 response.sendError 401
