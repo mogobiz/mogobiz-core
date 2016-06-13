@@ -218,6 +218,15 @@ public class CommonService {
                             env.id as String
                     )
                 }
+                MiraklEnv.findAllByCompany(company).each {env ->
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                            company.id as String,
+                            env.id as String
+                    )
+                }
                 seller.refresh()
                 seller.sell = false
                 seller.save(flush: true)
