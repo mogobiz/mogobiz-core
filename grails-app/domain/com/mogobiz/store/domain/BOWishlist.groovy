@@ -28,6 +28,10 @@ class BOWishlist
      * 
      */
     java.lang.String extra 
+    /**
+     * 
+     */
+    java.lang.String company 
     static transients = [ 'BOWishlistValidation', 'BOWishlistRender' ]
 
 
@@ -49,6 +53,7 @@ class BOWishlist
 
         id name:'id',column:'id',generator:'native'
         extra column:"extra",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        company column:"company",insertable:true,updateable:true,lazy:false,cache:false
 
     }
 
@@ -56,6 +61,7 @@ class BOWishlist
     uuid (nullable:false, unique:false)
 
         extra (nullable:true, unique:false)
+        company (nullable:true, unique:false)
     }
 
 
