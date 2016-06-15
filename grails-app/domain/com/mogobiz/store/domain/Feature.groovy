@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,44 +25,48 @@ class Feature
 
 
     /**
-     * 
+     *
      */
-    java.lang.String externalCode 
+    java.lang.String externalCode
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    int position 
+    int position
     /**
-     * 
+     *
      */
-    java.lang.String domain 
+    java.lang.String domain
     /**
-     * 
+     *
      */
-    Boolean hide  = false 
+    Boolean hide  = false
     /**
-     * 
+     *
      */
-    java.lang.String value 
+    java.lang.String value
     /**
-     * 
+     *
      */
-    java.lang.String i18n 
+    java.lang.String i18n
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Product product 
+    com.mogobiz.store.domain.Product product
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Category category 
+    com.mogobiz.store.domain.Category category
 
     static transients = [ 'featureValidation', 'featureRender' ]
+
+    static hasMany = [values: FeatureValue]
+
+    static mappedBy = [values: "feature"]
 
 
     static mapping = {
