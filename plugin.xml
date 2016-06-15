@@ -65,11 +65,13 @@
     <resource>com.mogobiz.store.domain.Album</resource>
     <resource>com.mogobiz.store.domain.BOCart</resource>
     <resource>com.mogobiz.store.domain.BOCartItem</resource>
+    <resource>com.mogobiz.store.domain.BOComment</resource>
     <resource>com.mogobiz.store.domain.BODelivery</resource>
     <resource>com.mogobiz.store.domain.BOProduct</resource>
     <resource>com.mogobiz.store.domain.BOReturn</resource>
     <resource>com.mogobiz.store.domain.BOReturnedItem</resource>
     <resource>com.mogobiz.store.domain.BOTicketType</resource>
+    <resource>com.mogobiz.store.domain.BOWishlist</resource>
     <resource>com.mogobiz.store.domain.Brand</resource>
     <resource>com.mogobiz.store.domain.BrandProperty</resource>
     <resource>com.mogobiz.store.domain.Catalog</resource>
