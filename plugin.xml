@@ -1,4 +1,4 @@
-<plugin name='mogobiz-core' version='1.0.0' grailsVersion='2.3 &gt; *'>
+<plugin name='mogobiz-core' version='1.0.0-RC1' grailsVersion='2.3 &gt; *'>
   <author>Your name</author>
   <title>Mogobiz Core Plugin</title>
   <description>Brief summary/description of the plugin.
