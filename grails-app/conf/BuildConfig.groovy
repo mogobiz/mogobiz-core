@@ -50,11 +50,12 @@ grails.project.dependency.resolution = {
 
         compile 'org.scala-lang:scala-library:2.11.2'
 
-        runtime 'com.typesafe.akka:akka-actor_2.11:2.3.9'
+        runtime 'com.typesafe.akka:akka-actor_2.11:2.3.12'
         runtime 'com.typesafe.akka:akka-stream-experimental_2.11:1.0-M3'
 
-        compile (group:"io.reactivex", name:"rxjava-reactive-streams", version: "0.3.0") {excludes ([ group: 'io.reactivex', name: 'rxjava'])}
-        compile ('com.netflix.rxjava:rxjava-groovy:0.20.7') {excludes "groovy-all"}
+        compile (group:"io.reactivex", name:"rxjava-reactive-streams", version: "1.0.1") {excludes ([ group: 'io.reactivex', name: 'rxjava'])}
+        compile ('io.reactivex:rxgroovy:1.0.3') {excludes "groovy-all"}
+        compile ('io.reactivex:rxjava:1.0.15')
 
         //oltu
         compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.common:0.31'
