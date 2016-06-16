@@ -104,7 +104,7 @@ class ImportService {
                 String[] kvs = byLang[1].split("\\|\\|")
                 Map map = [:]
                 kvs.each { kvStr ->
-                    String[] kv = kvStr.split("__")
+                    String[] kv = kvStr.split("__", -1)
                     String key = kv[0]
                     String value = kv[1]
                     map.put(key, value)
@@ -597,14 +597,15 @@ class ImportService {
                             String uuid = row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString()
                             String externalCode = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                             String path = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                            String position = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                            String description = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                            String keywords = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                            String hide = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                            String seo = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                            String google = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
-                            String deleted = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
-                            String i18n = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+                            String name = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                            String position = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                            String description = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                            String keywords = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                            String hide = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                            String seo = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                            String google = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                            String deleted = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+                            String i18n = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
 
                             String[] paths = path.substring(1).split('/')
 
@@ -617,7 +618,7 @@ class ImportService {
                                 else
                                     cat.uuid = UUID.randomUUID().toString()
                                 cat.externalCode = externalCode
-                                cat.name = paths[depth - 1]
+                                cat.name = name
                                 cat.position = Double.parseDouble(position).intValue()
                                 cat.description = description
                                 cat.keywords = keywords

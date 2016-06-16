@@ -24,7 +24,7 @@ class ExportService {
     def grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide", "i18n"]
-    final List<String> catHeaders = ["uuid", "external-code", "path", "position", "description", "keywords", "hide", "seo", "google", "deleted", "i18n"]
+    final List<String> catHeaders = ["uuid", "external-code", "path", "name", "position", "description", "keywords", "hide", "seo", "google", "deleted", "i18n"]
     final List<String> featHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "domain", "name", "value", "hide", "i18n"]
     final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide", "i18n"]
     final List<String> varValHeaders = ["category-uuid", "category-path", "variation-uuid", "variation-name", "uuid", "external-code", "value", "google", "i18n"]
@@ -54,7 +54,7 @@ class ExportService {
     }
 
     List<String> toArray(Category it) {
-        [it.uuid, it.externalCode, categoryService.path(it), ""+it.position, it.description, it.keywords, it.hide?.toString(), it.sanitizedName, it.googleCategory, ""+it.deleted, it.i18n]
+        [it.uuid, it.externalCode, categoryService.path(it), it.name, ""+it.position, it.description, it.keywords, it.hide?.toString(), it.sanitizedName, it.googleCategory, ""+it.deleted, it.i18n]
     }
 
     List<String> toArrayForCat(Feature it, int catRowNum) {
