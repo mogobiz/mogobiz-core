@@ -70,8 +70,8 @@ grails.project.dependency.resolution = {
 
         provided (group:"com.mogobiz", name:"mogobiz-tools", version:"1.0.0")  {excludes "groovy-all"}
 
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0.0")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0.0")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0.0-RC1")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0.0-RC1")  {excludes "groovy-all"}
     }
 
     plugins {
