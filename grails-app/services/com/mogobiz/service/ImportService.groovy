@@ -56,7 +56,7 @@ class ImportService {
         Category parent = null
         for (int i = 0; i < paths.size() - 1; i++) {
             String parentName = paths[i]
-            parent = Category.findByNameAndParentAndCatalog(parentName, parent, catalog)
+            parent = Category.findBySanitizedNameAndParentAndCatalog(parentName, parent, catalog)
         }
         return parent
     }
@@ -66,7 +66,7 @@ class ImportService {
         Category parent = null
         for (int i = 0; i < paths.size(); i++) {
             String parentName = paths[i]
-            parent = Category.findByNameAndParentAndCatalog(parentName, parent, catalog)
+            parent = Category.findBySanitizedNameAndParentAndCatalog(parentName, parent, catalog)
         }
         return parent
     }
