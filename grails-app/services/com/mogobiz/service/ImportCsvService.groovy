@@ -238,10 +238,21 @@ class ImportCsvService {
                             String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
                             String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
                             Coupon coupon = Coupon.findByUuid(uuid)
+                            boolean uuidSet = false
+                            if(coupon?.company != catalog.company){
+                                coupon = Coupon.findByCompanyAndCode(catalog.company, code)
+                                if(!coupon){
+                                    coupon = new Coupon()
+                                    coupon.uuid = UUID.randomUUID().toString()
+                                }
+                                uuidSet = true
+                            }
                             if (!coupon) {
                                 coupon = new Coupon()
                             }
-                            coupon.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            if(!uuidSet){
+                                coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                            }
                             coupon.name = name
                             coupon.code = code
                             coupon.active = active.equalsIgnoreCase("true")
@@ -323,12 +334,12 @@ class ImportCsvService {
                     if (row != null) {
                         String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                         if (cell.length() > 0) {
-                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+//                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                             String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
                             String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
                             String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                             String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByUuid(uuid)
+                            Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, code)
                             if (coupon) {
                                 if (catUuid.length() > 0) {
                                     coupon.addToCategories(Category.findByUuid(catUuid))
