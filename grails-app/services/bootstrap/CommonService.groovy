@@ -4,9 +4,6 @@
 
 package bootstrap
 
-import com.mogobiz.authentication.ProfileService
-import com.mogobiz.service.CountryImportService
-import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.domain.*
 import com.mogobiz.store.vo.RegisteredCartItemVO
 import com.mogobiz.tools.QRCodeUtils
@@ -416,7 +413,7 @@ public class CommonService {
 		TicketType sku = TicketType.findByNameAndProduct(name, produit);
 		if (sku == null)
 		{
-			Stock stock = new Stock(stock: Math.max(0, nombreEnStock), stockUnlimited: (nombreEnStock == -1));
+			Stock stock = new Stock(stock: Math.max(0, nombreEnStock), stockUnlimited: (nombreEnStock.intValue() == -1));
 			saveEntity(stock);
 
 			sku = new TicketType(sku:UUID.randomUUID().toString(), name: name, price: montant, minOrder: 1, maxOrder: 10, product: produit, stock: stock, startDate: produit.startDate, stopDate: produit.stopDate);
