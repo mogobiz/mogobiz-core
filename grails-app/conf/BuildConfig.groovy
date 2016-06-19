@@ -1,6 +1,4 @@
-//grails.project.class.dir = "target/classes"
-//grails.project.test.class.dir = "target/test-classes"
-//grails.project.test.reports.dir = "target/test-reports"
+mogobiz.version="1.0.0-RC2"
 grails.project.work.dir = "target"
 
 grails.project.fork = [
@@ -70,10 +68,10 @@ grails.project.dependency.resolution = {
 
         compile 'org.jsoup:jsoup:1.8.1'
 
-        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"1.0.0-RC2")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"${mogobiz.version}")  {excludes "groovy-all"}
 
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0.0-RC2")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0.0-RC2")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"${mogobiz.version}")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"${mogobiz.version}")  {excludes "groovy-all"}
     }
 
     plugins {
