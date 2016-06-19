@@ -1,6 +1,7 @@
-grails.project.class.dir = "target/classes"
-grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir = "target/test-reports"
+//grails.project.class.dir = "target/classes"
+//grails.project.test.class.dir = "target/test-classes"
+//grails.project.test.reports.dir = "target/test-reports"
+grails.project.work.dir = "target"
 
 grails.project.fork = [
         // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -69,11 +70,10 @@ grails.project.dependency.resolution = {
 
         compile 'org.jsoup:jsoup:1.8.1'
 
-        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"1.1.0-SNAPSHOT")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"1.0.0-RC2")  {excludes "groovy-all"}
 
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.1.0-SNAPSHOT")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.1.0-SNAPSHOT")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-mirakl", version:"1.1.0-SNAPSHOT")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0.0-RC2")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0.0-RC2")  {excludes "groovy-all"}
     }
 
     plugins {
