@@ -43,6 +43,10 @@ class MiraklEnv
     /**
      * 
      */
+    java.lang.String frontKey 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'miraklEnvValidation', 'miraklEnvRender' ]
@@ -69,6 +73,7 @@ class MiraklEnv
         apiKey column:"api_key",insertable:true,updateable:true,lazy:false,cache:false
         shopId column:"shop_id",insertable:true,updateable:true,lazy:false,cache:false
         running column:"running",insertable:true,updateable:true,lazy:false,cache:false
+        frontKey column:"front_key",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -81,6 +86,7 @@ class MiraklEnv
         apiKey ( blank:false, nullable:false, unique:false)
         shopId ( blank:false, nullable:false, unique:false)
         running ( blank:false, nullable:false, unique:false)
+        frontKey (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 
