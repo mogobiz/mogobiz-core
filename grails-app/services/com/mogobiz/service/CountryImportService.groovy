@@ -19,7 +19,7 @@ import static com.mogobiz.tools.Reader.getTrim
 import static com.mogobiz.tools.Reader.parseCsvFile
 
 class CountryImportService {
-
+    // http://download.geonames.org/export/dump/readme.txt
     boolean transactional = true
 
     def sessionFactory
