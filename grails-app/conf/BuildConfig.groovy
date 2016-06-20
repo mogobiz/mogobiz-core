@@ -37,8 +37,8 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // compile "org.springframework:spring-orm:$springVersion"
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "groovy" }
-        compile 'com.fasterxml.jackson.core:jackson-core:2.2.3'
-        compile 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+        compile 'com.fasterxml.jackson.core:jackson-core:2.7.0'
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
         compile group:"org.twitter4j", name:"twitter4j-async", version:"2.2.5"
         compile group:"org.twitter4j", name:"twitter4j-core", version:"2.2.5"
         compile group:"org.twitter4j", name:"twitter4j-media-support", version:"2.2.5"
