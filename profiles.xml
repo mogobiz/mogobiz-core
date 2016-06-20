@@ -1,8 +1,0 @@
-<profilesXml>
-	<activeProfiles>
-		<activeProfile>grails-cartridge</activeProfile>
-		<activeProfile>andromda-generate</activeProfile>
-		<activeProfile>postgresql</activeProfile>
-		<activeProfile>tomcat</activeProfile>
-	</activeProfiles>
-</profilesXml>
