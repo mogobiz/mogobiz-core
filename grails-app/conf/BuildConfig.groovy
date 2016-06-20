@@ -1,4 +1,4 @@
-mogobiz.version="1.0.0-RC2"
+mogobiz.version="${appVersion}"
 grails.project.work.dir = "target"
 
 grails.project.fork = [
