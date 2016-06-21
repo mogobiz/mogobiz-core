@@ -75,6 +75,10 @@ class Poi
     /**
      * 
      */
+    java.lang.String i18n 
+    /**
+     * 
+     */
     com.mogobiz.geolocation.domain.PoiType poiType 
 
     static transients = [ 'poiValidation', 'poiRender' ]
@@ -108,6 +112,7 @@ class Poi
         detail column:"detail",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         maxPrice column:"max_price",insertable:true,updateable:true,lazy:false,cache:false
         minPrice column:"min_price",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
         poiType column:"poi_type_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
@@ -127,6 +132,7 @@ class Poi
         detail (nullable:true, unique:false)
         maxPrice (nullable:true, unique:false)
         minPrice (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
         poiType (nullable:true)
     }
 
@@ -148,17 +154,17 @@ class Poi
         }
         return paginateParams ? Poi.executeQuery(queryString, [codePack:codePack], paginateParams) : Poi.executeQuery(queryString, [codePack:codePack])
     }
-    static java.util.Collection findLocationsAProximite(final double x, final double y, final int rayon)
+    static java.util.Collection findLocationsAround(final double x, final double y, final int rayon)
     {
-        return Poi.findLocationsAProximite("SELECT poi FROM Poi poi where evaluate_earth_distance(:x, :y, poi.latitude, poi.longitude) <= :rayon", x, y, rayon, 0, 0);
+        return Poi.findLocationsAround("SELECT poi FROM Poi poi where evaluate_earth_distance(:x, :y, poi.latitude, poi.longitude) <= :rayon", x, y, rayon, 0, 0);
     }
 
-    static java.util.Collection findLocationsAProximite(final double x, final double y, final int rayon, int pageNumber, int pageSize)
+    static java.util.Collection findLocationsAround(final double x, final double y, final int rayon, int pageNumber, int pageSize)
     {
-        return Poi.findLocationsAProximite("SELECT poi FROM Poi poi where evaluate_earth_distance(:x, :y, poi.latitude, poi.longitude) <= :rayon", x, y, rayon, pageNumber, pageSize);
+        return Poi.findLocationsAround("SELECT poi FROM Poi poi where evaluate_earth_distance(:x, :y, poi.latitude, poi.longitude) <= :rayon", x, y, rayon, pageNumber, pageSize);
     }
 
-    static java.util.Collection findLocationsAProximite(final java.lang.String queryString, final double x, final double y, final int rayon, int pageNumber, int pageSize)
+    static java.util.Collection findLocationsAround(final java.lang.String queryString, final double x, final double y, final int rayon, int pageNumber, int pageSize)
     {
         def paginateParams = null
         if (pageNumber > 0 && pageSize > 0) {

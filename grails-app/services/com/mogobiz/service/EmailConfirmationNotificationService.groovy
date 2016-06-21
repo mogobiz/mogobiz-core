@@ -2,10 +2,10 @@
  * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
  */
 
-package com.mogobiz.service;
-import grails.events.Listener;
+package com.mogobiz.service
 
 import com.mogobiz.store.domain.User
+import grails.events.Listener
 
 public class EmailConfirmationNotificationService {
 	@Listener(topic='signup.confirmed', namespace='plugin.emailConfirmation') 

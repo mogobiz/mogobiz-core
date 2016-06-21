@@ -7,19 +7,11 @@
  */
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
-import grails.plugin.mail.MailService
-import grails.transaction.Transactional
-
-import java.util.Map;
-import grails.util.Environment
-
-
-import grails.converters.JSON
-import grails.converters.XML
-
 import com.mogobiz.store.domain.ExternalAccount
 import com.mogobiz.store.domain.ExternalAuthLogin
+import grails.converters.JSON
+import grails.converters.XML
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -27,7 +19,7 @@ import com.mogobiz.store.domain.ExternalAuthLogin
  */
 class PartnerController {
 
-	AuthenticationService authenticationService
+	def authenticationService
 	def grailsApplication
 	def index = {	}
 

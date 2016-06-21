@@ -5,9 +5,6 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.ajax.AjaxResponse
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.service.ShippingRuleService
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.cmd.ShippingRuleCommand
 import com.mogobiz.store.domain.Seller
@@ -20,9 +17,9 @@ import org.springframework.validation.Errors
 import javax.servlet.http.HttpServletResponse
 
 class ShippingRuleController {
-    AuthenticationService authenticationService
-    ShippingRuleService shippingRuleService
-    AjaxResponseService ajaxResponseService
+    def authenticationService
+    def shippingRuleService
+    def ajaxResponseService
 
     @Transactional(readOnly = true)
     def list(PagedListCommand cmd) {

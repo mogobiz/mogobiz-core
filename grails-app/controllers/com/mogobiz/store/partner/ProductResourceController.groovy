@@ -7,14 +7,13 @@
  */
 package com.mogobiz.store.partner
 
-import com.mogobiz.tools.ImageTools
-import com.mogobiz.utils.IperUtil
-import grails.converters.JSON
-
 import com.mogobiz.store.domain.Product
 import com.mogobiz.store.domain.Product2Resource
 import com.mogobiz.store.domain.Resource
 import com.mogobiz.store.domain.ResourceType
+import com.mogobiz.tools.ImageTools
+import com.mogobiz.utils.IperUtil
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 /**
@@ -25,7 +24,6 @@ class ProductResourceController {
 	
 	def authenticationService
 	
-	def grailsUrlMappingsHolder
 
 	@Transactional(readOnly = true)
 	def retrieveProductResources() {

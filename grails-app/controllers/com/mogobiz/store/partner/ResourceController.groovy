@@ -7,22 +7,20 @@
  */
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.constant.IperConstant
+import com.mogobiz.store.domain.EventType
+import com.mogobiz.store.domain.Product2Resource
+import com.mogobiz.store.domain.Resource
+import com.mogobiz.store.domain.ResourceType
+import com.mogobiz.tools.ImageSize
 import com.mogobiz.tools.ImageTools
 import com.mogobiz.tools.MimeTypeTools
+import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
 
 import java.text.SimpleDateFormat
-
-import com.mogobiz.store.domain.EventType
-import com.mogobiz.store.domain.Product2Resource
-import com.mogobiz.store.domain.Resource
-import com.mogobiz.store.domain.ResourceType
-import com.mogobiz.constant.IperConstant
-import com.mogobiz.tools.ImageSize
-import com.mogobiz.utils.IperUtil
 
 /**
  * Controller utilis� pour g�rer les resources
@@ -32,7 +30,7 @@ import com.mogobiz.utils.IperUtil
  */
 class ResourceController {
 
-	AjaxResponseService ajaxResponseService
+	def ajaxResponseService
 
 	def authenticationService
 

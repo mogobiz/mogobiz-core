@@ -35,6 +35,10 @@ class ProductProperty
     /**
      * 
      */
+    java.lang.String i18n 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Product product 
 
     static transients = [ 'productPropertyValidation', 'productPropertyRender' ]
@@ -59,6 +63,7 @@ class ProductProperty
         id name:'id',column:'id',generator:'native'
         name column:"name",insertable:true,updateable:true,lazy:false,cache:false
         value column:"value",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         product column:"product_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -69,6 +74,7 @@ class ProductProperty
 
         name ( blank:false, nullable:false, unique:false)
         value (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
         product ( blank:false, nullable:false)
     }
 

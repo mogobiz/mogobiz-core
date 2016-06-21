@@ -71,6 +71,19 @@ class Category
     /**
      *
      */
+    java.lang.String i18n
+    /**
+     *
+     */
+    java.lang.Boolean publishable
+    /**
+     *
+     */
+    java.lang.String logisticClass
+
+    /**
+     *
+     */
     com.mogobiz.store.domain.Company company
 
     /**
@@ -90,9 +103,9 @@ class Category
 
     static transients = [ 'categoryValidation', 'categoryRender' ]
 
-    static hasMany = [features: Feature, children: Category]
+    static hasMany = [features: Feature, variations: Variation, children: Category]
 
-    static mappedBy = [features: "category", children: "parent"]
+    static mappedBy = [features: "category", variations: "category", children: "parent"]
 
     static mapping = {
 
@@ -122,7 +135,9 @@ class Category
         deleted column:"deleted",insertable:true,updateable:true,lazy:false,cache:false
         returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
         fullpath column:"fullpath",insertable:true,updateable:true,lazy:false,cache:false
-
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        publishable column:"publishable",insertable:true,updateable:true,lazy:false,cache:false
+        logisticClass column:"logistic_class",insertable:true,updateable:true,lazy:false,cache:false
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
@@ -147,6 +162,9 @@ class Category
         deleted ( blank:false, nullable:false, unique:false)
         returnMaxDelay ( blank:false, nullable:false, unique:false)
         fullpath (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
+        publishable (nullable:true, unique:false)
+        logisticClass (nullable:true, unique:false)
         company ( blank:false, nullable:false)
         parent (nullable:true)
         catalog (nullable:true)

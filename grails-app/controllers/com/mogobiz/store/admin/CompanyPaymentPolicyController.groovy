@@ -5,11 +5,10 @@
 package com.mogobiz.store.admin
 
 import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.json.RenderUtil
+import com.mogobiz.store.domain.Company
 import grails.converters.JSON
 import grails.converters.XML
-
-import com.mogobiz.store.domain.Company
-import com.mogobiz.json.RenderUtil
 import grails.transaction.Transactional
 
 /**

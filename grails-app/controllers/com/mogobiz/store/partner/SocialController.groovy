@@ -2,14 +2,13 @@
  * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
  */
 
-package com.mogobiz.store.partner;
-
-import grails.converters.JSON
-import grails.converters.XML
+package com.mogobiz.store.partner
 
 import com.mogobiz.store.domain.ExternalAccount
 import com.mogobiz.store.domain.ExternalAuthLogin
 import com.mogobiz.store.domain.User
+import grails.converters.JSON
+import grails.converters.XML
 import grails.transaction.Transactional
 
 public class SocialController {

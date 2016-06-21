@@ -1,24 +1,11 @@
 package com.mogobiz.facebook
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
-import java.io.InputStream
-import java.util.List
-
 import com.restfb.BinaryAttachment
 import com.restfb.Connection
 import com.restfb.DefaultFacebookClient
-import com.restfb.FacebookClient
 import com.restfb.Parameter
 import com.restfb.json.JsonObject
-import com.restfb.types.Album
-import com.restfb.types.Comment
-import com.restfb.types.FacebookType
-import com.restfb.types.NamedFacebookType
-import com.restfb.types.Photo
-import com.restfb.types.Post
-import com.restfb.types.User
+import com.restfb.types.*
 
 /**
  * @author Hayssam Saleh

@@ -4,16 +4,12 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.constant.IperConstant
 import com.mogobiz.json.RenderUtil
-import com.mogobiz.service.ProductService
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.Page
 import com.mogobiz.utils.PermissionType
-import static com.mogobiz.utils.ProfileUtils.*
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -24,6 +20,7 @@ import java.text.SimpleDateFormat
 
 import static com.mogobiz.constant.IperConstant.QUEUE_NS
 import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
+import static com.mogobiz.utils.ProfileUtils.computeShiroPermission
 
 /**
  * Controller utilisé pour gérer les produits
@@ -32,9 +29,9 @@ import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
  *
  */
 class ProductController {
-    AjaxResponseService ajaxResponseService
-    AuthenticationService authenticationService
-    ProductService productService
+    def ajaxResponseService
+    def authenticationService
+    def productService
 
     SimpleDateFormat sdf = new SimpleDateFormat(IperConstant.DATE_FORMAT)
     SimpleDateFormat sdfWithoutHour = new SimpleDateFormat(IperConstant.DATE_FORMAT_WITHOUT_HOUR)
@@ -388,6 +385,7 @@ class ProductController {
         }
         ProductProperty productProperty = ProductProperty.get(id)
         if (productProperty && productProperty.product.company == seller.company) {
+            Translation.findAllByTarget(productProperty.id).each { it.delete() }
             productProperty.delete(flush: true)
             render([success: true] as Map) as JSON
             return

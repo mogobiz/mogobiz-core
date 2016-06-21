@@ -1,6 +1,5 @@
-grails.project.class.dir = "target/classes"
-grails.project.test.class.dir = "target/test-classes"
-grails.project.test.reports.dir = "target/test-reports"
+mogobiz.version="${appVersion}"
+grails.project.work.dir = "target"
 
 grails.project.fork = [
         // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -38,8 +37,8 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // compile "org.springframework:spring-orm:$springVersion"
         compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "groovy" }
-        compile 'com.fasterxml.jackson.core:jackson-core:2.2.3'
-        compile 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+        compile 'com.fasterxml.jackson.core:jackson-core:2.7.0'
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
         compile group:"org.twitter4j", name:"twitter4j-async", version:"2.2.5"
         compile group:"org.twitter4j", name:"twitter4j-core", version:"2.2.5"
         compile group:"org.twitter4j", name:"twitter4j-media-support", version:"2.2.5"
@@ -50,11 +49,12 @@ grails.project.dependency.resolution = {
 
         compile 'org.scala-lang:scala-library:2.11.2'
 
-        runtime 'com.typesafe.akka:akka-actor_2.11:2.3.9'
+        runtime 'com.typesafe.akka:akka-actor_2.11:2.3.12'
         runtime 'com.typesafe.akka:akka-stream-experimental_2.11:1.0-M3'
 
-        compile (group:"io.reactivex", name:"rxjava-reactive-streams", version: "0.3.0") {excludes ([ group: 'io.reactivex', name: 'rxjava'])}
-        compile ('com.netflix.rxjava:rxjava-groovy:0.20.7') {excludes "groovy-all"}
+        compile (group:"io.reactivex", name:"rxjava-reactive-streams", version: "1.0.1") {excludes ([ group: 'io.reactivex', name: 'rxjava'])}
+        compile ('io.reactivex:rxgroovy:1.0.3') {excludes "groovy-all"}
+        compile ('io.reactivex:rxjava:1.0.15')
 
         //oltu
         compile 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.common:0.31'
@@ -68,10 +68,10 @@ grails.project.dependency.resolution = {
 
         compile 'org.jsoup:jsoup:1.8.1'
 
-        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"1.0.0")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"${mogobiz.version}")  {excludes "groovy-all"}
 
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"1.0.0")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"1.0.0")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"${mogobiz.version}")  {excludes "groovy-all"}
+        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"${mogobiz.version}")  {excludes "groovy-all"}
     }
 
     plugins {

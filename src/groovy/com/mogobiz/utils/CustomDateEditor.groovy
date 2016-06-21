@@ -1,8 +1,8 @@
-package com.mogobiz.utils;
-
-import java.beans.PropertyEditorSupport
+package com.mogobiz.utils
 
 import org.apache.commons.lang.time.DateUtils
+
+import java.beans.PropertyEditorSupport
 
 public class CustomDateEditor extends PropertyEditorSupport {
     boolean allowEmpty

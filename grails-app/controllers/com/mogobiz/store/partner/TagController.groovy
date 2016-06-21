@@ -3,8 +3,8 @@
  */
 
 package com.mogobiz.store.partner
+
 import com.mogobiz.ajax.AjaxResponse
-import com.mogobiz.ajax.AjaxResponseService
 import com.mogobiz.service.PagedList
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.domain.Seller
@@ -18,7 +18,7 @@ class TagController {
 
     def authenticationService
     def tagService
-    AjaxResponseService ajaxResponseService
+    def ajaxResponseService
 
     @Transactional(readOnly = true)
     def list(PagedListCommand cmd) {

@@ -4,26 +4,17 @@
 
 package com.mogobiz.store.validator
 
-import com.mogobiz.auth.AuthRealm
-import com.mogobiz.store.domain.BOProduct;
-import com.mogobiz.store.domain.BOTicketType;
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.Consumption;
-import com.mogobiz.store.domain.DatePeriod;
-import com.mogobiz.store.domain.IntraDayPeriod;
-import com.mogobiz.store.domain.ProductCalendar
-import com.mogobiz.store.domain.Product
-import com.mogobiz.constant.IperConstant;
-import com.mogobiz.json.RenderUtil;
+import com.mogobiz.constant.IperConstant
+import com.mogobiz.json.RenderUtil
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
-import grails.transaction.Transactional;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException
 import grails.converters.JSON
+import grails.transaction.Transactional
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authc.AuthenticationException
+import org.apache.shiro.authc.UsernamePasswordToken
 
 import java.text.SimpleDateFormat
-
-import org.apache.shiro.authc.UsernamePasswordToken
 
 /**
  * @author hedi.abidi@ebiznext.com

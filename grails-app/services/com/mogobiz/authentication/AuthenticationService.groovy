@@ -11,7 +11,8 @@ import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.subject.Subject
 
-import static com.mogobiz.utils.ProfileUtils.*
+import static com.mogobiz.utils.ProfileUtils.ALL
+import static com.mogobiz.utils.ProfileUtils.computePermission
 
 /**
  * @author stephane.manciot@ebiznext.com

@@ -15,7 +15,7 @@ class CategoryRender
 
     java.util.Map asMap(java.util.List<String> included = [], java.util.List<String> excluded = [], com.mogobiz.store.domain.Category entity, String lang = 'fr') {
 		if (included == null || included.size() == 0) {
-			included = ["id", "name", "ibeacon", "ibeacon.id", "ibeacon.name", "catalog", "catalog.name"]
+            included = ["id", "name", "uuid", "externalCode", "ibeacon", "ibeacon.id", "ibeacon.name", "catalog", "catalog.name"]
 		}
 		Map result = super.asMap(included, excluded, entity, lang);
 		return result;

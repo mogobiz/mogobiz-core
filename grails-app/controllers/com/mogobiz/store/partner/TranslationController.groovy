@@ -1,26 +1,23 @@
-/*
+    /*
  * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
  */
 
 package com.mogobiz.store.partner
 
-import grails.transaction.Transactional
+    import com.mogobiz.ajax.AjaxResponse
+    import com.mogobiz.store.domain.Catalog
+    import grails.converters.JSON
+    import grails.transaction.Transactional
 
-import javax.servlet.http.HttpServletResponse;
+    import javax.servlet.http.HttpServletResponse
 
-import grails.converters.JSON
-
-import com.mogobiz.service.TranslationService;
-import com.mogobiz.ajax.AjaxResponse;
-import com.mogobiz.authentication.AuthenticationService;
-
-/**
+    /**
  * Translation manager controller
  */
 class TranslationController {
 
-	AuthenticationService authenticationService
-	TranslationService translationService;
+	def authenticationService
+	def translationService;
 	
 	/**
 	 * Returns a list of configurable languages ​​by the Partner application
@@ -94,6 +91,7 @@ class TranslationController {
 			return
 		}
 
+        Long catalogId = params.long("catalog.id")
 		Long target = params.long("target")
 		String lang = params["language"]
         String value = params["value"]
@@ -102,8 +100,13 @@ class TranslationController {
 			response.sendError HttpServletResponse.SC_BAD_REQUEST
 			return
 		}
+        Catalog catalog = Catalog.get(catalogId)
+        if (catalog.company != seller.company) {
+            response.sendError 401
+            return
+        }
 
-		AjaxResponse reponse = translationService.update(seller, target, lang, value, type);
+		AjaxResponse reponse = translationService.update(seller, catalog, target, lang, value, type);
 		render reponse.asMap() as JSON		
 	}
 }

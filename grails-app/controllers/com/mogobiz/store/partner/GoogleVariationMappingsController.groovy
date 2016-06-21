@@ -4,14 +4,7 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.store.domain.Company
-import com.mogobiz.store.domain.GoogleVariationMapping
-import com.mogobiz.store.domain.GoogleVariationType
-import com.mogobiz.store.domain.GoogleVariationValue
-import com.mogobiz.store.domain.TicketType
-import com.mogobiz.store.domain.Variation
-import com.mogobiz.store.domain.VariationValue
+import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.converters.XML
 import grails.gorm.DetachedCriteria
@@ -19,7 +12,7 @@ import grails.transaction.Transactional
 
 class GoogleVariationMappingsController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
     @Transactional(readOnly = true)
     def show(Long id, String type, String value) {

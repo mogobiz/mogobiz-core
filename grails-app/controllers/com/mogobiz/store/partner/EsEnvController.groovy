@@ -5,7 +5,6 @@
 package com.mogobiz.store.partner
 
 import com.mogobiz.store.domain.EsEnv
-import com.mogobiz.authentication.AuthenticationService
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -13,7 +12,7 @@ import org.quartz.CronExpression
 
 class EsEnvController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
 
     @Transactional(readOnly = true)

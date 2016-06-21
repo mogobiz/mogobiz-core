@@ -5,12 +5,11 @@
 package com.mogobiz.store.admin
 
 import com.mogobiz.ajax.AjaxResponseService
+import com.mogobiz.store.domain.TaxRate
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
-
-import com.mogobiz.store.domain.TaxRate
 
 /**
  * 

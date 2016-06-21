@@ -7,13 +7,7 @@
  */
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.store.domain.Brand
-import com.mogobiz.store.domain.BrandProperty
-import com.mogobiz.store.domain.Ibeacon
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Seller
+import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
@@ -25,9 +19,9 @@ import org.apache.commons.io.FileUtils
  */
 class BrandController {
 
-    AjaxResponseService ajaxResponseService
+    def ajaxResponseService
 
-    AuthenticationService authenticationService
+    def authenticationService
 
     static final int BUFFER_SIZE = 2048
 
@@ -55,7 +49,7 @@ class BrandController {
             if (!brands) {
                 brands = []
             }
-            def mc = [ compare: {a,b-> a.name.compareTo(b.name)} ] as Comparator
+            def mc = [compare: { a, b -> a.name.compareTo(b.name) }] as Comparator
             Collections.sort(brands, mc)
             withFormat {
                 html brands: brands
@@ -139,6 +133,7 @@ class BrandController {
         if (brand && brand.company == company) {
             def products = Product.executeQuery('FROM Product p JOIN p.brand b WHERE b=:brand', [brand: brand])
             if (products.isEmpty()) {
+                Translation.findAllByTarget(brand.id).each { it.delete() }
                 brand.delete()
             }
         }

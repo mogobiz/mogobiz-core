@@ -1,32 +1,10 @@
 package com.mogobiz
 
-import com.mogobiz.store.domain.Brand;
-import com.mogobiz.store.domain.BrandRender;
-import com.mogobiz.store.domain.BrandValidation;
-import com.mogobiz.store.domain.Catalog;
-import com.mogobiz.store.domain.Category;
-import com.mogobiz.store.domain.CategoryRender;
-import com.mogobiz.store.domain.CategoryValidation;
-import com.mogobiz.store.domain.Company;
-import com.mogobiz.store.domain.LocalTaxRate;
-import com.mogobiz.store.domain.LocalTaxRateRender;
-import com.mogobiz.store.domain.LocalTaxRateValidation;
-import com.mogobiz.store.domain.Product;
-import com.mogobiz.store.domain.ProductCalendar;
-import com.mogobiz.store.domain.ProductRender;
-import com.mogobiz.store.domain.ProductState;
-import com.mogobiz.store.domain.ProductType;
-import com.mogobiz.store.domain.ProductValidation;
-import com.mogobiz.store.domain.Tag;
-import com.mogobiz.store.domain.TagRender;
-import com.mogobiz.store.domain.TagValidation;
-import com.mogobiz.store.domain.TaxRate;
-import com.mogobiz.store.domain.TaxRateRender;
-import com.mogobiz.store.domain.TaxRateValidation
-import com.mogobiz.service.TaxRateService;
 import com.mogobiz.service.ProductService
-import grails.test.mixin.TestMixin;
-import grails.test.mixin.support.GrailsUnitTestMixin;
+import com.mogobiz.service.TaxRateService
+import com.mogobiz.store.domain.*
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 
 @TestMixin(GrailsUnitTestMixin)
 class AbstractTestService {

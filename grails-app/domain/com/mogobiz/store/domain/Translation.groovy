@@ -44,6 +44,11 @@ class Translation
      * 
      */
     long companyId 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Catalog catalog 
+
     static transients = [ 'translationValidation', 'translationRender' ]
 
 
@@ -70,6 +75,8 @@ class Translation
         type column:"type",insertable:true,updateable:true,lazy:false,cache:false
         companyId column:"company_id",insertable:true,updateable:true,lazy:false,cache:false
 
+
+        catalog column:"catalog_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -80,6 +87,7 @@ class Translation
         value ( blank:false, nullable:false, unique:false)
         type (nullable:true, unique:false)
         companyId ( blank:false, nullable:false, unique:false)
+        catalog (nullable:true)
     }
 
 

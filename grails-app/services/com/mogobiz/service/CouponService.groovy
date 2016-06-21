@@ -4,15 +4,9 @@
 
 package com.mogobiz.service
 
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.cmd.coupon.CouponCreateUpdateCommand
 import com.mogobiz.store.cmd.coupon.CouponListCommand
 import com.mogobiz.store.domain.*
-import com.mogobiz.store.vo.CartItemVO
-import com.mogobiz.store.vo.CartVO
-import com.mogobiz.store.vo.CouponVO
-import com.mogobiz.utils.DateUtilitaire
-import com.mogobiz.utils.IperUtil
 import grails.orm.PagedResultList
 
 class CouponService {
@@ -20,7 +14,7 @@ class CouponService {
     private static final String DICTIONARY = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
     static transactional = true
-    AuthenticationService authenticationService
+    def authenticationService
 
     Coupon findByCode(long companyId, String couponCode) {
         return Coupon.createCriteria().get {

@@ -1,7 +1,5 @@
 package com.mogobiz.constant
 
-import grails.util.Holders
-
 interface IperConstant {
 	
 	/**

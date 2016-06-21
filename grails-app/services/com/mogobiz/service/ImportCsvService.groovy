@@ -4,32 +4,10 @@
 
 package com.mogobiz.service
 
-import com.mogobiz.store.domain.Category
-import com.mogobiz.store.domain.Brand
-import com.mogobiz.store.domain.Catalog
-import com.mogobiz.store.domain.Coupon
-import com.mogobiz.store.domain.Feature
-import com.mogobiz.store.domain.FeatureValue
-import com.mogobiz.store.domain.LocalTaxRate
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Product2Resource
-import com.mogobiz.store.domain.ProductCalendar
-import com.mogobiz.store.domain.ProductProperty
-import com.mogobiz.store.domain.ProductState
-import com.mogobiz.store.domain.ProductType
-import com.mogobiz.store.domain.ReductionRule
-import com.mogobiz.store.domain.ReductionRuleType
-import com.mogobiz.store.domain.Resource
-import com.mogobiz.store.domain.ResourceType
-import com.mogobiz.store.domain.ShippingRule
-import com.mogobiz.store.domain.Stock
-import com.mogobiz.store.domain.Tag
-import com.mogobiz.store.domain.TaxRate
-import com.mogobiz.store.domain.TicketType
-import com.mogobiz.store.domain.Variation
-import com.mogobiz.store.domain.VariationValue
+import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
 import com.mogobiz.utils.ZipFileUtil
+import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellReference
@@ -37,9 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.hibernate.SessionFactory
 import org.jsoup.Jsoup
-import grails.transaction.Transactional
 
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -49,10 +25,10 @@ import java.util.zip.ZipFile
 @Transactional
 class ImportCsvService {
 
-    SanitizeUrlService sanitizeUrlService
-    ResService resService
+    def sanitizeUrlService
+    def resService
     def grailsApplication
-    SessionFactory sessionFactory
+    def sessionFactory
 
     int FLUSHSIZE = Holders.config.importCatalog.flushsize ?: 100
 
@@ -262,10 +238,21 @@ class ImportCsvService {
                             String pastille = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
                             String consumed = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
                             Coupon coupon = Coupon.findByUuid(uuid)
+                            boolean uuidSet = false
+                            if(coupon?.company != catalog.company){
+                                coupon = Coupon.findByCompanyAndCode(catalog.company, code)
+                                if(!coupon){
+                                    coupon = new Coupon()
+                                    coupon.uuid = UUID.randomUUID().toString()
+                                }
+                                uuidSet = true
+                            }
                             if (!coupon) {
                                 coupon = new Coupon()
                             }
-                            coupon.uuid = uuid ? uuid : UUID.randomUUID().toString()
+                            if(!uuidSet){
+                                coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                            }
                             coupon.name = name
                             coupon.code = code
                             coupon.active = active.equalsIgnoreCase("true")
@@ -347,12 +334,12 @@ class ImportCsvService {
                     if (row != null) {
                         String cell = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                         if (cell.length() > 0) {
-                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
+//                            String uuid = row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString()
                             String code = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
                             String catUuid = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
                             String prodUuid = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
                             String skuUuid = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                            Coupon coupon = Coupon.findByUuid(uuid)
+                            Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, code)
                             if (coupon) {
                                 if (catUuid.length() > 0) {
                                     coupon.addToCategories(Category.findByUuid(catUuid))

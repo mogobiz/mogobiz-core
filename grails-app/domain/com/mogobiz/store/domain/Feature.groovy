@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,40 +25,48 @@ class Feature
 
 
     /**
-     * 
+     *
      */
-    java.lang.String externalCode 
+    java.lang.String externalCode
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    int position 
+    int position
     /**
-     * 
+     *
      */
-    java.lang.String domain 
+    java.lang.String domain
     /**
-     * 
+     *
      */
-    Boolean hide  = false 
+    Boolean hide  = false
     /**
-     * 
+     *
      */
-    java.lang.String value 
+    java.lang.String value
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Product product 
+    java.lang.String i18n
+    /**
+     *
+     */
+    com.mogobiz.store.domain.Product product
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Category category 
+    com.mogobiz.store.domain.Category category
 
     static transients = [ 'featureValidation', 'featureRender' ]
+
+    static hasMany = [values: FeatureValue]
+
+    static mappedBy = [values: "feature"]
 
 
     static mapping = {
@@ -84,6 +92,7 @@ class Feature
         domain column:"domain",insertable:true,updateable:true,lazy:false,cache:false
         hide column:"hide",insertable:true,updateable:true,lazy:false,cache:false
         value column:"value",insertable:true,updateable:true,lazy:false,cache:false
+        i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
 
         product column:"product_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -100,6 +109,7 @@ class Feature
         domain (nullable:true, unique:false)
         hide ( blank:false, nullable:false, unique:false)
         value (nullable:true, unique:false)
+        i18n (nullable:true, unique:false)
         product (nullable:true)
         category (nullable:true)
     }

@@ -4,32 +4,32 @@
 
 package bootstrap
 
-import com.mogobiz.authentication.ProfileService
-import com.mogobiz.service.CountryImportService
 import com.mogobiz.store.domain.*
-import com.mogobiz.service.SanitizeUrlService
 import com.mogobiz.store.vo.RegisteredCartItemVO
+import com.mogobiz.tools.QRCodeUtils
 import com.mogobiz.utils.DateUtilitaire
 import com.mogobiz.utils.IperUtil
-import com.mogobiz.tools.QRCodeUtils
 import com.mogobiz.utils.PermissionType
 import com.mogobiz.utils.SecureCodec
 import com.sun.org.apache.xml.internal.security.utils.Base64
 import grails.util.Holders
 import groovy.json.JsonBuilder
 
-import static com.mogobiz.utils.ProfileUtils.*
+import static com.mogobiz.utils.ProfileUtils.ALL
 
 public class CommonService {
 
-	SanitizeUrlService sanitizeUrlService
+	def sanitizeUrlService
 
-    ProfileService profileService
+    def profileService
 
-    CountryImportService countryImportService
+    def countryImportService
+
+    def translationService
 
     def destroy() {}
 	def init() {
+
         // import countries
         final codes = (Holders.config.importCountries?.codes as String)?.split(',')?.collect{it.trim().toUpperCase()} ?: ['DE','ES','FR','GB','US']
         final countryCodes = Country.findAll().collect {it.code}
@@ -207,6 +207,15 @@ public class CommonService {
                     }
                 }
                 EsEnv.findAllByCompany(company).each {env ->
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.PUBLISH_STORE_CATALOGS_TO_ENV,
+                            company.id as String,
+                            env.id as String
+                    )
+                }
+                MiraklEnv.findAllByCompany(company).each {env ->
                     profileService.saveUserPermission(
                             seller,
                             true,
@@ -404,7 +413,7 @@ public class CommonService {
 		TicketType sku = TicketType.findByNameAndProduct(name, produit);
 		if (sku == null)
 		{
-			Stock stock = new Stock(stock: Math.max(0, nombreEnStock), stockUnlimited: (nombreEnStock == -1));
+			Stock stock = new Stock(stock: Math.max(0, nombreEnStock), stockUnlimited: (nombreEnStock.intValue() == -1));
 			saveEntity(stock);
 
 			sku = new TicketType(sku:UUID.randomUUID().toString(), name: name, price: montant, minOrder: 1, maxOrder: 10, product: produit, stock: stock, startDate: produit.startDate, stopDate: produit.stopDate);

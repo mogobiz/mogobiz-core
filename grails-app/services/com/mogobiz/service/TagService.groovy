@@ -8,10 +8,10 @@
  * You can (and have to!) safely modify it by hand.
  */
 package com.mogobiz.service
+
 import com.mogobiz.store.cmd.PagedListCommand
 import com.mogobiz.store.domain.Company
 import com.mogobiz.store.domain.Ibeacon
-import com.mogobiz.store.domain.ProductState
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Tag
 

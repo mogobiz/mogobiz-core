@@ -4,7 +4,6 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.authentication.AuthenticationService
 import com.mogobiz.store.domain.GoogleCategory
 import grails.converters.JSON
 import grails.converters.XML
@@ -14,7 +13,7 @@ import org.springframework.web.servlet.support.RequestContextUtils as RCU
 
 class GoogleCategoryController {
 
-    AuthenticationService authenticationService
+    def authenticationService
 
     @Transactional(readOnly = true)
     def show(String parentPath) {

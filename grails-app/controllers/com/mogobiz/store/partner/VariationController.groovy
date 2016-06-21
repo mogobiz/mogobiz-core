@@ -4,22 +4,19 @@
 
 package com.mogobiz.store.partner
 
-import com.mogobiz.ajax.AjaxResponseService
-import com.mogobiz.authentication.AuthenticationService
-import com.mogobiz.service.CategoryService
-import grails.converters.JSON
-import grails.converters.XML
-
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Seller
+import com.mogobiz.store.domain.Translation
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
+import grails.converters.JSON
+import grails.converters.XML
 import grails.transaction.Transactional
 
 class VariationController {
-    AuthenticationService authenticationService
-	AjaxResponseService ajaxResponseService
-	CategoryService categoryService
+    def authenticationService
+	def ajaxResponseService
+	def categoryService
 
 	private List<Variation> getVariations(Category category) {
 		List<Variation> variations = Variation.findAllByCategory(category,[sort:'position',order:'asc'])
@@ -203,6 +200,7 @@ class VariationController {
 		def variation = params['variation']?.id?Variation.get (params['variation']?.id):null
 		if(variation){
             try {
+                Translation.findAllByTarget(variation.id).each { it.delete() }
                 variation.delete(flush: true)
                 withFormat {
                     xml {  render [:] as XML }
@@ -275,6 +273,7 @@ class VariationController {
 			}
 			if (variationValue){
 				variation.removeFromVariationValues(variationValue)
+                Translation.findAllByTarget(variationValue.id).each { it.delete() }
 				variationValue.delete(flush:true)
 				variation.save(flush:true)
 				withFormat {

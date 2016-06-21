@@ -7,18 +7,16 @@
  */
 package com.mogobiz.geolocation.partner
 
+import com.mogobiz.geolocation.domain.Poi
+import com.mogobiz.geolocation.domain.VisibilityType
+import com.mogobiz.store.domain.Product
+import com.mogobiz.store.domain.Resource
+import com.mogobiz.store.domain.Translation
+import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
-
-import com.mogobiz.store.domain.Product
-import com.mogobiz.store.domain.Resource
-import com.mogobiz.ajax.AjaxResponseService;
-import com.mogobiz.authentication.AuthenticationService;
-import com.mogobiz.geolocation.domain.Poi
-import com.mogobiz.geolocation.domain.VisibilityType
-import com.mogobiz.utils.IperUtil
 
 /**
  * @author stephane.manciot@ebiznext.com
@@ -26,8 +24,8 @@ import com.mogobiz.utils.IperUtil
  */
 class PoiController {
 
-	AjaxResponseService ajaxResponseService
-	AuthenticationService authenticationService
+	def ajaxResponseService
+	def authenticationService
 
 	def listPOITypes() {
 		def dirList = []
@@ -112,6 +110,7 @@ class PoiController {
 					product.poi = null
 					product.save()
 				}
+                Translation.findAllByTarget(poi.id).each { it.delete() }
 				poi.delete(flush:true)
 			}
 		}

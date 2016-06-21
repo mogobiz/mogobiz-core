@@ -7,8 +7,8 @@
  */
 package com.mogobiz.store.admin
 
-import grails.transaction.Transactional
 import com.mogobiz.store.domain.Company
+import grails.transaction.Transactional
 
 /**
  * @author stephane.manciot@ebiznext.com

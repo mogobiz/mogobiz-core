@@ -7,9 +7,6 @@
  */
 package com.mogobiz.auth
 
-import com.megatome.grails.RecaptchaService
-import com.mogobiz.service.CompanyService
-import com.mogobiz.service.SellerService
 import com.mogobiz.store.domain.Company
 import grails.transaction.Transactional
 import org.apache.shiro.SecurityUtils
@@ -26,9 +23,9 @@ import org.apache.shiro.web.util.WebUtils
  */
 class AuthController {
 
-    RecaptchaService recaptchaService
-    CompanyService companyService
-    SellerService sellerService
+    def recaptchaService
+    def companyService
+    def sellerService
 
     // sign up	Company
     @Transactional

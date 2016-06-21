@@ -7,9 +7,6 @@
  */
 package com.mogobiz.store.admin
 
-import org.apache.log4j.FileAppender
-import org.apache.log4j.Logger
-
 class AdminController {
 
     def index() {}
