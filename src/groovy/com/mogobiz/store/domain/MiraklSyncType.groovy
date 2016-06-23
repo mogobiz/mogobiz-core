@@ -8,7 +8,7 @@ package com.mogobiz.store.domain;
  */
 enum MiraklSyncType
 {
-CATEGORIES("CATEGORIES"), HIERARCHIES("HIERARCHIES"), VALUES("VALUES"), ATTRIBUTES("ATTRIBUTES"), PRODCUCTS("PRODCUCTS"), OFFERS("OFFERS")
+CATEGORIES("CATEGORIES"), HIERARCHIES("HIERARCHIES"), VALUES("VALUES"), ATTRIBUTES("ATTRIBUTES"), PRODUCTS("PRODUCTS"), OFFERS("OFFERS"), PRODUCTS_SYNCHRO("PRODUCTS_SYNCHRO")
     private java.lang.String value
     private MiraklSyncType(java.lang.String value){
         this.value = value

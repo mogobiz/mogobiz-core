@@ -54,6 +54,11 @@ class MiraklSync
      */
     com.mogobiz.store.domain.Company company 
 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.MiraklEnv miraklEnv 
+
     static transients = [ 'miraklSyncValidation', 'miraklSyncRender' ]
 
 
@@ -84,6 +89,8 @@ class MiraklSync
         catalog column:"catalog_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        miraklEnv column:"mirakl_env_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -96,6 +103,7 @@ class MiraklSync
         timestamp ( blank:false, nullable:false, unique:false)
         catalog ( blank:false, nullable:false)
         company ( blank:false, nullable:false)
+        miraklEnv ( blank:false, nullable:false)
     }
 
 

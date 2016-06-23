@@ -39,11 +39,23 @@ class MiraklEnv
     /**
      * 
      */
-    boolean running  = false 
+    boolean running  = true 
     /**
      * 
      */
     java.lang.String frontKey 
+    /**
+     * 
+     */
+    boolean active  = true 
+    /**
+     * 
+     */
+    java.lang.String cronExpr 
+    /**
+     * 
+     */
+    java.lang.String name 
     /**
      * 
      */
@@ -74,6 +86,9 @@ class MiraklEnv
         shopId column:"shop_id",insertable:true,updateable:true,lazy:false,cache:false
         running column:"running",insertable:true,updateable:true,lazy:false,cache:false
         frontKey column:"front_key",insertable:true,updateable:true,lazy:false,cache:false
+        active column:"active",insertable:true,updateable:true,lazy:false,cache:false
+        cronExpr column:"cron_expr",insertable:true,updateable:true,lazy:false,cache:false
+        name column:"name",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -87,6 +102,9 @@ class MiraklEnv
         shopId ( blank:false, nullable:false, unique:false)
         running ( blank:false, nullable:false, unique:false)
         frontKey (nullable:true, unique:false)
+        active ( blank:false, nullable:false, unique:false)
+        cronExpr (nullable:true, unique:false)
+        name (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 
