@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,41 +25,41 @@ class MiraklEnv
 
 
     /**
-     * 
+     *
      */
-    java.lang.String url 
+    java.lang.String url
     /**
-     * 
+     *
      */
-    java.lang.String apiKey 
+    java.lang.String apiKey
     /**
-     * 
+     *
      */
-    java.lang.String shopId 
+    java.lang.String shopId
     /**
-     * 
+     *
      */
-    boolean running  = true 
+    boolean running  = false
     /**
-     * 
+     *
      */
-    java.lang.String frontKey 
+    java.lang.String frontKey
     /**
-     * 
+     *
      */
-    boolean active  = true 
+    boolean active  = true
     /**
-     * 
+     *
      */
-    java.lang.String cronExpr 
+    java.lang.String cronExpr
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
 
     static transients = [ 'miraklEnvValidation', 'miraklEnvRender' ]
 
