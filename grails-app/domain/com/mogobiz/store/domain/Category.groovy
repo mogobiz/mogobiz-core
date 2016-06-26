@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- *
+ * 
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,81 +25,88 @@ class Category
 
 
     /**
-     *
+     * 
      */
-    java.lang.String externalCode
+    java.lang.String externalCode 
     /**
-     *
+     * 
      */
-    java.lang.String name
+    java.lang.String name 
     /**
-     *
+     * 
      */
-    java.lang.String description
+    java.lang.String description 
     /**
-     *
+     * 
      */
-    java.lang.String keywords
+    java.lang.String keywords 
     /**
-     *
+     * 
      */
-    int position
+    int position 
     /**
-     *
+     * 
      */
-    Boolean hide  = false
+    Boolean hide  = false 
     /**
-     *
+     * 
      */
-    java.lang.String sanitizedName
+    java.lang.String sanitizedName 
     /**
-     *
+     * 
      */
-    java.lang.String googleCategory
+    java.lang.String googleCategory 
     /**
-     *
+     * 
      */
-    boolean deleted  = false
+    boolean deleted  = false 
     /**
-     *
+     * 
      */
-    long returnMaxDelay  = 0
+    long returnMaxDelay  = 0 
     /**
-     *
+     * 
      */
-    String fullpath
+    String fullpath 
     /**
-     *
+     * 
      */
-    java.lang.String i18n
+    java.lang.String i18n 
     /**
-     *
+     * 
      */
-    java.lang.Boolean publishable
+    java.lang.Boolean publishable 
     /**
-     *
+     * 
      */
-    java.lang.String logisticClass
+    java.lang.String logisticClass 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.MiraklSyncStatus miraklStatus 
+    /**
+     * 
+     */
+    java.lang.String miraklTrackingId 
+    /**
+     * 
+     */
+    com.mogobiz.store.domain.Company company 
 
     /**
-     *
+     * 
      */
-    com.mogobiz.store.domain.Company company
+    com.mogobiz.store.domain.Category parent 
 
     /**
-     *
+     * 
      */
-    com.mogobiz.store.domain.Category parent
+    com.mogobiz.store.domain.Catalog catalog 
 
     /**
-     *
+     * 
      */
-    com.mogobiz.store.domain.Catalog catalog
-
-    /**
-     *
-     */
-    com.mogobiz.store.domain.Ibeacon ibeacon
+    com.mogobiz.store.domain.Ibeacon ibeacon 
 
     static transients = [ 'categoryValidation', 'categoryRender' ]
 
@@ -138,6 +145,9 @@ class Category
         i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
         publishable column:"publishable",insertable:true,updateable:true,lazy:false,cache:false
         logisticClass column:"logistic_class",insertable:true,updateable:true,lazy:false,cache:false
+        miraklStatus column:"mirakl_status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
+        miraklTrackingId column:"mirakl_tracking_id",insertable:true,updateable:true,lazy:false,cache:false
+
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
@@ -165,6 +175,8 @@ class Category
         i18n (nullable:true, unique:false)
         publishable (nullable:true, unique:false)
         logisticClass (nullable:true, unique:false)
+        miraklStatus (nullable:true, unique:false)
+        miraklTrackingId (nullable:true, unique:false)
         company ( blank:false, nullable:false)
         parent (nullable:true)
         catalog (nullable:true)
