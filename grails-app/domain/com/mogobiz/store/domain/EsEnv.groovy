@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,47 +25,49 @@ class EsEnv
 
 
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    java.lang.String url 
+    java.lang.String url
     /**
-     * 
+     *
      */
-    java.lang.String cronExpr 
+    java.lang.String cronExpr
     /**
-     * 
+     *
      */
-    boolean running  = false 
+    boolean running  = false
     /**
-     * 
+     *
      */
-    java.lang.String extra 
+    java.lang.String extra
     /**
-     * 
+     *
      */
-    boolean active  = false 
+    boolean active  = false
     /**
      * <p>
      * Version de l'export ES
      * </p>
      */
-    java.lang.String idx 
+    java.lang.String idx
     /**
-     * 
+     *
      */
-    boolean success  = true 
+    boolean success  = true
     /**
-     * 
+     *
      */
-    java.lang.String activeIndex 
+    java.lang.String activeIndex
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
+
+    java.lang.String cacheUrls
 
     static transients = [ 'esEnvValidation', 'esEnvRender' ]
 
@@ -96,6 +98,7 @@ class EsEnv
         idx column:"idx",insertable:true,updateable:true,lazy:false,cache:false
         success column:"success",insertable:true,updateable:true,lazy:false,cache:false
         activeIndex column:"active_index",insertable:true,updateable:true,lazy:false,cache:false
+        cacheUrls column:"cache_urls",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -113,6 +116,7 @@ class EsEnv
         idx (nullable:true, unique:false)
         success ( blank:false, nullable:false, unique:false)
         activeIndex (nullable:true, unique:false)
+        cacheUrls (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 
