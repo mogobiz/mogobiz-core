@@ -103,7 +103,7 @@ class MiraklSync
         timestamp ( blank:false, nullable:false, unique:false)
         catalog ( blank:false, nullable:false)
         company ( blank:false, nullable:false)
-        miraklEnv ( blank:false, nullable:false)
+        miraklEnv (nullable:true)
     }
 
 

@@ -67,6 +67,10 @@ class Catalog
     /**
      * 
      */
+    boolean readOnly  = false 
+    /**
+     * 
+     */
     com.mogobiz.store.domain.Company company 
 
     static transients = [ 'catalogValidation', 'catalogRender' ]
@@ -99,6 +103,7 @@ class Catalog
         xcatalog column:"xcatalog",insertable:true,updateable:true,lazy:false,cache:false
         returnMaxDelay column:"return_max_delay",insertable:true,updateable:true,lazy:false,cache:false
         i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        readOnly column:"read_only",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -117,6 +122,7 @@ class Catalog
         xcatalog (nullable:true, unique:false)
         returnMaxDelay ( blank:false, nullable:false, unique:false)
         i18n (nullable:true, unique:false)
+        readOnly (nullable:true, unique:false)
         company ( blank:false, nullable:false)
     }
 
