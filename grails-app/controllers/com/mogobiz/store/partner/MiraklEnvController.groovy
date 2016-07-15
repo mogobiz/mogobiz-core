@@ -58,16 +58,15 @@ class MiraklEnvController {
         env.company = company
         if (env.validate()) {
             env.save(flush: true)
-//            if(!CronExpression.isValidExpression(env.cronExpr)){
-//                log.error("invalid cron expression ${env.cronExpr}")
-//            }
-//            else{
-//                if(env.active){
-//                    MiraklEnv.executeUpdate("update MiraklEnv set active = :active", [active:false])
-//                    servletContext.setAttribute(env.company.code, env.url)
-//                }
-//                env.save(flush: true)
-//            }
+            if(!CronExpression.isValidExpression(env.cronExpr)){
+                log.error("invalid cron expression ${env.cronExpr}")
+            }
+            else{
+                if(env.active){
+                    MiraklEnv.executeUpdate("update MiraklEnv set active = :active", [active:false])
+                }
+                env.save(flush: true)
+            }
         }
         withFormat {
             html env: env
@@ -88,15 +87,15 @@ class MiraklEnvController {
             env.properties = params['miraklenv']
             if (env.validate()) {
                 env.save(flush: true)
-//                if(!CronExpression.isValidExpression(env.cronExpr)){
-//                    log.error("invalid cron expression ${env.cronExpr}")
-//                }
-//                else {
-//                    env.save(flush: true)
-//                    if (env.active) {
-//                        MiraklEnv.executeUpdate("update MiraklEnv set active = :active where company.id = :idCompany and id != :id ", [id: env.id, active: false, idCompany: company.id])
-//                    }
-//                }
+                if(!CronExpression.isValidExpression(env.cronExpr)){
+                    log.error("invalid cron expression ${env.cronExpr}")
+                }
+                else {
+                    env.save(flush: true)
+                    if (env.active) {
+                        MiraklEnv.executeUpdate("update MiraklEnv set active = :active where company.id = :idCompany and id != :id ", [id: env.id, active: false, idCompany: company.id])
+                    }
+                }
             }
             else {
                 env.errors.allErrors.each {
