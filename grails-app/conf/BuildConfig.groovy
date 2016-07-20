@@ -68,10 +68,11 @@ grails.project.dependency.resolution = {
 
         compile 'org.jsoup:jsoup:1.8.1'
 
-        provided (group:"com.mogobiz", name:"mogobiz-tools", version:"${mogobiz.version}")  {excludes "groovy-all"}
+        compile (group:"com.mogobiz", name:"mogobiz-tools", version:"${mogobiz.version}")  {excludes "groovy-all"}
 
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"${mogobiz.version}")  {excludes "groovy-all"}
-        provided (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"${mogobiz.version}")  {excludes "groovy-all"}
+        compile (group:"com.mogobiz.rivers", name:"mogobiz-common", version:"${mogobiz.version}")  {excludes "groovy-all"}
+        compile (group:"com.mogobiz.rivers", name:"mogobiz-elasticsearch", version:"${mogobiz.version}")  {excludes "groovy-all"}
+        compile (group:"com.mogobiz.rivers", name:"mogobiz-mirakl", version:"${mogobiz.version}")  {excludes "groovy-all"}
     }
 
     plugins {

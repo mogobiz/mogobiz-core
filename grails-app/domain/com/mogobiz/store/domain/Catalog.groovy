@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,53 +25,55 @@ class Catalog
 
 
     /**
-     * 
+     *
      */
-    java.lang.String externalCode 
+    java.lang.String externalCode
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    java.util.Date activationDate 
+    java.util.Date activationDate
     /**
-     * 
+     *
      */
-    java.lang.String description 
+    java.lang.String description
     /**
-     * 
+     *
      */
-    boolean social  = false 
+    boolean social  = false
     /**
-     * 
+     *
      */
-    java.lang.String channels 
+    java.lang.String channels
     /**
-     * 
+     *
      */
-    boolean deleted  = false 
+    boolean deleted  = false
     /**
-     * 
+     *
      */
-    java.lang.String xcatalog 
+    java.lang.String xcatalog
     /**
-     * 
+     *
      */
-    long returnMaxDelay  = 0 
+    long returnMaxDelay  = 0
     /**
-     * 
+     *
      */
-    java.lang.String i18n 
+    java.lang.String i18n
     /**
-     * 
+     *
      */
-    boolean readOnly  = false 
+    boolean readOnly  = false
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
+
+    com.mogobiz.store.domain.MiraklEnv miraklEnv
 
     static transients = [ 'catalogValidation', 'catalogRender' ]
 
@@ -107,6 +109,7 @@ class Catalog
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+        miraklEnv column:"mirakl_env_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static constraints = {
@@ -124,6 +127,7 @@ class Catalog
         i18n (nullable:true, unique:false)
         readOnly (nullable:true, unique:false)
         company ( blank:false, nullable:false)
+        miraklEnv (nullable:true, unique:false)
     }
 
 

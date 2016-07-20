@@ -4,7 +4,17 @@
 
 package com.mogobiz.service
 
+import com.mogobiz.common.client.ClientConfig
+import com.mogobiz.common.client.Credentials
+import com.mogobiz.common.rivers.spi.RiverConfig
+import com.mogobiz.mirakl.client.MiraklClient
+import com.mogobiz.mirakl.client.domain.AttributeType
 import com.mogobiz.store.domain.Catalog
+import com.mogobiz.store.domain.Category
+import com.mogobiz.store.domain.Feature
+import com.mogobiz.store.domain.FeatureValue
+import com.mogobiz.store.domain.Variation
+import com.mogobiz.store.domain.VariationValue
 import com.mogobiz.store.exception.ProductNotFoundException
 import groovy.sql.Sql
 
@@ -13,6 +23,8 @@ import groovy.sql.Sql
  */
 class CatalogService {
 	def dataSource
+
+    def sanitizeUrlService
 
 	Catalog addNew(Catalog catalog) {
 		catalog.save(flush:true)
@@ -122,4 +134,111 @@ class CatalogService {
 		}
 		return count
 	}
+
+    def refreshMiraklCatalog(Catalog catalog){
+        final env = catalog.miraklEnv
+        if(env){
+            RiverConfig config = new RiverConfig(
+                    debug: true,
+                    clientConfig: new ClientConfig(
+                            store: catalog.company.code,
+                            merchant_id: env.shopId,
+                            merchant_url: env.url,
+                            debug: true,
+                            credentials: new Credentials(
+                                    frontKey: env.frontKey as String,
+                                    apiKey: env.apiKey
+                            )
+                    ),
+                    idCatalog: catalog.id,
+                    languages: null,
+                    defaultLang: catalog.company.defaultLanguage
+            )
+            handleMiraklCategoriesByHierarchyAndLevel(catalog, config)
+            catalog.readOnly = true
+            catalog.save(flush: true)
+        }
+    }
+
+    def handleMiraklCategoriesByHierarchyAndLevel(Catalog catalog, RiverConfig config, String hierarchyCode = null, int level = 1) {
+        def listHierarchiesResponse = MiraklClient.listHierarchies(config, hierarchyCode, level)
+        listHierarchiesResponse.hierarchies?.findAll {
+            it.level as int == level && (!hierarchyCode || it.parentCode == hierarchyCode)
+        }?.each {hierarchie ->
+            final externalCode = "mirakl::${hierarchie.code}"
+            def category = Category.findByCatalogAndExternalCode(catalog, externalCode) ?:
+                    new Category(
+                            company: catalog.company,
+                            catalog: catalog,
+                            externalCode: externalCode,
+                            name: hierarchie.label,
+                            sanitizedName: sanitizeUrlService.sanitizeWithDashes(hierarchie.label)/*,
+                            uuid: UUID.randomUUID().toString()*/
+                    )
+            if(hierarchie.parentCode?.trim()?.length() > 0){
+                category.parent = Category.findByCatalogAndExternalCode(
+                        catalog,
+                        "mirakl::${hierarchie.parentCode}"
+                )
+            }
+            category.validate()
+            if(!category.hasErrors()){
+                category.save(flush: true)
+                // récupération des features et variations
+                def listAttributesResponse = MiraklClient.listAttributes(config, hierarchie.code)
+                listAttributesResponse.attributes?.findAll {it.type == AttributeType.LIST && it.typeParameter}?.each { attribute ->
+                    if(!attribute.variant){
+                        def feature = Feature.findByCategoryAndExternalCode(category, "mirakl::${attribute.code}") ?: new Feature(
+                                name: attribute.label,
+                                externalCode: "mirakl::${attribute.code}",
+                                category: category
+                        )
+                        feature.validate()
+                        if(!feature.hasErrors()){
+                            feature.save(flush: true)
+                            def listValuesResponse = MiraklClient.listValues(config, attribute.typeParameter)
+                            listValuesResponse.valuesLists?.first()?.values?.each {value ->
+                                def featureValue = FeatureValue.findByFeatureAndExternalCode(feature, "mirakl::${value.code}") ?: new FeatureValue(
+                                        value: value.label,
+                                        externalCode: "mirakl::${value.code}",
+                                        feature: feature
+                                )
+                                featureValue.validate()
+                                if(!featureValue.hasErrors()){
+                                    featureValue.save(flush: true)
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        def variation = Variation.findByCategoryAndExternalCode(category, "mirakl::${attribute.code}") ?: new Variation(
+                                name: attribute.label,
+                                externalCode: "mirakl::${attribute.code}",
+                                category: category
+                        )
+                        variation.validate()
+                        if(!variation.hasErrors()){
+                            variation.save(flush: true)
+                            def listValuesResponse = MiraklClient.listValues(config, attribute.typeParameter)
+                            listValuesResponse.valuesLists?.first()?.values?.each {value ->
+                                def variationValue = VariationValue.findByVariationAndExternalCode(variation, "mirakl::${value.code}") ?: new VariationValue(
+                                        value: value.label,
+                                        externalCode: "mirakl::${value.code}",
+                                        variation: variation
+                                )
+                                variationValue.validate()
+                                if(!variationValue.hasErrors()){
+                                    variationValue.save(flush: true)
+                                }
+                            }
+                        }
+                    }
+                }
+                handleMiraklCategoriesByHierarchyAndLevel(catalog, config, hierarchie.code, level+1)
+            }
+            else {
+                category.errors.allErrors.each { log.error(it) }
+            }
+        }
+    }
 }

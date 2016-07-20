@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,18 +25,22 @@ class FeatureValue
 
 
     /**
-     * 
+     *
      */
-    java.lang.String value 
+    java.lang.String externalCode
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Feature feature 
+    java.lang.String value
+    /**
+     *
+     */
+    com.mogobiz.store.domain.Feature feature
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Product product 
+    com.mogobiz.store.domain.Product product
 
     static transients = [ 'featureValueValidation', 'featureValueRender' ]
 
@@ -58,6 +62,7 @@ class FeatureValue
         version false
 
         id name:'id',column:'id',generator:'native'
+        externalCode column:"external_code",insertable:true,updateable:true,lazy:false,cache:false
         value column:"value",insertable:true,updateable:true,lazy:false,cache:false
 
 
@@ -69,6 +74,7 @@ class FeatureValue
     static constraints = {
     uuid (nullable:false, unique:false)
 
+        externalCode (nullable:true, unique:false)
         value (nullable:true, unique:false)
         feature ( blank:false, nullable:false)
         product ( blank:false, nullable:false)

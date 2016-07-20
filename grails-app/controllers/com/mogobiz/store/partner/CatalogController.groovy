@@ -7,6 +7,7 @@ package com.mogobiz.store.partner
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Company
+import com.mogobiz.store.domain.MiraklEnv
 import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Translation
 import com.mogobiz.utils.PermissionType
@@ -19,6 +20,8 @@ class CatalogController {
     def authenticationService
 
     def profileService
+
+    def catalogService
 
     @Transactional(readOnly = true)
     def show() {
@@ -60,6 +63,9 @@ class CatalogController {
                 catalog = new Catalog(params['catalog'] as Map)
                 catalog.company = company
                 catalog.uuid = UUID.randomUUID().toString()
+                def envId = params.long("miraklenv.id")
+                def env = envId ? MiraklEnv.load(envId) : null
+                catalog.miraklEnv = env
                 catalog.validate()
                 if (!catalog.hasErrors()) {
                     catalog.save(flush: true)
@@ -70,6 +76,9 @@ class CatalogController {
                             company.id as String,
                             catalog.id as String
                     )
+                    if(env){
+                        catalogService.refreshMiraklCatalog(catalog)
+                    }
                 } else {
                     catalog.errors.allErrors.each { log.error(it) }
                 }
