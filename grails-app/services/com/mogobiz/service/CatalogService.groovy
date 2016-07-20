@@ -203,7 +203,7 @@ class CatalogService {
                 )
                 // récupération des features et variations
                 def listAttributesResponse = MiraklClient.listAttributes(config, hierarchie.code)
-                listAttributesResponse.attributes?.findAll {it.type == AttributeType.LIST && it.typeParameter}?.each { attribute ->
+                listAttributesResponse.attributes?.findAll {it.type == AttributeType.LIST && it.typeParameter && it.hierarchyCode == hierarchie.code}?.each { attribute ->
                     if(!attribute.variant){
                         def feature = Feature.findByCategoryAndExternalCode(category, "mirakl::${attribute.code}") ?: new Feature(
                                 name: attribute.label,
