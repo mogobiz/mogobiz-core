@@ -77,7 +77,7 @@ class CatalogController {
                             catalog.id as String
                     )
                     if(env){
-                        catalogService.refreshMiraklCatalog(catalog)
+                        catalogService.refreshMiraklCatalog(catalog, seller)
                     }
                 } else {
                     catalog.errors.allErrors.each { log.error(it) }

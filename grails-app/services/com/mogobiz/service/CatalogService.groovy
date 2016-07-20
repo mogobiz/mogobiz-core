@@ -13,9 +13,11 @@ import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.domain.Category
 import com.mogobiz.store.domain.Feature
 import com.mogobiz.store.domain.FeatureValue
+import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.Variation
 import com.mogobiz.store.domain.VariationValue
 import com.mogobiz.store.exception.ProductNotFoundException
+import com.mogobiz.utils.PermissionType
 import groovy.sql.Sql
 
 /**
@@ -26,7 +28,11 @@ class CatalogService {
 
     def sanitizeUrlService
 
-	Catalog addNew(Catalog catalog) {
+    def profileService
+
+    def authenticationService
+
+    Catalog addNew(Catalog catalog) {
 		catalog.save(flush:true)
 		return catalog
 	}
@@ -135,7 +141,7 @@ class CatalogService {
 		return count
 	}
 
-    def refreshMiraklCatalog(Catalog catalog){
+    def refreshMiraklCatalog(Catalog catalog, Seller seller = null){
         final env = catalog.miraklEnv
         if(env){
             RiverConfig config = new RiverConfig(
@@ -154,13 +160,16 @@ class CatalogService {
                     languages: null,
                     defaultLang: catalog.company.defaultLanguage
             )
-            handleMiraklCategoriesByHierarchyAndLevel(catalog, config)
+            handleMiraklCategoriesByHierarchyAndLevel(catalog, config, seller ?: authenticationService.retrieveAuthenticatedSeller())
             catalog.readOnly = true
             catalog.save(flush: true)
         }
     }
 
-    def handleMiraklCategoriesByHierarchyAndLevel(Catalog catalog, RiverConfig config, String hierarchyCode = null, int level = 1) {
+    def handleMiraklCategoriesByHierarchyAndLevel(Catalog catalog, RiverConfig config, Seller seller = null, String hierarchyCode = null, int level = 1) {
+        if(seller?.company?.id != catalog?.company?.id){
+            throw new IllegalArgumentException()
+        }
         def listHierarchiesResponse = MiraklClient.listHierarchies(config, hierarchyCode, level)
         listHierarchiesResponse.hierarchies?.findAll {
             it.level as int == level && (!hierarchyCode || it.parentCode == hierarchyCode)
@@ -184,6 +193,14 @@ class CatalogService {
             category.validate()
             if(!category.hasErrors()){
                 category.save(flush: true)
+                profileService.saveUserPermission(
+                        seller,
+                        true,
+                        PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                        catalog.company.id as String,
+                        catalog.id as String,
+                        category.id as String
+                )
                 // récupération des features et variations
                 def listAttributesResponse = MiraklClient.listAttributes(config, hierarchie.code)
                 listAttributesResponse.attributes?.findAll {it.type == AttributeType.LIST && it.typeParameter}?.each { attribute ->
@@ -234,7 +251,7 @@ class CatalogService {
                         }
                     }
                 }
-                handleMiraklCategoriesByHierarchyAndLevel(catalog, config, hierarchie.code, level+1)
+                handleMiraklCategoriesByHierarchyAndLevel(catalog, config, seller, hierarchie.code, level+1)
             }
             else {
                 category.errors.allErrors.each { log.error(it) }
