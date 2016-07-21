@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,39 +25,54 @@ class MiraklSync
 
 
     /**
-     * 
+     *
      */
-    java.lang.String trackingId 
+    java.lang.String trackingId
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.MiraklSyncType type 
+    com.mogobiz.store.domain.MiraklSyncType type
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.MiraklSyncStatus status 
+    com.mogobiz.store.domain.MiraklSyncStatus status
     /**
-     * 
+     *
      */
-    java.lang.String errorReport 
+    java.lang.String errorReport
     /**
-     * 
+     *
      */
-    java.util.Date timestamp 
+    java.util.Date timestamp
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Catalog catalog 
+    com.mogobiz.store.domain.Catalog catalog
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.MiraklEnv miraklEnv 
+    com.mogobiz.store.domain.MiraklEnv miraklEnv
+
+    /**
+     *
+     */
+    java.lang.Long linesRead = 0L
+
+    /**
+     *
+     */
+    java.lang.Long linesInError = 0L
+
+    /**
+     *
+     */
+    java.lang.Long linesInSuccess = 0L
 
     static transients = [ 'miraklSyncValidation', 'miraklSyncRender' ]
 
@@ -91,6 +106,10 @@ class MiraklSync
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
 
         miraklEnv column:"mirakl_env_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+
+        linesRead column:"lines_read",insertable:true,updateable:true,lazy:false,cache:false
+        linesInError column:"lines_in_error",insertable:true,updateable:true,lazy:false,cache:false
+        linesInSuccess column:"lines_in_success",insertable:true,updateable:true,lazy:false,cache:false
     }
 
     static constraints = {
@@ -104,6 +123,9 @@ class MiraklSync
         catalog ( blank:false, nullable:false)
         company ( blank:false, nullable:false)
         miraklEnv (nullable:true)
+        linesRead (nullable:true, unique:false)
+        linesInError (nullable:true, unique:false)
+        linesInSuccess (nullable:true, unique:false)
     }
 
 
