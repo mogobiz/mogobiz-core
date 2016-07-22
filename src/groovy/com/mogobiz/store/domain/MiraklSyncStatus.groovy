@@ -4,11 +4,15 @@
 
 package com.mogobiz.store.domain;
 /**
- * 
+ *
  */
 enum MiraklSyncStatus
 {
-WAITING("WAITING"), RUNNING("RUNNING"), COMPLETE("COMPLETE"), FAILED("FAILED"), CANCELLED("CANCELLED"), QUEUED("QUEUED")
+WAITING("WAITING"), RUNNING("RUNNING"), COMPLETE("COMPLETE"), FAILED("FAILED"), CANCELLED("CANCELLED"), QUEUED("QUEUED"),
+    SENT("SENT"),
+    TRANSFORMATION_WAITING("TRANSFORMATION_WAITING"),
+    TRANSFORMATION_RUNNING("TRANSFORMATION_RUNNING"),
+    TRANSFORMATION_FAILED("TRANSFORMATION_FAILED")
     private java.lang.String value
     private MiraklSyncStatus(java.lang.String value){
         this.value = value
