@@ -39,7 +39,7 @@ class MiraklEnv
     /**
      *
      */
-    boolean running  = false
+    Boolean running  = false
     /**
      *
      */
@@ -47,7 +47,7 @@ class MiraklEnv
     /**
      *
      */
-    boolean active  = false
+    Boolean active  = false
     /**
      *
      */
@@ -56,6 +56,38 @@ class MiraklEnv
      *
      */
     java.lang.String name
+    /**
+     *
+     */
+    Boolean operator  = false
+    /**
+     *
+     */
+    String remoteHost
+    /**
+     *
+     */
+    String remotePath
+    /**
+     *
+     */
+    String username
+    /**
+     *
+     */
+    String password
+    /**
+     *
+     */
+    String keyPath
+    /**
+     *
+     */
+    String passPhrase
+    /**
+     *
+     */
+    String localPath
     /**
      *
      */
@@ -89,6 +121,14 @@ class MiraklEnv
         active column:"active",insertable:true,updateable:true,lazy:false,cache:false
         cronExpr column:"cron_expr",insertable:true,updateable:true,lazy:false,cache:false
         name column:"name",insertable:true,updateable:true,lazy:false,cache:false
+        operator column:"operator",insertable:true,updateable:true,lazy:false,cache:false
+        remoteHost column:"remote_host",insertable:true,updateable:true,lazy:false,cache:false
+        remotePath column:"remote_path",insertable:true,updateable:true,lazy:false,cache:false
+        username column:"username",insertable:true,updateable:true,lazy:false,cache:false
+        password column:"password",insertable:true,updateable:true,lazy:false,cache:false
+        keyPath column:"key_path",insertable:true,updateable:true,lazy:false,cache:false
+        passPhrase column:"pass_phrase",insertable:true,updateable:true,lazy:false,cache:false
+        localPath column:"local_path",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -100,12 +140,20 @@ class MiraklEnv
         url ( blank:false, nullable:false, unique:false)
         apiKey ( blank:false, nullable:false, unique:false)
         shopId ( blank:false, nullable:false, unique:false)
-        running ( blank:false, nullable:false, unique:false)
+        running ( nullable:true, unique:false)
         frontKey (nullable:true, unique:false)
-        active ( blank:false, nullable:false, unique:false)
+        active ( nullable:true, unique:false)
         cronExpr (nullable:true, unique:false)
         name (nullable:true, unique:false)
         company ( blank:false, nullable:false)
+        operator ( nullable:true, unique:false)
+        remoteHost ( nullable:true, unique:false)
+        remotePath ( nullable:true, unique:false)
+        username ( nullable:true, unique:false)
+        password ( nullable:true, unique:false)
+        keyPath ( nullable:true, unique:false)
+        passPhrase ( nullable:true, unique:false)
+        localPath ( nullable:true, unique:false)
     }
 
 
