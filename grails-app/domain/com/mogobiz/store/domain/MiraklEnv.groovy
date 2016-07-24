@@ -91,6 +91,10 @@ class MiraklEnv
     /**
      *
      */
+    java.lang.String shopIds
+    /**
+     *
+     */
     com.mogobiz.store.domain.Company company
 
     static transients = [ 'miraklEnvValidation', 'miraklEnvRender' ]
@@ -129,6 +133,7 @@ class MiraklEnv
         keyPath column:"key_path",insertable:true,updateable:true,lazy:false,cache:false
         passPhrase column:"pass_phrase",insertable:true,updateable:true,lazy:false,cache:false
         localPath column:"local_path",insertable:true,updateable:true,lazy:false,cache:false
+        shopIds column:"shop_ids",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -154,6 +159,7 @@ class MiraklEnv
         keyPath ( nullable:true, unique:false)
         passPhrase ( nullable:true, unique:false)
         localPath ( nullable:true, unique:false)
+        shopIds ( nullable:true, unique:false)
     }
 
 
