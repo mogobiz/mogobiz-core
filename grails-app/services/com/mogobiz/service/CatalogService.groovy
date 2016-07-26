@@ -181,8 +181,7 @@ class CatalogService {
                             catalog: catalog,
                             externalCode: externalCode,
                             name: hierarchie.label,
-                            sanitizedName: sanitizeUrlService.sanitizeWithDashes(hierarchie.label)/*,
-                            uuid: UUID.randomUUID().toString()*/
+                            sanitizedName: sanitizeUrlService.sanitizeWithDashes(hierarchie.label)
                     )
             if(hierarchie.parentCode?.trim()?.length() > 0){
                 category.parent = Category.findByCatalogAndExternalCode(
@@ -193,14 +192,16 @@ class CatalogService {
             category.validate()
             if(!category.hasErrors()){
                 category.save(flush: true)
-                profileService.saveUserPermission(
-                        seller,
-                        true,
-                        PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
-                        catalog.company.id as String,
-                        catalog.id as String,
-                        category.id as String
-                )
+                if(seller){
+                    profileService.saveUserPermission(
+                            seller,
+                            true,
+                            PermissionType.UPDATE_STORE_CATEGORY_WITHIN_CATALOG,
+                            catalog.company.id as String,
+                            catalog.id as String,
+                            category.id as String
+                    )
+                }
                 // récupération des features et variations
                 def listAttributesResponse = MiraklClient.listAttributes(config, hierarchie.code)
                 listAttributesResponse.attributes?.findAll {it.type == AttributeType.LIST && it.typeParameter && it.hierarchyCode == hierarchie.code}?.each { attribute ->
