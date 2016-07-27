@@ -123,6 +123,7 @@ public class TicketTypeController {
                 ticketType.variation1 = params['variation1']?.id ? VariationValue.get(params['variation1']?.id) : null
                 ticketType.variation2 = params['variation2']?.id ? VariationValue.get(params['variation2']?.id) : null
                 ticketType.variation3 = params['variation3']?.id ? VariationValue.get(params['variation3']?.id) : null
+                ticketType.publishable = params['ticketType']?.publishable == "true"
 
                 if (ticketType.validate()) {
                     ticketType.save()
@@ -183,6 +184,7 @@ public class TicketTypeController {
                 ticketType.variation1 = params['variation1']?.id ? VariationValue.get(params['variation1']?.id) : null
                 ticketType.variation2 = params['variation2']?.id ? VariationValue.get(params['variation2']?.id) : null
                 ticketType.variation3 = params['variation3']?.id ? VariationValue.get(params['variation3']?.id) : null
+                ticketType.publishable = params['ticketType']?.publishable == "true"
 
                 //update related stockCalendar and Global stock
                 def sockCalendarUpdated = true

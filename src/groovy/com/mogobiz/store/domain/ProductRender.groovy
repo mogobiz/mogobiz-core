@@ -49,6 +49,7 @@ class ProductRender
 				'xtype',
 				'content',
 				'url',
+				'publishable',
 				'poi',
 				'poi.id',
 				'poi.road1',
