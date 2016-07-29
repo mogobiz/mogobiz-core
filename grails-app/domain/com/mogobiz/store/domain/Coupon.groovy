@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,63 +25,67 @@ class Coupon
 
 
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    java.lang.String code 
+    java.lang.String code
     /**
-     * 
+     *
      */
-    boolean active  = true 
+    boolean active  = true
     /**
      * <p>
      * Number of uses coupons. null means unlimited
      * </p>
      */
-    java.lang.Long numberOfUses 
+    java.lang.Long numberOfUses
     /**
-     * 
+     *
      */
-    java.util.Calendar startDate 
+    java.util.Calendar startDate
     /**
-     * 
+     *
      */
-    java.util.Calendar endDate 
+    java.util.Calendar endDate
     /**
-     * 
+     *
      */
-    boolean catalogWise  = false 
+    boolean catalogWise  = false
     /**
-     * 
+     *
      */
-    boolean forSale  = false 
+    boolean forSale  = false
     /**
-     * 
+     *
      */
-    java.lang.String description 
+    java.lang.String description
     /**
-     * 
+     *
      */
-    java.lang.Boolean anonymous  = java.lang.Boolean.valueOf(false) 
+    java.lang.Boolean anonymous  = java.lang.Boolean.valueOf(false)
     /**
-     * 
+     *
      */
-    java.lang.String pastille 
+    java.lang.String pastille
     /**
-     * 
+     *
      */
-    long consumed  = 0 
+    long consumed  = 0
     /**
-     * 
+     *
      */
-    java.lang.String i18n 
+    java.lang.String i18n
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Company company 
+    com.mogobiz.store.domain.Company company
+    /**
+     *
+     */
+    java.lang.String externalCode
 
     static hasMany = [ categories:com.mogobiz.store.domain.Category , products:com.mogobiz.store.domain.Product , ticketTypes:com.mogobiz.store.domain.TicketType ,  rules:com.mogobiz.store.domain.ReductionRule , catalogs:com.mogobiz.store.domain.Catalog ]
 
@@ -118,6 +122,7 @@ class Coupon
         pastille column:"pastille",insertable:true,updateable:true,lazy:false,cache:false
         consumed column:"consumed",insertable:true,updateable:true,lazy:false,cache:false
         i18n column:"i18n",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        externalCode column:"external_code",insertable:true,updateable:true,lazy:false,cache:false
 
 
         categories column:"categories_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -150,6 +155,7 @@ class Coupon
         consumed ( blank:false, nullable:false, unique:false)
         i18n (nullable:true, unique:false)
         company ( blank:false, nullable:false)
+        externalCode (nullable:true, unique:false)
     }
 
 
