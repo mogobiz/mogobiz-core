@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="id")
@@ -25,55 +25,55 @@ class TicketType
 
 
     /**
-     * 
+     *
      */
-    java.lang.String sku 
+    java.lang.String sku
     /**
-     * 
+     *
      */
-    java.lang.String externalCode 
+    java.lang.String externalCode
     /**
      * <p>
      * Montant unitaire du SKU
      * </p>
      */
-    long price 
+    long price
     /**
      * <p>
      * Quantité minimum lors de l'achat
      * </p>
      */
-    int minOrder  = 1 
+    int minOrder  = 1
     /**
      * <p>
      * Quantité maximum lors de l'achat (-1 = infini)
      * </p>
      */
-    int maxOrder  = -1 
+    int maxOrder  = -1
     /**
-     * 
+     *
      */
-    long nbSales  = 0 
-    /**
-     * <p>
-     * Période de mise en vente de ce type de ticket
-     * </p>
-     */
-    java.util.Calendar startDate 
+    long nbSales  = 0
     /**
      * <p>
      * Période de mise en vente de ce type de ticket
      * </p>
      */
-    java.util.Calendar stopDate 
+    java.util.Calendar startDate
+    /**
+     * <p>
+     * Période de mise en vente de ce type de ticket
+     * </p>
+     */
+    java.util.Calendar stopDate
     /**
      * <p>
      * privée, non disponible à la vente
      * </p>
      */
-    java.lang.Boolean xprivate 
+    java.lang.Boolean xprivate
     /**
-     * 
+     *
      */
     java.lang.String name     /**
      * <p>
@@ -83,13 +83,13 @@ class TicketType
     com.mogobiz.store.domain.Stock stock
 
     /**
-     * 
+     *
      */
-    java.lang.String description 
+    java.lang.String description
     /**
-     * 
+     *
      */
-    java.lang.Integer position 
+    java.lang.Integer position
     /**
      * <p>
      * Global Trade Item Numbers (GTINs) submitted through the 'gtin'
@@ -97,67 +97,75 @@ class TicketType
      * and ISBN
      * </p>
      */
-    java.lang.String gtin 
+    java.lang.String gtin
     /**
      * <p>
      * Manufacturer Part Number (MPN) submitted through the 'mpn'
      * attribute
      * </p>
      */
-    java.lang.String mpn 
+    java.lang.String mpn
     /**
-     * 
+     *
      */
-    java.util.Calendar availabilityDate 
+    java.util.Calendar availabilityDate
     /**
-     * 
+     *
      */
-    java.lang.String filename 
+    java.lang.String filename
     /**
-     * 
+     *
      */
-    java.lang.Boolean available 
+    java.lang.Boolean available
     /**
-     * 
+     *
      */
-    java.lang.String byDateTimes 
+    java.lang.String byDateTimes
     /**
-     * 
+     *
      */
-    java.lang.String i18n 
+    java.lang.String i18n
     /**
-     * 
+     *
      */
-    java.lang.Boolean publishable 
+    java.lang.Boolean publishable
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.MiraklSyncStatus miraklStatus 
+    com.mogobiz.store.domain.MiraklSyncStatus miraklProductStatus
     /**
-     * 
+     *
      */
-    java.lang.String miraklTrackingId 
+    java.lang.String miraklProductTrackingId
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.VariationValue variation1 
+    com.mogobiz.store.domain.MiraklSyncStatus miraklStatus
+    /**
+     *
+     */
+    java.lang.String miraklTrackingId
+    /**
+     *
+     */
+    com.mogobiz.store.domain.VariationValue variation1
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.VariationValue variation2 
+    com.mogobiz.store.domain.VariationValue variation2
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.Product product 
+    com.mogobiz.store.domain.Product product
 
     /**
-     * 
+     *
      */
-    com.mogobiz.store.domain.VariationValue variation3 
+    com.mogobiz.store.domain.VariationValue variation3
     /**
-     * 
+     *
      */
     com.mogobiz.store.domain.Resource picture
 
@@ -211,6 +219,8 @@ class TicketType
         publishable column:"publishable",insertable:true,updateable:true,lazy:false,cache:false
         miraklStatus column:"mirakl_status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
         miraklTrackingId column:"mirakl_tracking_id",insertable:true,updateable:true,lazy:false,cache:false
+        miraklProductStatus column:"mirakl_product_status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
+        miraklProductTrackingId column:"mirakl_product_tracking_id",insertable:true,updateable:true,lazy:false,cache:false
 
 
         variation1 column:"variation1_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -255,6 +265,8 @@ class TicketType
         product ( blank:false, nullable:false)
         variation3 (nullable:true)
         picture (nullable:true)
+        miraklProductStatus (nullable:true, unique:false)
+        miraklProductTrackingId (nullable:true, unique:false)
     }
 
     static java.util.Collection findSalableByProduct(final long idProduct)
@@ -293,7 +305,7 @@ class TicketType
         }
         return firstResult
     }
-    
+
 
     String toString(){return ticketTypeRender?.asString(this)}
 

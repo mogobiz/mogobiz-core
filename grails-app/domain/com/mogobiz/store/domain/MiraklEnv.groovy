@@ -96,6 +96,10 @@ class MiraklEnv
      *
      */
     com.mogobiz.store.domain.Company company
+    /**
+     *
+     */
+    java.util.Date offersLastRequestDate
 
     static transients = [ 'miraklEnvValidation', 'miraklEnvRender' ]
 
@@ -134,6 +138,7 @@ class MiraklEnv
         passPhrase column:"pass_phrase",insertable:true,updateable:true,lazy:false,cache:false
         localPath column:"local_path",insertable:true,updateable:true,lazy:false,cache:false
         shopIds column:"shop_ids",insertable:true,updateable:true,lazy:false,cache:false
+        offersLastRequestDate column:"last_request_date",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -160,6 +165,7 @@ class MiraklEnv
         passPhrase ( nullable:true, unique:false)
         localPath ( nullable:true, unique:false)
         shopIds ( nullable:true, unique:false)
+        offersLastRequestDate ( nullable:true, unique:false)
     }
 
 

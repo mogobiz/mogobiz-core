@@ -44,7 +44,8 @@ class TicketTypeRender
 				'variation2',
 				'variation2.id',
 				'variation3',
-				'variation3.id'
+				'variation3.id',
+				'publishable'
 			]
 		}
 		Map result = super.asMap(included, excluded, entity, lang)
