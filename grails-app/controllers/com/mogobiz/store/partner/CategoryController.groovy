@@ -224,6 +224,30 @@ class CategoryController {
             }
             if (category.validate()) {
                 category.save(flush: true)
+                final publishable = category.publishable
+                Product.findAllByCategory(category).each{p ->
+                    p.publishable = publishable
+                    p.save(flush: true)
+                    TicketType.findAllByProduct(p).each{sku ->
+                        sku.publishable = publishable
+                        sku.save(flush: true)
+                    }
+                }
+                if(oldParentId == newParentId){
+                    // update all children publishable
+                    retrieveChildren(category, new HashSet<Category>()).each {cat ->
+                        cat.publishable = publishable
+                        cat.save(flush: true)
+                        Product.findAllByCategory(cat).each{p ->
+                            p.publishable = publishable
+                            p.save(flush: true)
+                            TicketType.findAllByProduct(p).each{sku ->
+                                sku.publishable = publishable
+                                sku.save(flush: true)
+                            }
+                        }
+                    }
+                }
             }
             List<Category> categories = Category.withCriteria {
                 company {
@@ -270,10 +294,20 @@ class CategoryController {
                     it.position = pos
                     it.save(flush: true)
                 }
-                // update all children full path
-                retrieveChildren(category, new HashSet<Category>()).each {
-                    it.fullpath = null
-                    it.save(flush: true)
+                // update all children full path + publishable
+                final publishable = category.publishable
+                retrieveChildren(category, new HashSet<Category>()).each {cat ->
+                    cat.fullpath = null
+                    cat.publishable = publishable
+                    cat.save(flush: true)
+                    Product.findAllByCategory(cat).each{p ->
+                        p.publishable = publishable
+                        p.save(flush: true)
+                        TicketType.findAllByProduct(p).each{sku ->
+                            sku.publishable = publishable
+                            sku.save(flush: true)
+                        }
+                    }
                 }
             }
         }

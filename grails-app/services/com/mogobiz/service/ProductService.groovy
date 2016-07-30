@@ -53,7 +53,7 @@ class ProductService
 			le('startDate',today)
 			ge('stopDate',today)
 		}
-		
+
 		if (product == null) {
 			throw new ProductNotFoundException("The product " + productId + "was not found")
 		}
@@ -66,7 +66,7 @@ class ProductService
 			TicketType.createCriteria().list {eq('product.id', product.id)}.each { TicketType ticketType ->
 				Map mapTicketType = ticketType.asMapForJSON(["id", "amount", "startDate", "stopDate", "minOrder", "name", "maxOrder"], null, locale?.language)
 
-				//adding stock		
+				//adding stock
 				Stock stock = ticketType.stock;
 				if (stock != null)
 				{
@@ -74,17 +74,17 @@ class ProductService
 					mapTicketType["stockUnlimited"] = stock.stockUnlimited
 					mapTicketType["stockOutSelling"] = stock.stockOutSelling
 					mapTicketType["stockDisplay"] = product.stockDisplay
-					
+
 					if (!stock.stockUnlimited) {
 						if (product.calendarType == ProductCalendar.NO_DATE) {
 							StockCalendar stockCalendar = StockCalendar.findByTicketType(ticketType)
 							if (stockCalendar) {
-								mapTicketType["stock"] = Math.max(0, stockCalendar.stock - stockCalendar.sold);							
+								mapTicketType["stock"] = Math.max(0, stockCalendar.stock - stockCalendar.sold);
 							}
 							else
 							{
-								mapTicketType["stock"] = stock.stock								
-							}							
+								mapTicketType["stock"] = stock.stock
+							}
 						}
 						else {
 							List<Map> stockByDateTime = []
@@ -101,7 +101,7 @@ class ProductService
 				ticketTypes << mapTicketType
 			}
 			map['ticketTypes'] =  ticketTypes
-			
+
 			// adding features
 			def features = []
 			Feature.findAllByProduct(product).each { Feature feature ->
@@ -118,7 +118,7 @@ class ProductService
 			return map
 		}
 	}
-	
+
 
 	com.mogobiz.store.domain.Resource retrievePicture(Product entity) {
 		def pictures = getPictures(entity)
@@ -156,7 +156,7 @@ class ProductService
 			", params, [max:1, offset:0])
 		return bindedResource?bindedResource.resource:null
 	}
-	
+
 	/**
 	 * <p>
 	 * Permet de cr�er ou modifier le produit. La m�thode renvoie la
@@ -318,6 +318,10 @@ class ProductService
 
 			if(!entity.hasErrors()){
 				entity.save(flush: true)
+				TicketType.findAllByProduct(entity).each {sku ->
+					sku.publishable = entity.publishable
+					sku.save(flush: true)
+				}
 			}
 		}
 
