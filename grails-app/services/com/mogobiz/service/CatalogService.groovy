@@ -156,7 +156,7 @@ class CatalogService {
                                     apiKey: env.apiKey
                             )
                     ),
-                    idCatalog: catalog.id,
+                    idCatalogs: [catalog.id] as List<Long>,
                     languages: null,
                     defaultLang: catalog.company.defaultLanguage
             )
