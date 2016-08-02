@@ -39,6 +39,10 @@ class EsSync
      *
      */
     com.mogobiz.store.domain.Company company
+    /**
+     *
+     */
+    com.mogobiz.store.domain.Catalog target
 
     static transients = [ 'esSyncValidation', 'esSyncRender' ]
 
@@ -64,6 +68,7 @@ class EsSync
 
         esEnv column:"es_env_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
+        target column:"target_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
 
     static hasMany = [categories: Category, products: Product, catalogs: Catalog]
@@ -74,5 +79,6 @@ class EsSync
         timestamp ( nullable:true, unique:false)
         company ( nullable:false, unique:false)
         esEnv ( nullable:false, unique:false)
+        target ( nullable:false, unique:false)
     }
 }
