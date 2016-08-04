@@ -249,6 +249,15 @@ public class CommonService {
                 esEnv.id as String
         )
         // end stuff to export bo entities for mogopay
+
+        // update categories full path
+        Category.executeQuery('FROM Category where fullpath is null').each {
+            it.fullpath = ''
+            it.validate()
+            if(!it.hasErrors()){
+                it.save(flush: true)
+            }
+        }
 	}
 
 	public Feature createFeature(String name, String value, Product product, int position, boolean flush = true)
