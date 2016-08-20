@@ -96,6 +96,8 @@ class CountryImportService {
         ).subscribe(
                 { CsvLine csvLine ->
                     final String code = csvLine.values[0].trim().toUpperCase()
+                    final String isoCode3 = csvLine.values[1].trim().toUpperCase()
+                    final String isoNumericCode = csvLine.values[2]
                     final String name = csvLine.values[4]
                     final String postalCodeRegex = csvLine.values[14]
                     final String phoneCode = csvLine.values[12]
@@ -107,6 +109,8 @@ class CountryImportService {
                             log.info("CountryService.importCountries: ${csvLine.number} Adding $code $name")
                             country = new Country(
                                     code: code,
+                                    isoCode3: isoCode3,
+                                    isoNumericCode: isoNumericCode,
                                     name: name,
                                     shipping: true,
                                     billing: true,
@@ -117,6 +121,8 @@ class CountryImportService {
                                     postalCodeRegex: postalCodeRegex
                             )
                         } else {
+                            country.isoCode3 = isoCode3
+                            country.isoNumericCode = isoNumericCode
                             country.lastUpdated = new Date()
                             log.info("CountryService.importCountries: ${csvLine.number} Not added $code $name (already exist)")
                         }
