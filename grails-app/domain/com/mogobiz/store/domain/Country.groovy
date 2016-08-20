@@ -8,7 +8,7 @@ import grails.persistence.Entity
 import groovy.transform.EqualsAndHashCode
 
 /**
- * 
+ *
  */
 @Entity
 @EqualsAndHashCode(includes="code")
@@ -24,42 +24,50 @@ class Country
     String uuid = java.util.UUID.randomUUID().toString()
 
     /**
-     * 
+     *
      */
     java.lang.String code
 
     /**
-     * 
+     *
      */
-    java.lang.String name 
+    java.lang.String name
     /**
-     * 
+     *
      */
-    boolean shipping 
+    boolean shipping
     /**
-     * 
+     *
      */
-    boolean billing 
+    boolean billing
     /**
-     * 
+     *
      */
-    java.lang.String postalCodeRegex 
+    java.lang.String postalCodeRegex
     /**
-     * 
+     *
      */
-    java.lang.String currencyCode 
+    java.lang.String currencyCode
     /**
-     * 
+     *
      */
-    java.lang.String currencyNumericCode 
+    java.lang.String currencyNumericCode
     /**
-     * 
+     *
      */
-    java.lang.String currencyName 
+    java.lang.String currencyName
     /**
-     * 
+     *
      */
-    java.lang.String phoneCode 
+    java.lang.String phoneCode
+    /**
+     *
+     */
+    java.lang.String isoCode3
+    /**
+     *
+     */
+    java.lang.String isoNumericCode
     static transients = [ 'countryValidation', 'countryRender' ]
 
 
@@ -89,6 +97,8 @@ class Country
         currencyNumericCode column:"currency_numeric_code",insertable:true,updateable:true,lazy:false,cache:false
         currencyName column:"currency_name",insertable:true,updateable:true,lazy:false,cache:false
         phoneCode column:"phone_code",insertable:true,updateable:true,lazy:false,cache:false
+        isoCode3 column:"iso_code3",insertable:true,updateable:true,lazy:false,cache:false
+        isoNumericCode column:"iso_numeric_code",insertable:true,updateable:true,lazy:false,cache:false
     }
 
     static constraints = {
@@ -103,6 +113,8 @@ class Country
         currencyNumericCode (nullable:true, unique:false)
         currencyName (nullable:true, unique:false)
         phoneCode (nullable:true, unique:false)
+        isoCode3 (nullable:true, unique:false)
+        isoNumericCode (nullable:true, unique:false)
     }
 
 
