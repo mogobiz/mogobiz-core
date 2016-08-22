@@ -25,6 +25,10 @@ class BOCartItem
 
 
     /**
+     *
+     */
+    java.lang.String externalCode
+    /**
      * 
      */
     java.lang.String code 
@@ -111,6 +115,7 @@ class BOCartItem
         version false
 
         id name:'id',column:'id',generator:'native'
+        externalCode column:"external_code",insertable:true,updateable:true,lazy:false,cache:false
         code column:"code",insertable:true,updateable:true,lazy:false,cache:false
         price column:"price",insertable:true,updateable:true,lazy:false,cache:false
         tax column:"tax",insertable:true,updateable:true,lazy:false,cache:false
@@ -135,6 +140,7 @@ class BOCartItem
     static constraints = {
     uuid (nullable:false, unique:false)
 
+        externalCode (nullable:true, unique:false)
         code ( blank:false, nullable:false, unique:true)
         price ( blank:false, nullable:false, unique:false)
         tax ( blank:false, nullable:false, unique:false)
