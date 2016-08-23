@@ -51,7 +51,11 @@ class BOCart
     /**
      * 
      */
-    double currencyRate 
+    double currencyRate
+    /**
+     *
+     */
+    java.lang.String externalOrderId
     /**
      * 
      */
@@ -84,6 +88,7 @@ class BOCart
         status column:"status",enumType:"string",insertable:true,updateable:true,lazy:false,cache:false
         currencyCode column:"currency_code",insertable:true,updateable:true,lazy:false,cache:false
         currencyRate column:"currency_rate",insertable:true,updateable:true,lazy:false,cache:false
+        externalOrderId column:"external_order_id",insertable:true,updateable:true,lazy:false,cache:false
 
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
@@ -100,6 +105,7 @@ class BOCart
         currencyCode ( blank:false, nullable:false, unique:false)
         currencyRate ( blank:false, nullable:false, unique:false)
         company ( blank:false, nullable:false)
+        externalOrderId (nullable:true, unique:false)
     }
 
 
