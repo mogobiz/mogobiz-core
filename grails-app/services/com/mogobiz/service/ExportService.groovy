@@ -6,6 +6,7 @@ package com.mogobiz.service
 
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
+import groovy.json.JsonOutput
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.xssf.usermodel.XSSFSheet
@@ -16,42 +17,29 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import grails.converters.JSON
 
 class ExportService extends BaseExportService {
 
-//    private static def boolValidateCell(XSSFSheet sheet, List<Integer> cellNums) {
-//        //sheet.protectSheet("")
-//        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
-//        DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
-//        cellNums.each {
-//            CellRangeAddressList addressList = new CellRangeAddressList(1, 65000, it, it);
-//            XSSFDataValidation dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
-//            dataValidation.setShowErrorBox(true);
-//            sheet.addValidationData(dataValidation)
-//        }
-//
-//    }
-
-    File export(long catalogId, File xlsFile, File zipFile, Category parent = null, boolean deleted = false) {
-//        return exportAsXls(catalogId, xlsFile, zipFile, parent, deleted)
-        exportAsJson(catalogId, xlsFile, zipFile, parent, deleted)
+    File export(long catalogId, File jsonOrXlsFile, File zipFile, String exportFormat, Category parent = null, boolean deleted = false) {
+        if (exportFormat == "json")
+            exportAsJson(catalogId, jsonOrXlsFile, zipFile, parent, deleted)
+        else
+            return exportAsXls(catalogId, jsonOrXlsFile, zipFile, parent, deleted)
     }
 
-    File exportAsJson(long catalogId, File xlsFile, File zipFile, Category parent = null, boolean deleted = false) {
+    File exportAsJson(long catalogId, File jsonFile, File zipFile, Category parent = null, boolean deleted = false) {
         List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
         final String resourcesPath = grailsApplication.config.resources.path
         final String companyCode = Catalog.get(catalogId).company.code
-        File outDir = xlsFile.getParentFile()
+        File outDir = jsonFile.getParentFile()
 
         Path brandLogosDir = Paths.get(outDir.getAbsolutePath(), "__brandlogos__")
         brandLogosDir.toFile().mkdirs()
         List<String> brandLogos = []
-        xlsFile.withWriter('UTF-8') { writer ->
+        jsonFile.withWriter('UTF-8') { writer ->
             brands.each { brand ->
                 Map brandMap = toMap(brand)
-                brandMap.put("type", "Brand")
-                writer.println(new JSON(brandMap).toString())
+                writer.println(JsonOutput.toJson(brandMap))
 
                 final String brandId = brand.id.toString()
                 String brandLogodPath = "$resourcesPath/brands/logos/$companyCode"
@@ -82,65 +70,56 @@ class ExportService extends BaseExportService {
             taxRates.each { tax ->
                 tax.localTaxRates.each { local ->
                     Map taxMap = toMap(local, tax.name)
-                    taxMap.put("type", "LocalTaxRate")
-                    writer.println(new JSON(taxMap).toString())
+                    writer.println(JsonOutput.toJson(taxMap))
                 }
             }
 
             List<ShippingRule> shippingRules = ShippingRule.findAllByCompany(Catalog.get(catalogId).company)
             shippingRules.each { shippingRule ->
                 Map shipingRuleMap = toMap(shippingRule)
-                shipingRuleMap.put("type", "ShippingRule")
-                writer.println(new JSON(shipingRuleMap).toString())
+                writer.println(JsonOutput.toJson(shipingRuleMap))
             }
 
             List<Coupon> coupons = Coupon.findAllByCompany(Catalog.get(catalogId).company)
             coupons.each { coupon ->
                 Map couponMap = toMap(coupon)
-                couponMap.put("type", "Coupon")
-                writer.println(new JSON(couponMap).toString())
+                writer.println(JsonOutput.toJson(couponMap))
 
                 coupon.rules.each { rule ->
                     Map couponRuleMap = toMap(rule, coupon.code)
-                    couponRuleMap.put("type", "CouponRule")
-                    writer.println(new JSON(couponRuleMap).toString())
+                    writer.println(JsonOutput.toJson(couponRuleMap))
                 }
 
                 coupon.categories?.each { category ->
                     Map couponUseMap = [
-                            "couponUuid"  : coupon.uuid,
+                            "type"        : "CouponUseCategory",
                             "couponCode"  : coupon.code,
-                            "categoryUuid": category.uuid,
-                            "categoryName": category.name
+                            "categoryUuid": category.uuid
                     ]
-                    couponUseMap.put("type", "CouponUseCategory")
-                    writer.println(new JSON(couponUseMap).toString())
+                    writer.println(JsonOutput.toJson(couponUseMap))
                 }
 
                 coupon.products?.each { product ->
                     Map couponUseMap = [
-                            "couponUuid" : coupon.uuid,
+                            "type"       : "CouponUseProduct",
                             "couponCode" : coupon.code,
                             "productUuid": product.uuid,
-                            "productName": product.name
                     ]
-                    couponUseMap.put("type", "CouponUseProduct")
-                    writer.println(new JSON(couponUseMap).toString())
+                    writer.println(JsonOutput.toJson(couponUseMap))
                 }
 
                 coupon.ticketTypes?.each { sku ->
                     Map couponUseMap = [
-                            "couponUuid" : coupon.uuid,
-                            "couponCode" : coupon.code,
-                            "productUuid": sku.uuid,
-                            "productName": sku.name
+                            "type"      : "CouponUseSku",
+                            "couponCode": coupon.code,
+                            "skuUuid"   : sku.uuid
                     ]
-                    couponUseMap.put("type", "CouponUseSku")
-                    writer.println(new JSON(couponUseMap).toString())
+                    writer.println(JsonOutput.toJson(couponUseMap))
                 }
             }
 
-            doExportAsJson(catalogId, writer, parent, deleted, outDir)
+            doExportCategoriesAsJson(catalogId, writer, parent, deleted, outDir)
+            doExportProductsAsJson(catalogId, writer, parent, deleted, outDir)
             // Write the workbook in file system
         }
         ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
@@ -664,36 +643,43 @@ class ExportService extends BaseExportService {
         }
     }
 
-    void doExportAsJson(long catalogId, Writer writer, Category parent, boolean deleted, File exportDir) {
-        String resourcesPath = grailsApplication.config.resources.path
-
+    void doExportCategoriesAsJson(long catalogId, Writer writer, Category parent, boolean deleted, File exportDir) {
         List<Category> cats = Category.findAllByCatalogAndParentAndDeleted(Catalog.get(catalogId), parent, deleted)
         cats.each { cat ->
             Map catMap = toMap(cat)
-            writer.println(new JSON(catMap).toString())
+            writer.println(JsonOutput.toJson(catMap))
             List<Feature> features = featureService.getCategoryFeatures(cat.id, false)
             features.each {
                 Map featMap = toMapForCat(it, cat)
-                writer.println(new JSON(featMap).toString())
+                writer.println(JsonOutput.toJson(featMap))
             }
 
             List<Variation> variations = Variation.findAllByCategory(cat, [sort: 'position', order: 'asc'])
             variations.each { varit ->
                 Map varMap = toMap(varit, cat)
-                writer.println(new JSON(varMap).toString())
+                writer.println(JsonOutput.toJson(varMap))
                 List<VariationValue> values = VariationValue.findAllByVariation(varit)
                 values.each { valit ->
                     Map valMap = toMap(valit, cat, varit)
-                    writer.println(new JSON(valMap).toString())
+                    writer.println(JsonOutput.toJson(valMap))
                 }
             }
+            log.info(cat.name + " category")
+            doExportCategoriesAsJson(catalogId, writer, cat, deleted, exportDir)
+        }
+    }
 
+    void doExportProductsAsJson(long catalogId, Writer writer, Category parent, boolean deleted, File exportDir) {
+        String resourcesPath = grailsApplication.config.resources.path
+
+        List<Category> cats = Category.findAllByCatalogAndParentAndDeleted(Catalog.get(catalogId), parent, deleted)
+        cats.each { cat ->
             List<Product> products = Product.findAllByCategoryAndDeleted(cat, deleted)
             products.each { prd ->
                 log.debug(prd)
                 toMap(prd, cat)
                 Map prdMap = toMap(prd, cat)
-                writer.println(new JSON(prdMap).toString())
+                writer.println(JsonOutput.toJson(prdMap))
 
                 (new File(exportDir, prd.sanitizedName)).mkdirs()
                 List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
@@ -710,23 +696,23 @@ class ExportService extends BaseExportService {
                 List<Feature> pfeatures = featureService.getProductFeatures(prd.id, false)
                 pfeatures.each {
                     Map pfeatMap = toMapForPrd(it, cat, prd)
-                    writer.println(new JSON(pfeatMap).toString())
+                    writer.println(JsonOutput.toJson(pfeatMap))
                 }
 
                 List<ProductProperty> pproperties = ProductProperty.findAllByProduct(Product.get(prd.id))
                 pproperties.each {
                     Map ppropMap = toMap(it, cat, prd)
-                    writer.println(new JSON(ppropMap).toString())
+                    writer.println(JsonOutput.toJson(ppropMap))
                 }
 
                 List<TicketType> ticketTypes = TicketType.findAllByProduct(prd)
                 ticketTypes.each {
                     Map skuMap = toMap(it, cat, prd)
-                    writer.println(new JSON(skuMap).toString())
+                    writer.println(JsonOutput.toJson(skuMap))
                 }
             }
-            log.info(cat.name + " category")
-            doExportAsJson(catalogId, writer, cat, deleted, exportDir)
+            log.info(cat.name + " products")
+            doExportProductsAsJson(catalogId, writer, cat, deleted, exportDir)
         }
     }
 }

@@ -12,6 +12,7 @@ import com.mogobiz.utils.ZipFileUtil
 import grails.transaction.Transactional
 import grails.util.Holders
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.apache.commons.io.FileUtils
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.util.CellReference
@@ -38,9 +39,9 @@ class ImportService {
     def sessionFactory
     def profileService
 
-    int FLUSHSIZE = Holders.config.importCatalog.flushsize ?: 100
+    int FLUSH_SIZE = Holders.config.importCatalog.flushsize ?: 100
 
-    int NBTHREADS = Holders.config.importCatalog.nbthreads ?: 3
+    int NB_THREADS = Holders.config.importCatalog.nbthreads ?: 3
 
     private String getFormulaCell(String cellValue, Map<String, XSSFSheet> sheets) {
         String[] tab = cellValue.split('!')
@@ -201,14 +202,740 @@ class ImportService {
     }
 
     Map ximport(long catalogId, long sellerId, ZipFile zipFile) {
-        User seller = Seller.get(sellerId)
-        Catalog catalog = Catalog.get(catalogId)
         String now = new SimpleDateFormat("yyyy-MM-dd.HHmmss").format(new Date())
         File impexDir = getImportDir(now)
         ZipFileUtil.unzipFileIntoDirectory(zipFile, impexDir)
         File dateDir = impexDir.listFiles().find {
             it.isDirectory()
         }
+        File inputFile = new File(dateDir, "mogobiz.json")
+        if (inputFile.exists())
+            ximportJson(catalogId, sellerId, dateDir)
+        else
+            ximportXls(catalogId, sellerId, dateDir)
+    }
+
+    Map ximportJson(long catalogId, long sellerId, File dateDir) {
+        int countInserts = 0
+        User seller = Seller.get(sellerId)
+        Catalog catalog = Catalog.get(catalogId)
+        int variationPosition = 1
+        List<String[]> prodList = new ArrayList<>()
+        List<String[]> skuList = new ArrayList<>()
+        List<Map> pfList = new ArrayList<>() // Product Feature List
+        List<Map> ppList = new ArrayList<>() // Product Property List
+        Map<String, Product> products = new HashMap<>().asSynchronized()
+        Map<String, TaxRate> taxRates = new HashMap<>().asSynchronized()
+        Map<String, Feature> features = new HashMap<>()
+        Map<String, Category> categories = new HashMap<>()
+        Map<String, Brand> brands = new HashMap<>()
+        Map<String, Brand> brandNameLogos = new HashMap<>()
+        Map<String, Variation> variations = new HashMap<>()
+        Map<String, VariationValue> variationValues = new HashMap<>()
+        File inputFile = new File(dateDir, "mogobiz.json")
+        inputFile.withReader { reader ->
+            JsonSlurper jsonSlurper = new JsonSlurper()
+            String line = reader.readLine()
+            Map obj = jsonSlurper.parseText(line)
+            while (line != null) {
+                switch (obj?.type) {
+                    case "Brand":
+                        Brand.withNewTransaction {
+                            while (obj?.type == "Brand") {
+                                // Brand
+                                String uuid = obj.uuid ?: ""
+                                String name = obj.name ?: ""
+                                String website = obj.website ?: ""
+                                String facebook = obj.facebook ?: ""
+                                String twitter = obj.twitter ?: ""
+                                String description = obj.description ?: ""
+                                String hide = obj.hide ?: ""
+                                String i18n = obj.i18n ?: ""
+
+                                Brand b = Brand.findByNameAndCompany(name, catalog.company)
+                                if (!b) {
+                                    b = new Brand()
+                                    b.company = catalog.company
+                                    b.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                    b.name = name
+                                    b.website = website
+                                    b.facebooksite = facebook
+                                    b.twitter = twitter
+                                    b.description = description
+                                    b.hide = hide.equalsIgnoreCase("true")
+                                    b.i18n = i18n
+                                    if (b.validate()) {
+                                        b.save(flush: true)
+                                        updateTranslation(b.id, "BRAND", i18n)
+                                        brands.put(name, b)
+                                        brandNameLogos.put(IperUtil.normalizeName(name), b)
+                                    } else {
+                                        b.errors.allErrors.each { log.error(it) }
+                                        return [errors: b.errors.allErrors, sheet: "cat-feature", line: rownum]
+                                    }
+                                } else {
+                                    brandNameLogos.put(IperUtil.normalizeName(name), b)
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "LocalTaxRate":
+                        TaxRate.withNewTransaction {
+                            while (obj?.type == "LocalTaxRate") {
+                                String uuid = obj.uuid ?: ""
+                                uuid = uuid.trim().length() > 0 ? uuid : UUID.randomUUID().toString()
+                                String name = obj.name ?: ""
+                                String countryCode = obj.countryCode ?: ""
+                                String stateCode = obj.stateCode ?: ""
+                                String rate = obj.rate ?: ""
+                                String active = obj.active ?: ""
+                                TaxRate t = TaxRate.findByNameAndCompany(name, catalog.company)
+                                Country country = Country.findByCode(countryCode)
+                                if (!country) {
+                                    ObjectError err = new ObjectError("Country", "Invalid Country Code $countryCode")
+                                    log.error(err)
+                                    return [errors: [err], sheet: "taxrate", line: rownum]
+                                }
+                                if (stateCode?.length() > 0) {
+                                    CountryAdmin adm = CountryAdmin.findByCountryAndCode(country, stateCode)
+                                    if (!adm) {
+                                        ObjectError err = new ObjectError("CountryAdmin", "Invalid state code Code $countryCode / $stateCode")
+                                        log.error(err)
+                                        return [errors: [err], sheet: "taxrate", line: rownum]
+                                    }
+                                }
+                                if (!t) {
+                                    t = new TaxRate()
+                                    t.company = catalog.company
+                                    t.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                    t.name = name
+                                    if (t.validate())
+                                        t.save(flush: true)
+                                    else {
+                                        t.errors.allErrors.each { log.error(it) }
+                                        return [errors: t.errors.allErrors, sheet: "taxrate", line: rownum]
+                                    }
+                                }
+
+                                LocalTaxRate l = LocalTaxRate.findByUuid(uuid)
+                                boolean isNewLocalTaxRate = l == null
+                                if (isNewLocalTaxRate)
+                                    l = new LocalTaxRate()
+                                l.uuid = uuid
+                                l.active = active.equalsIgnoreCase("true")
+                                l.countryCode = countryCode ?: null
+                                l.stateCode = stateCode ?: null
+                                l.rate = rate.toFloat()
+                                TaxRate tr = TaxRate.find {
+                                    localTaxRates.uuid == l.uuid
+                                }
+                                if (tr != null && tr.company != catalog.company) {
+                                    ObjectError err = new ObjectError("LocalTaxRate", "Local Tax Rate with UUID ${l?.uuid} exist for a different company ${tr?.company?.code}")
+                                    log.warn(err)
+                                    l.uuid = UUID.randomUUID().toString()
+                                }
+                                if (l.validate()) {
+                                    l.save(flush: true)
+                                    if (isNewLocalTaxRate) {
+                                        t.addToLocalTaxRates(l)
+                                        t.save(flush: true)
+                                    }
+                                } else {
+                                    l.errors.allErrors.each { log.error(it) }
+                                    return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "ShippingRule":
+                        ShippingRule.withNewTransaction {
+                            while (obj?.type == "ShippingRule") {
+                                String uuid = obj.uuid ?: ""
+                                String countryCode = obj.countryCode ?: ""
+                                String minAmount = obj.minAmount ?: ""
+                                String maxAmount = obj.maxAmount ?: ""
+                                String price = obj.price ?: ""
+                                ShippingRule sr = ShippingRule.findByUuid(uuid)
+                                if (sr == null) {
+                                    sr = new ShippingRule()
+                                }
+                                sr.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                sr.countryCode = countryCode
+                                sr.minAmount = minAmount.toFloat().toLong()
+                                sr.maxAmount = maxAmount.toFloat().toLong()
+                                sr.price = price
+                                sr.company = catalog.company
+                                if (sr.validate())
+                                    sr.save(flush: true)
+                                else {
+                                    sr.errors.allErrors.each { log.error(it) }
+                                    return [errors: sr.errors.allErrors, sheet: "shipping", line: rownum]
+                                }
+
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "Coupon":
+                        ShippingRule.withNewTransaction {
+                            while (obj?.type == "Coupon") {
+                                String uuid = obj.uuid ?: ""
+                                String name = obj.name ?: ""
+                                String code = obj.code ?: ""
+                                String active = obj.active ?: ""
+                                String numberOfUses = obj.numberOfUses ?: ""
+                                String startDate = obj.startDate ?: ""
+                                String endDate = obj.endDate ?: ""
+                                String catalogWise = obj.catalogWise ?: ""
+                                String forSale = obj.forSale ?: ""
+                                String description = obj.description ?: ""
+                                String anonymous = obj.anonymous ?: ""
+                                String pastille = obj.pastille ?: ""
+                                String consumed = obj.consumed ?: ""
+                                String i18n = obj.i18n ?: ""
+                                Coupon coupon = Coupon.findByUuid(uuid)
+                                boolean uuidSet = false
+                                if (coupon?.company != catalog.company) {
+                                    coupon = Coupon.findByCompanyAndCode(catalog.company, code)
+                                    if (!coupon) {
+                                        coupon = new Coupon()
+                                        coupon.uuid = UUID.randomUUID().toString()
+                                    }
+                                    uuidSet = true
+                                }
+                                if (!coupon) {
+                                    coupon = new Coupon()
+                                }
+                                if (!uuidSet) {
+                                    coupon.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                }
+                                coupon.name = name
+                                coupon.code = code
+                                coupon.active = active.equalsIgnoreCase("true")
+                                coupon.numberOfUses = numberOfUses.length() > 0 ? numberOfUses.toFloat().toLong() : null
+                                coupon.startDate = getCalendar(startDate)
+                                coupon.endDate = getCalendar(endDate)
+                                coupon.catalogWise = catalogWise.equalsIgnoreCase("true")
+                                coupon.forSale = forSale.equalsIgnoreCase("true")
+                                coupon.description = description
+                                coupon.anonymous = anonymous.equalsIgnoreCase("true")
+                                coupon.pastille = pastille
+                                coupon.consumed = consumed.length() > 0 ? consumed.toFloat().toLong() : null
+                                coupon.company = catalog.company
+                                coupon.i18n = i18n
+                                if (coupon.validate()) {
+                                    coupon.save(flush: true)
+                                    updateTranslation(coupon.id, "COUPON", i18n)
+
+                                } else {
+                                    coupon.errors.allErrors.each { log.error(it) }
+                                    return [errors: coupon.errors.allErrors, sheet: "coupon", line: rownum]
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "ReductionRule":
+                        ReductionRule.withNewTransaction {
+                            while (obj?.type == "ReductionRule") {
+                                String couponCode = obj.couponCode ?: ""
+                                String uuid = obj.uuid ?: ""
+                                String xtype = obj.xtype ?: ""
+                                String qMin = obj.quantityMin ?: ""
+                                String qMax = obj.quantityMax ?: ""
+                                String discount = obj.discount ?: ""
+                                String xpurchased = obj.xPurchased ?: ""
+                                String yoffered = obj.yOffered ?: ""
+                                Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, couponCode)
+                                if (coupon) {
+                                    ReductionRule rr = ReductionRule.findByUuid(uuid)
+                                    if (!rr) {
+                                        rr = new ReductionRule()
+                                    }
+                                    rr.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                    rr.xtype = ReductionRuleType.valueOf(xtype)
+                                    rr.quantityMin = qMin.length() > 0 ? qMin.toFloat().toLong() : null
+                                    rr.quantityMax = qMax.length() > 0 ? qMax.toFloat().toLong() : null
+                                    rr.discount = discount.length() > 0 ? discount : null
+                                    rr.xPurchased = xpurchased.length() > 0 ? xpurchased.toFloat().toLong() : null
+                                    rr.yOffered = yoffered.length() > 0 ? yoffered.toFloat().toLong() : null
+                                    rr.save(flush: true)
+                                    coupon.addToRules(rr)
+                                    if (coupon.validate()) {
+                                        coupon.save(flush: true)
+
+                                    } else {
+                                        coupon.errors.allErrors.each { log.error(it) }
+                                        return [errors: coupon.errors.allErrors, sheet: "coupon-rule", line: rownum]
+                                    }
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "CouponUseCategory":
+                    case "CouponUseProduct":
+                    case "CouponUseSku":
+                        Coupon.withNewTransaction {
+                            while (obj?.type == "ReductionRule") {
+                                String code = obj.couponCode ?: ""
+                                String catUuid = obj.categoryUuid ?: ""
+                                String prodUuid = obj.productUuid ?: ""
+                                String skuUuid = obj.skuUuid ?: ""
+                                Coupon coupon = Coupon.findByCompanyAndCode(catalog.company, code)
+                                if (coupon) {
+                                    if (catUuid?.length() > 0) {
+                                        coupon.addToCategories(Category.findByUuid(catUuid))
+                                    } else if (prodUuid?.length() > 0) {
+                                        coupon.addToProducts(Product.findByUuid(prodUuid))
+                                    } else if (skuUuid?.length() > 0) {
+                                        coupon.addToTicketTypes(TicketType.findByUuid(skuUuid))
+                                    }
+                                    if (coupon.validate()) {
+                                        coupon.save(flush: true)
+
+                                    } else {
+                                        coupon.errors.allErrors.each { log.error(it) }
+                                        return [errors: coupon.errors.allErrors, sheet: "coupon-use", line: rownum]
+                                    }
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "Category":
+                        Category.withNewTransaction {
+                            while (obj?.type == "Category") {
+                                String uuid = obj.uuid ?: ""
+                                String externalCode = obj.externalCode ?: ""
+                                String path = obj.categoryPath ?: ""
+                                String name = obj.name ?: ""
+                                String position = obj.position ?: ""
+                                String description = obj.description ?: ""
+                                String keywords = obj.keywords ?: ""
+                                String hide = obj.hide ?: ""
+                                String seo = ""
+                                String google = obj.google ?: ""
+                                String deleted = obj.deleted ?: ""
+                                String i18n = obj.i18n ?: ""
+
+                                Category parent = getParentCategoryFromPath(path.substring(1), catalog)
+                                Category cat = new Category()
+                                if (uuid.length() > 0)
+                                    cat.uuid = uuid
+                                else
+                                    cat.uuid = UUID.randomUUID().toString()
+                                cat.externalCode = externalCode
+                                cat.name = name
+                                cat.position = Double.parseDouble(position).intValue()
+                                cat.description = description
+                                cat.keywords = keywords
+                                cat.hide = hide.equalsIgnoreCase("true")
+                                cat.sanitizedName = seo.length() == 0 ? sanitizeUrlService.sanitizeWithDashes(cat.name) : seo
+                                cat.googleCategory = google
+                                cat.deleted = !deleted.toLowerCase().equals("false")
+                                cat.catalog = catalog
+                                cat.company = catalog.company
+                                cat.parent = parent
+                                cat.i18n = i18n
+                                if (cat.validate()) {
+                                    cat.save(flush: true)
+                                    updateTranslation(cat.id, "CATEGORY", i18n)
+                                    categories.put(path, cat)
+                                } else {
+                                    cat.errors.allErrors.each { log.error(it) }
+                                    return [errors: cat.errors.allErrors, sheet: "category", line: rownum]
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "CategoryFeature":
+                        Feature.withNewTransaction {
+                            while (obj?.type == "CategoryFeature") {
+                                String catuuid = obj.categoryUuid ?: ""
+                                String catpath = obj.categoryPath ?: ""
+                                String uuid = obj.uuid ?: ""
+                                String externalCode = obj.externalCode ?: ""
+                                String domain = obj.domain ?: ""
+                                String name = obj.name ?: ""
+                                String value = obj.value ?: ""
+                                String hide = obj.hide ?: ""
+                                String i18n = obj.i18n ?: ""
+
+
+                                Feature f = new Feature()
+                                f.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                f.category = categories.get(catpath) //getCategoryFromPath(catpath, catalog)
+                                f.externalCode = externalCode
+                                f.domain = domain
+                                f.name = name
+                                f.value = value
+                                f.hide = hide.equalsIgnoreCase("true")
+                                f.i18n = i18n
+                                if (f.validate()) {
+                                    f.save(flush: true)
+                                    updateTranslation(f.id, "FEATURE", i18n)
+                                    features.put(uuid, f)
+                                } else {
+                                    f.errors.allErrors.each { log.error(it) }
+                                    return [errors: f.errors.allErrors, sheet: "cat-feature", line: rownum]
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "Variation":
+                        Variation.withNewTransaction {
+                            while (obj?.type == "Variation") {
+                                String catuuid = obj.categoryUuid ?: ""
+                                String catpath = obj.categoryPath ?: ""
+                                String uuid = obj.uuid ?: ""
+                                String externalCode = obj.externalCode ?: ""
+                                String name = obj.name ?: ""
+                                String google = obj.googleVariationType ?: ""
+                                String hide = obj.hide ?: ""
+                                String i18n = obj.i18n ?: ""
+
+
+                                Variation v = new Variation()
+                                v.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                v.category = categories.get(catpath)
+                                v.externalCode = externalCode
+                                v.name = name
+                                v.googleVariationType = google
+                                v.position = variationPosition++
+                                v.hide = hide.equalsIgnoreCase("true")
+                                v.i18n = i18n
+                                if (v.validate()) {
+                                    v.save(flush: false)
+                                    updateTranslation(v.id, "VARIATION", i18n)
+                                    variations.put(catpath + "*" + name, v)
+                                } else {
+                                    v.errors.allErrors.each { log.error(it) }
+                                    return [errors: v.errors.allErrors, sheet: "variation", line: rownum]
+                                }
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "VariationValue":
+                        VariationValue.withNewTransaction {
+                            while (obj?.type == "VariationValue") {
+                                String catuuid = obj.categoryUuid ?: ""
+                                String catpath = obj.categoryPath ?: ""
+                                String varuuid = obj.variationUuid ?: ""
+                                String varname = obj.variationName ?: ""
+                                String uuid = obj.uuid ?: ""
+                                String externalCode = obj.externalCode ?: ""
+                                String value = obj.value ?: ""
+                                String google = obj.googleVariationValue ?: ""
+                                String i18n = obj.i18n ?: ""
+
+                                VariationValue v = new VariationValue()
+                                v.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                                v.variation = variations.get(catpath + "*" + varname)
+                                // Variation.findByNameAndCategory(varname, categories.get(catpath)) // getCategoryFromPath(catpath, catalog))
+
+                                if (v.variation == null) {
+                                    log.debug(varname + "->" + catpath)
+                                }
+                                v.externalCode = externalCode
+                                v.value = value
+                                v.googleVariationValue = google
+                                v.position = countInserts
+                                v.i18n = i18n
+                                if (v.validate()) {
+                                    v.save(flush: true)
+                                    updateTranslation(v.id, "VARIATION_VALUE", i18n)
+                                    variationValues.put(catpath + "*" + varname + "*" + value, v)
+                                } else {
+                                    v.errors.allErrors.each { log.error(it) }
+                                    return [errors: v.errors.allErrors, sheet: "variation-value", line: rownum]
+                                }
+
+                                countInserts++;
+                                if (countInserts % 100 == 0) {
+                                    log.info(countInserts + " items inserted")
+                                    this.cleanUpGorm()
+                                }
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "ProductFeature":
+                        Feature.withNewTransaction {
+                            while (obj?.type == "ProductFeature") {
+                                pfList.add(obj)
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "ProductProperty":
+                        ProductProperty.withNewTransaction {
+                            while (obj?.type == "ProductProperty") {
+                                ppList.add(obj)
+                                line = reader.readLine()
+                                obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                            }
+                        }
+                        break;
+                    case "Sku":
+                        while (obj?.type == "Sku") {
+                            String catpath = obj.categoryPath ?: ""
+                            String prdcode = obj.productCode ?: ""
+                            String uuid = obj.uuid ?: ""
+                            String externalCode = obj.externalCode ?: ""
+                            String sku = obj.sku ?: ""
+                            String name = obj.name ?: ""
+                            String price = obj.price ?: ""
+                            String minorder = obj.minOrder ?: ""
+                            String maxorder = obj.maxOrder ?: ""
+                            String sales = obj.nbSales ?: ""
+                            String startDate = obj.startDate ?: ""
+                            String stopDate = obj.stopDate ?: ""
+                            String xprivate = obj.xprivate ?: ""
+                            String remainingStock = obj.remainingStock ?: ""
+                            String unlimitedStock = obj.unlimitedStock ?: ""
+                            String outsellStock = obj.outsellStock ?: ""
+                            String description = obj.description ?: ""
+                            String availability = obj.availability ?: ""
+                            String googleGtin = obj.googleGtin ?: ""
+                            String googleMpn = obj.googleMpn ?: ""
+                            String variationName1 = obj.variationName1 ?: ""
+                            String variationValue1 = obj.variationValue1 ?: ""
+                            String variationName2 = obj.variationName2 ?: ""
+                            String variationValue2 = obj.variationValue2 ?: ""
+                            String variationName3 = obj.variationName3 ?: ""
+                            String variationValue3 = obj.variationValue3 ?: ""
+                            String i18n = obj.i18n ?: ""
+                            log.info("Import Sku=$uuid")
+                            String[] cols = [
+                                    "", catpath, "", prdcode, uuid, externalCode, sku, name, price, minorder, maxorder,
+                                    sales, startDate, stopDate, xprivate, remainingStock, unlimitedStock, outsellStock, description,
+                                    availability, googleGtin, googleMpn, variationName1, variationValue1,
+                                    variationName2, variationValue2, variationName3, variationValue3, i18n
+                            ]
+                            skuList.add(cols)
+                            line = reader.readLine()
+                            obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                        }
+
+                        break;
+                    case "Product":
+                        while (obj?.type == "Product") {
+                            String catuuid = obj.categoryUuid ?: ""
+                            String catpath = obj.categoryPath ?: ""
+                            String uuid = obj.uuid ?: ""
+                            String externalCode = obj.externalCode ?: ""
+                            String code = obj.code ?: ""
+                            String name = obj.name ?: ""
+                            String xtype = obj.xtype ?: ""
+                            String price = obj.price ?: ""
+                            String state = obj.state ?: ""
+                            String description = obj.description ?: ""
+                            String descriptionAsText = Jsoup.parse(description).text()
+                            String sales = obj.nbSales ?: ""
+                            String displayStock = obj.displayStock ?: ""
+                            String calendar = obj.calendarType ?: ""
+                            String startDate = obj.startDate ?: ""
+                            String stopDate = obj.stopDate ?: ""
+                            String startFeatDate = obj.startFeatureDate ?: ""
+                            String stopFeatDate = obj.stopFeatureDate ?: ""
+                            String seo = ""
+                            String tags = obj.tags ?: ""
+                            String keywords = obj.keywords ?: ""
+                            String brandName = obj.brand ?: ""
+                            String taxRateName = obj.taxRate ?: ""
+                            String dateCreated = obj.dateCreated ?: ""
+                            String lastUpdated = obj.lastUpdated ?: ""
+                            String i18n = obj.i18n ?: ""
+                            log.info("Import Product=$uuid")
+                            String[] cols = [
+                                    catuuid, catpath, uuid, externalCode, code, name, xtype, price, state, description,
+                                    sales, displayStock, calendar, startDate, stopDate, startFeatDate, stopFeatDate, seo,
+                                    tags, keywords, brandName, taxRateName, dateCreated, lastUpdated, i18n
+                            ]
+                            prodList.add(cols)
+                            line = reader.readLine()
+                            obj = line == null ? ["type": "_"] : jsonSlurper.parseText(line)
+                        }
+
+                        break;
+                }
+            }
+        }
+
+
+        File brandsDir = new File(dateDir, "__brandlogos__")
+        File brandLogosFile = Paths.get(brandsDir.getAbsolutePath(), "__brandlogos__").toFile()
+        final resourcesPath = grailsApplication.config.resources.path
+        final companyCode = catalog.company.code
+        String brandsTargetDir = "$resourcesPath/brands/logos/$companyCode/"
+        File d = new File(brandsTargetDir)
+        d.mkdirs()
+        if (brandLogosFile.exists()) {
+            brandLogosFile.text.split('\t').each {
+                String brandNameLogo = it.substring(0, it.indexOf('.'))
+                final brand = brandNameLogos.get(brandNameLogo)
+                if (brand) {
+                    File logoTargetFile = new File(brandsTargetDir, it.replace(brandNameLogo, brand.id.toString()))
+                    File logoFile = new File(brandsDir, it)
+                    logoTargetFile.delete()
+                    FileUtils.copyFile(logoFile, logoTargetFile)
+                    String resourcesDir = "$resourcesPath/resources/$companyCode"
+                    FileUtils.copyFile(logoFile, new File("${resourcesDir}/${brand.id}"))
+                } else {
+                    log.warn("could not find brand for name -> $brandNameLogo")
+                }
+            }
+
+        }
+
+
+
+        importProducts(brands, categories, taxRates, catalog, dateDir, products, prodList, seller)
+        importSkus(skuList, products, catalog, variationValues)
+        Feature.withNewTransaction {
+            pfList.each { obj ->
+                String prdcode = obj.productCode ?: ""
+                String uuid = obj.uuid ?: ""
+                String externalCode = obj.externalCode ?: ""
+                String domain = obj.domain ?: ""
+                String name = obj.name ?: ""
+                String value = obj.value ?: ""
+                String hide = obj.hide ?: ""
+                String i18n = obj.i18n ?: ""
+
+                Product product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code", [catalog: catalog.id, code: prdcode]).get(0)
+                boolean created = false
+                if (uuid) {
+                    Feature feat = features.get(uuid)
+                    if (feat != null) {
+                        FeatureValue featVal = new FeatureValue(value: value, product: product, feature: feat)
+                        featVal.save(flush: false)
+                        created = true
+                    }
+                }
+                if (!created) {
+                    Feature f = new Feature()
+                    f.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                    f.product = product
+                    f.externalCode = externalCode
+                    f.domain = domain
+                    f.name = name
+                    f.value = value
+                    f.hide = hide
+                    f.i18n = i18n
+                    if (f.validate()) {
+                        f.save(flush: false)
+                        updateTranslation(f.id, "FEATURE", i18n)
+                    } else {
+                        f.errors.allErrors.each { log.error(it) }
+                        return [errors: f.errors.allErrors, sheet: "product-feature", line: rownum]
+                    }
+                }
+                countInserts++;
+                if (countInserts % 100 == 0) {
+                    log.info(countInserts + " items inserted")
+                    this.cleanUpGorm()
+                }
+            }
+        }
+        ProductProperty.withNewTransaction {
+            ppList.each { obj ->
+                String catpath = obj.categoryPath ?: ""
+                String prdcode = obj.productCode ?: ""
+                String uuid = obj.uuid ?: ""
+                String name = obj.name ?: ""
+                String value = obj.value ?: ""
+                String i18n = obj.i18n ?: ""
+                ProductProperty pp = new ProductProperty()
+                Category category = categories.get(catpath)
+                pp.uuid = uuid != null && uuid.length() > 0 ? uuid : UUID.randomUUID().toString()
+                pp.product = products.get(prdcode) ?: Product.executeQuery("select p from Product p, Category c, Catalog d where p.category = c and c.catalog = d and d.id = :catalog and p.code = :code and c.id = :category", [catalog: catalog.id, code: prdcode, category: category.id]).get(0)
+                pp.name = name
+                pp.value = value
+                pp.i18n = i18n
+                if (pp.validate()) {
+                    pp.save(flush: false)
+                    updateTranslation(pp.id, "PRODUCT_PROPERTY", i18n)
+                } else {
+                    pp.errors.allErrors.each { log.error(it) }
+                    return [errors: pp.errors.allErrors, sheet: "product-property"]
+                }
+                countInserts++;
+                if (countInserts % 100 == 0) {
+                    log.info(countInserts + " items inserted")
+                    this.cleanUpGorm()
+                }
+            }
+        }
+        impexDir.deleteDir()
+        return [errors: [], sheet: "", line: -1]
+    }
+
+    Map ximportXls(long catalogId, long sellerId, File dateDir) {
+        User seller = Seller.get(sellerId)
+        Catalog catalog = Catalog.get(catalogId)
         File inputFile = new File(dateDir, "mogobiz.xlsx")
         log.info("Loading file ...")
         XSSFWorkbook workbook = new XSSFWorkbook(inputFile.getAbsolutePath())
@@ -776,12 +1503,56 @@ class ImportService {
                 }
             }
         }
-        Map<String, TaxRate> taxRates = new HashMap<String, TaxRate>().asSynchronized()
 
         log.info("Importing products")
+        Map<String, TaxRate> taxRates = new HashMap<String, TaxRate>().asSynchronized()
         Map<String, Product> products = new HashMap<String, Product>().asSynchronized()
         int countRows = prdSheet.getPhysicalNumberOfRows()
-        importProducts(brands, categories, sheets, prdSheet, taxRates, catalog, dateDir, products, 1, countRows, seller)
+        List<String[]> prodList = new ArrayList<>(countRows)
+        log.info("Preloading products ...")
+        for (int rownum = 1; rownum < countRows + 1; rownum++) {
+            XSSFRow row
+            row = prdSheet.getRow(rownum)
+            if (row != null) {
+                String cell
+                cell = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                if (cell?.length() > 0) {
+                    String catuuid = getFormulaCell(row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String catpath = getFormulaCell(row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
+                    String uuid = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
+                    String externalCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
+                    String code = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
+                    String name = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
+                    String xtype = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
+                    String price = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
+                    String state = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
+                    String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
+                    String descriptionAsText = Jsoup.parse(description).text()
+                    String sales = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
+                    String displayStock = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
+                    String calendar = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
+                    String startDate = row.getCell(13, Row.CREATE_NULL_AS_BLANK).toString()
+                    String stopDate = row.getCell(14, Row.CREATE_NULL_AS_BLANK).toString()
+                    String startFeatDate = row.getCell(15, Row.CREATE_NULL_AS_BLANK).toString()
+                    String stopFeatDate = row.getCell(16, Row.CREATE_NULL_AS_BLANK).toString()
+                    String seo = row.getCell(17, Row.CREATE_NULL_AS_BLANK).toString()
+                    String tags = row.getCell(18, Row.CREATE_NULL_AS_BLANK).toString()
+                    String keywords = row.getCell(19, Row.CREATE_NULL_AS_BLANK).toString()
+                    String brandName = row.getCell(20, Row.CREATE_NULL_AS_BLANK).toString()
+                    String taxRateName = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
+                    String dateCreated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
+                    String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
+                    String i18n = row.getCell(24, Row.CREATE_NULL_AS_BLANK).toString()
+                    String[] cols = [
+                            catuuid, catpath, uuid, externalCode, code, name, xtype, price, state, description,
+                            sales, displayStock, calendar, startDate, stopDate, startFeatDate, stopFeatDate, seo,
+                            tags, keywords, brandName, taxRateName, dateCreated, lastUpdated, i18n
+                    ]
+                    prodList.add(cols)
+                }
+            }
+        }
+        importProducts(brands, categories, taxRates, catalog, dateDir, products, prodList, seller)
 
         int countInserts = 0;
         log.info("Importing product features")
@@ -935,8 +1706,14 @@ class ImportService {
             }
         }
 
+        importSkus(skuList, products, catalog, variationValues)
+        impexDir.deleteDir()
+        return [errors: [], sheet: "", line: -1]
+    }
+
+    private void importSkus(ArrayList<String[]> skuList, Map<String, Product> products, Catalog catalog, Map<String, VariationValue> variationValues) {
         int countLines = skuList.size()
-        int nbthreads = NBTHREADS - 1
+        int nbthreads = NB_THREADS - 1
         List<Future<Integer>> futures = new ArrayList<>(nbthreads + 1)
         Range<Integer> range = 0..nbthreads
         int countPerThread = countLines / (nbthreads + 1)
@@ -953,7 +1730,7 @@ class ImportService {
                 }
                 TicketType.withNewTransaction {
                     while (rownum < startIndex + nbProductsToInsert) {
-                        int max = rownum + FLUSHSIZE
+                        int max = rownum + FLUSH_SIZE
                         max = max > startIndex + countPerThread ? startIndex + nbProductsToInsert : max
                         while (rownum < max) {
                             String[] cols = skuList.get(rownum)
@@ -1041,11 +1818,9 @@ class ImportService {
             }
             futures.add(future)
         }
-        futures.each {
-            it.get()
+        futures.each { future ->
+            future.get()
         }
-        impexDir.deleteDir()
-        return [errors: [], sheet: "", line: -1]
     }
 
     def cleanUpGorm() {
@@ -1057,56 +1832,12 @@ class ImportService {
     }
 
     @Transactional
-    Integer importProducts(Map<String, Brand> brands, Map<String, Category> categories, Map<String, XSSFSheet> sheets, XSSFSheet prdSheet, Map<String, TaxRate> taxRates, Catalog catalog, File dateDir, Map<String, Product> products, int startLine, int countLines, Seller seller) {
-        List<String[]> prodList = new ArrayList<>(countLines)
-        log.info("Preloading products ...")
-        for (int rownum = startLine; rownum < startLine + countLines; rownum++) {
-            XSSFRow row
-            row = prdSheet.getRow(rownum)
-            if (row != null) {
-                String cell
-                cell = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                if (cell?.length() > 0) {
-                    String catuuid = getFormulaCell(row.getCell(0, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
-                    String catpath = getFormulaCell(row.getCell(1, Row.CREATE_NULL_AS_BLANK).toString(), sheets)
-                    String uuid = row.getCell(2, Row.CREATE_NULL_AS_BLANK).toString()
-                    String externalCode = row.getCell(3, Row.CREATE_NULL_AS_BLANK).toString()
-                    String code = row.getCell(4, Row.CREATE_NULL_AS_BLANK).toString()
-                    String name = row.getCell(5, Row.CREATE_NULL_AS_BLANK).toString()
-                    String xtype = row.getCell(6, Row.CREATE_NULL_AS_BLANK).toString()
-                    String price = row.getCell(7, Row.CREATE_NULL_AS_BLANK).toString()
-                    String state = row.getCell(8, Row.CREATE_NULL_AS_BLANK).toString()
-                    String description = row.getCell(9, Row.CREATE_NULL_AS_BLANK).toString()
-                    String descriptionAsText = Jsoup.parse(description).text()
-                    String sales = row.getCell(10, Row.CREATE_NULL_AS_BLANK).toString()
-                    String displayStock = row.getCell(11, Row.CREATE_NULL_AS_BLANK).toString()
-                    String calendar = row.getCell(12, Row.CREATE_NULL_AS_BLANK).toString()
-                    String startDate = row.getCell(13, Row.CREATE_NULL_AS_BLANK).toString()
-                    String stopDate = row.getCell(14, Row.CREATE_NULL_AS_BLANK).toString()
-                    String startFeatDate = row.getCell(15, Row.CREATE_NULL_AS_BLANK).toString()
-                    String stopFeatDate = row.getCell(16, Row.CREATE_NULL_AS_BLANK).toString()
-                    String seo = row.getCell(17, Row.CREATE_NULL_AS_BLANK).toString()
-                    String tags = row.getCell(18, Row.CREATE_NULL_AS_BLANK).toString()
-                    String keywords = row.getCell(19, Row.CREATE_NULL_AS_BLANK).toString()
-                    String brandName = row.getCell(20, Row.CREATE_NULL_AS_BLANK).toString()
-                    String taxRateName = row.getCell(21, Row.CREATE_NULL_AS_BLANK).toString()
-                    String dateCreated = row.getCell(22, Row.CREATE_NULL_AS_BLANK).toString()
-                    String lastUpdated = row.getCell(23, Row.CREATE_NULL_AS_BLANK).toString()
-                    String i18n = row.getCell(24, Row.CREATE_NULL_AS_BLANK).toString()
-                    String[] cols = [
-                            catuuid, catpath, uuid, externalCode, code, name, xtype, price, state, description,
-                            sales, displayStock, calendar, startDate, stopDate, startFeatDate, stopFeatDate, seo,
-                            tags, keywords, brandName, taxRateName, dateCreated, lastUpdated, i18n
-                    ]
-                    prodList.add(cols)
-                }
-            }
-        }
+    Integer importProducts(Map<String, Brand> brands, Map<String, Category> categories, Map<String, TaxRate> taxRates, Catalog catalog, File dateDir, Map<String, Product> products, List<String[]> prodList, Seller seller) {
         log.info("Products preloaded")
         Map<String, Tag> tagMap = (new HashMap<>()).asSynchronized()
 
-        countLines = prodList.size()
-        int nbthreads = NBTHREADS - 1
+        int countLines = prodList.size()
+        int nbthreads = NB_THREADS - 1
         List<Future<Integer>> futures = new ArrayList<>(nbthreads + 1)
         Range<Integer> range = 0..nbthreads
         int countPerThread = countLines / (nbthreads + 1)
@@ -1254,8 +1985,8 @@ class ImportService {
             }
             futures.add(future)
         }
-        futures.each {
-            it.get()
+        futures.each { future ->
+            future.get()
         }
 
         Category.findAllByCatalog(catalog).each { category ->
