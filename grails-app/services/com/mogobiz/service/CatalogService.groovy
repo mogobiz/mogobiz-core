@@ -4,6 +4,8 @@
 
 package com.mogobiz.service
 
+import com.mogobiz.authentication.AuthenticationService
+import com.mogobiz.authentication.ProfileService
 import com.mogobiz.common.client.ClientConfig
 import com.mogobiz.common.client.Credentials
 import com.mogobiz.common.rivers.spi.RiverConfig
@@ -19,18 +21,20 @@ import com.mogobiz.store.domain.VariationValue
 import com.mogobiz.store.exception.ProductNotFoundException
 import com.mogobiz.utils.PermissionType
 import groovy.sql.Sql
+import org.hibernate.SessionFactory
+
+import grails.util.Holders
 
 /**
  * Management service catalogs
  */
 class CatalogService {
-	def dataSource
 
-    def sanitizeUrlService
+    SanitizeUrlService sanitizeUrlService
 
-    def profileService
+    ProfileService profileService
 
-    def authenticationService
+    AuthenticationService authenticationService
 
     Catalog addNew(Catalog catalog) {
 		catalog.save(flush:true)
@@ -82,8 +86,11 @@ class CatalogService {
         ALTER TABLE b_o_product ALTER COLUMN product_fk DROP NOT NULL
 
          */
-		def sql = new Sql(dataSource)
-		// First check hat noproduct in that catalog has been sold.
+        def sessionFactory = Holders.grailsApplication.mainContext.sessionFactory
+        def session = sessionFactory.currentSession
+		def sql = new Sql(session.connection())
+
+        // First check hat noproduct in that catalog has been sold.
 		def row = sql.firstRow("select count(*) from b_o_product where product_fk in  (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 		int count = row.getAt(0)
 		if (count == 0) {
@@ -138,7 +145,8 @@ class CatalogService {
             log.info("delete from xcatalog where id = ${catalog.id}")
             sql.execute("delete from xcatalog where id = ${catalog.id}")
 		}
-		return count
+        sql.close()
+        return count
 	}
 
     def refreshMiraklCatalog(Catalog catalog, Seller seller = null){
