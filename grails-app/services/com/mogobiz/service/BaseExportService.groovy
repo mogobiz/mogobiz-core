@@ -21,6 +21,7 @@ class BaseExportService {
     def grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide", "i18n"]
+    final List<String> taxHeaders = ["uuid", "name", "country-code", "state-code", "rate", "active"]
     final List<String> catHeaders = ["uuid", "external-code", "path", "name", "position", "description", "keywords", "hide", "seo", "google", "deleted", "i18n"]
     final List<String> featHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "domain", "name", "value", "hide", "i18n"]
     final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide", "i18n"]
@@ -28,7 +29,6 @@ class BaseExportService {
     final List<String> prdHeaders = ["category-uuid", "category-path", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords", "brand-name", "tax-rate", "date-created", "last-updated", "i18n"]
     final List<String> prdPropHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "name", "value", "i18n"]
     final List<String> skuHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-name-1", "variation-value-1", "variation-name-2", "variation-value-2", "variation-name-3", "variation-value-3", "i18n"]
-    final List<String> taxHeaders = ["uuid", "name", "country-code", "state-code", "rate", "active"]
     final List<String> shipHeaders = ["uuid", "country-code", "min-amount", "max-amount", "price"]
     final List<String> couponHeaders = ["uuid", "name", "code", "active", "number-of-uses", "start-date", "end-date", "catalog-wise", "for-sale", "description", "anonymous", "pastille", "consumed", "i18n"]
     final List<String> reductionRuleHeaders = ["coupon-code", "uuid", "xtype", "quantity-min", "quantity-max", "discount", "xpurchased", "yoffered"]
@@ -154,10 +154,9 @@ class BaseExportService {
     Map<String, String> toMapForPrd(Feature it, Category cat, Product prd) {
         [
                 "type"        : "ProductFeature",
-                "categoryUuid": cat.uuid,
-                "categoryPath": categoryService.path(cat),
-                "productUuid" : prd.uuid,
+                "productCode" : prd.code,
                 "externalCode": it.externalCode,
+                "uuid"        : it.uuid,
                 "domain"      : it.domain,
                 "name"        : it.name,
                 "value"       : it.value?.indexOf("||||") >= 0 ? it.value.substring(it.value.indexOf("||||") + 4) : it.value,
@@ -248,9 +247,7 @@ class BaseExportService {
     Map<String, String> toMap(TicketType it, Category cat, Product prd) {
         [
                 "type"        : "Sku",
-                "categoryUuid"    : cat.uuid,
                 "categoryPath"    : categoryService.path(cat),
-                "productUuid"     : prd.uuid,
                 "productCode"     : prd.code,
                 "uuid"            : it.uuid,
                 "externalCode"    : it.externalCode,
@@ -287,9 +284,7 @@ class BaseExportService {
     Map<String, String> toMap(ProductProperty it, Category cat, Product prd) {
         [
                 "type"        : "ProductProperty",
-                "categoryUuid": cat.uuid,
                 "categoryPath": categoryService.path(cat),
-                "productUuid" : prd.uuid,
                 "productCode" : prd.code,
                 "uuid"        : it.uuid,
                 "name"        : it.name,
