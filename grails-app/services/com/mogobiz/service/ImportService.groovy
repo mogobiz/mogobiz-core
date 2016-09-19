@@ -209,13 +209,17 @@ class ImportService {
             it.isDirectory()
         }
         File inputFile = new File(dateDir, "mogobiz.json")
+        Map result
         if (inputFile.exists())
-            ximportJson(catalogId, sellerId, dateDir)
+            result =ximportJson(catalogId, sellerId, dateDir)
         else
-            ximportXls(catalogId, sellerId, dateDir)
+            result = ximportXls(catalogId, sellerId, dateDir)
+        impexDir.deleteDir()
+        return result
     }
 
     Map ximportJson(long catalogId, long sellerId, File dateDir) {
+        log.info("JSON Import")
         int countInserts = 0
         User seller = Seller.get(sellerId)
         Catalog catalog = Catalog.get(catalogId)
@@ -929,11 +933,11 @@ class ImportService {
                 }
             }
         }
-        impexDir.deleteDir()
         return [errors: [], sheet: "", line: -1]
     }
 
     Map ximportXls(long catalogId, long sellerId, File dateDir) {
+        log.info("XLS Import")
         User seller = Seller.get(sellerId)
         Catalog catalog = Catalog.get(catalogId)
         File inputFile = new File(dateDir, "mogobiz.xlsx")
@@ -1707,7 +1711,6 @@ class ImportService {
         }
 
         importSkus(skuList, products, catalog, variationValues)
-        impexDir.deleteDir()
         return [errors: [], sheet: "", line: -1]
     }
 
