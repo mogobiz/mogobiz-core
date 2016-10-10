@@ -6,6 +6,7 @@ package com.mogobiz.service
 
 import com.mogobiz.store.domain.Catalog
 import com.mogobiz.store.exception.ProductNotFoundException
+import grails.util.Holders
 import groovy.sql.Sql
 
 /**
@@ -64,8 +65,11 @@ class CatalogService {
         ALTER TABLE b_o_product ALTER COLUMN product_fk DROP NOT NULL
 
          */
-		def sql = new Sql(dataSource)
-		// First check hat noproduct in that catalog has been sold.
+        def sessionFactory = Holders.grailsApplication.mainContext.sessionFactory
+        def session = sessionFactory.currentSession
+        def sql = new Sql(session.connection())
+
+        // First check hat noproduct in that catalog has been sold.
 		def row = sql.firstRow("select count(*) from b_o_product where product_fk in  (select p.id from product p, category c where p.category_fk = c.id and c.catalog_fk = ${catalog.id})")
 		int count = row.getAt(0)
 		if (count == 0) {
@@ -120,6 +124,7 @@ class CatalogService {
             log.info("delete from xcatalog where id = ${catalog.id}")
             sql.execute("delete from xcatalog where id = ${catalog.id}")
 		}
-		return count
+        sql.close()
+        return count
 	}
 }

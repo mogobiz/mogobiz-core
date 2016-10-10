@@ -6,6 +6,7 @@ package com.mogobiz.service
 
 import com.mogobiz.store.domain.*
 import com.mogobiz.utils.IperUtil
+import groovy.json.JsonOutput
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.xssf.usermodel.XSSFSheet
@@ -14,98 +15,120 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.text.SimpleDateFormat
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class ExportService {
-    def categoryService
-    def featureService
-    def grailsApplication
+class ExportService extends BaseExportService {
 
-    final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide", "i18n"]
-    final List<String> catHeaders = ["uuid", "external-code", "path", "name", "position", "description", "keywords", "hide", "seo", "google", "deleted", "i18n"]
-    final List<String> featHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "domain", "name", "value", "hide", "i18n"]
-    final List<String> varHeaders = ["category-uuid", "category-path", "uuid", "external-code", "name", "google", "hide", "i18n"]
-    final List<String> varValHeaders = ["category-uuid", "category-path", "variation-uuid", "variation-name", "uuid", "external-code", "value", "google", "i18n"]
-    final List<String> prdHeaders = ["category-uuid", "category-path", "uuid", "external-code", "code", "name", "xtype", "price", "state", "description", "sales", "display-stock", "calendar", "start-date", "stop-date", "start-featured-date", "stop-featured-date", "seo", "tags", "keywords", "brand-name", "tax-rate", "date-created", "last-updated", "i18n"]
-    final List<String> prdPropHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "name", "value", "i18n"]
-    final List<String> skuHeaders = ["category-uuid", "category-path", "product-uuid", "product-code", "uuid", "external-code", "sku", "name", "price", "min-order", "max-order", "sales", "start-date", "stop-date", "private", "remaining-stock", "unlimited-stock", "outsell-stock", "description", "availability-date", "google-gtin", "google-mpn", "variation-name-1", "variation-value-1", "variation-name-2", "variation-value-2", "variation-name-3", "variation-value-3", "i18n"]
-    final List<String> taxHeaders = ["uuid", "name", "country-code", "state-code", "rate", "active"]
-    final List<String> shipHeaders = ["uuid", "country-code", "min-amount", "max-amount", "price"]
-    final List<String> couponHeaders = ["uuid", "name", "code", "active", "number-of-uses", "start-date", "end-date", "catalog-wise", "for-sale", "description", "anonymous", "pastille", "consumed", "i18n"]
-    final List<String> reductionRuleHeaders = ["coupon-code", "uuid", "xtype", "quantity-min", "quantity-max", "discount", "xpurchased", "yoffered"]
-    final List<String> couponUseHeaders = ["uuid", "code", "category-uuid", "product-uuid", "sku-uuid", "target-name"]
-
-    List<String> toArray(Coupon it) {
-        [it.uuid, it.name, it.code, ""+it.active, it.numberOfUses?.toString(), it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.endDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.endDate.getTime()) : "", ""+it.catalogWise, ""+it.forSale, it.description, it.anonymous?.toString(), it.pastille, ""+it.consumed, it.i18n]
+    File export(long catalogId, File jsonOrXlsFile, File zipFile, String exportFormat, Category parent = null, boolean deleted = false) {
+        if (exportFormat == "json")
+            exportAsJson(catalogId, jsonOrXlsFile, zipFile, parent, deleted)
+        else
+            return exportAsXls(catalogId, jsonOrXlsFile, zipFile, parent, deleted)
     }
 
-    List<String> toArray(ReductionRule it, String couponCode) {
-        [couponCode, it.uuid, it.xtype.name(), it.quantityMin?.toString(), it.quantityMax?.toString(), it.discount, it.xPurchased?.toString(), it.yOffered?.toString()]
+    File exportAsJson(long catalogId, File jsonFile, File zipFile, Category parent = null, boolean deleted = false) {
+        List<Brand> brands = Brand.findAllByCompany(Catalog.get(catalogId).company)
+        final String resourcesPath = grailsApplication.config.resources.path
+        final String companyCode = Catalog.get(catalogId).company.code
+        File outDir = jsonFile.getParentFile()
+
+        Path brandLogosDir = Paths.get(outDir.getAbsolutePath(), "__brandlogos__")
+        brandLogosDir.toFile().mkdirs()
+        List<String> brandLogos = []
+        jsonFile.withWriter('UTF-8') { writer ->
+            brands.each { brand ->
+                Map brandMap = toMap(brand)
+                writer.println(JsonOutput.toJson(brandMap))
+
+                final String brandId = brand.id.toString()
+                String brandLogodPath = "$resourcesPath/brands/logos/$companyCode"
+                Path resUrl = Paths.get(brandLogodPath)
+                if (Files.exists(resUrl)) {
+                    new File(brandLogodPath).listFiles(new FilenameFilter() {
+                        @Override
+                        boolean accept(File f, String name) {
+                            return name.startsWith(brandId)
+                        }
+                    }).each {
+                        try {
+                            String brandNameLogo = IperUtil.normalizeName(brand.name)
+                            final name = it.getName().replace(brandId, brandNameLogo)
+                            Files.copy(it.toPath(), Paths.get(brandLogosDir.toString(), name))
+                            brandLogos.add(name)
+                        }
+                        catch (IOException ioe) {
+                            log.error(resUrl + "->" + outDir.getAbsolutePath() + "/" + brand.name)
+                            ioe.printStackTrace()
+                        }
+                    }
+                }
+            }
+            new File(brandLogosDir.toFile(), '__brandlogos__').text = brandLogos.join('\t')
+
+            List<TaxRate> taxRates = TaxRate.findAllByCompany(Catalog.get(catalogId).company)
+            taxRates.each { tax ->
+                tax.localTaxRates.each { local ->
+                    Map taxMap = toMap(local, tax.name)
+                    writer.println(JsonOutput.toJson(taxMap))
+                }
+            }
+
+            List<ShippingRule> shippingRules = ShippingRule.findAllByCompany(Catalog.get(catalogId).company)
+            shippingRules.each { shippingRule ->
+                Map shipingRuleMap = toMap(shippingRule)
+                writer.println(JsonOutput.toJson(shipingRuleMap))
+            }
+
+            List<Coupon> coupons = Coupon.findAllByCompany(Catalog.get(catalogId).company)
+            coupons.each { coupon ->
+                Map couponMap = toMap(coupon)
+                writer.println(JsonOutput.toJson(couponMap))
+
+                coupon.rules.each { rule ->
+                    Map couponRuleMap = toMap(rule, coupon.code)
+                    writer.println(JsonOutput.toJson(couponRuleMap))
+                }
+
+                coupon.categories?.each { category ->
+                    Map couponUseMap = [
+                            "type"        : "CouponUseCategory",
+                            "couponCode"  : coupon.code,
+                            "categoryUuid": category.uuid
+                    ]
+                    writer.println(JsonOutput.toJson(couponUseMap))
+                }
+
+                coupon.products?.each { product ->
+                    Map couponUseMap = [
+                            "type"       : "CouponUseProduct",
+                            "couponCode" : coupon.code,
+                            "productUuid": product.uuid,
+                    ]
+                    writer.println(JsonOutput.toJson(couponUseMap))
+                }
+
+                coupon.ticketTypes?.each { sku ->
+                    Map couponUseMap = [
+                            "type"      : "CouponUseSku",
+                            "couponCode": coupon.code,
+                            "skuUuid"   : sku.uuid
+                    ]
+                    writer.println(JsonOutput.toJson(couponUseMap))
+                }
+            }
+
+            doExportCategoriesAsJson(catalogId, writer, parent, deleted, outDir)
+            doExportProductsAsJson(catalogId, writer, parent, deleted, outDir)
+            // Write the workbook in file system
+        }
+        ZipOutputStream zip = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
+        addFolderToZip("", outDir.getAbsolutePath(), zip)
+        zip.close()
+        return zipFile
     }
 
-    List<String> toArray(ShippingRule it) {
-        [it.uuid, it.countryCode, ""+it.minAmount, ""+it.maxAmount, it.price]
-    }
-
-    List<String> toArray(Brand it) {
-        [it.uuid, it.name, it.website, it.facebooksite, it.twitter, it.description, ""+it.hide, it.i18n]
-    }
-
-    List<String> toArray(Category it) {
-        [it.uuid, it.externalCode, categoryService.path(it), it.name, ""+it.position, it.description, it.keywords, it.hide?.toString(), it.sanitizedName, it.googleCategory, ""+it.deleted, it.i18n]
-    }
-
-    List<String> toArrayForCat(Feature it, int catRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, null, null, it.uuid, it.externalCode, it.domain, it.name, it.value, it.hide?.toString(), it.i18n]
-    }
-
-    List<String> toArrayForPrd(Feature it, int catRowNum, int prdRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.domain, it.name, it.value?.indexOf("||||") >= 0 ? it.value.substring(it.value.indexOf("||||") + 4) : it.value, it.hide?.toString(), it.i18n]
-    }
-
-    List<String> toArray(Variation it, int catRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode, it.name, it.googleVariationType, it.hide?.toString(), it.i18n]
-    }
-
-    List<String> toArray(VariationValue it, int catRowNum, int varRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "variation!C" + varRowNum, "variation!E" + varRowNum, it.uuid, it.externalCode, it.value, it.googleVariationValue, it.i18n]
-    }
-
-    List<String> toArray(Product it, int catRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, it.uuid, it.externalCode ?: "", it.code, it.name, ""+it.xtype, ""+it.price, ""+it.state, it.description ?: "", ""+it.nbSales, ""+it.stockDisplay, ""+it.calendarType, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.startFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startFeatureDate.getTime()) : "", it.stopFeatureDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopFeatureDate.getTime()) : "", it.sanitizedName, it.tags.collect {
-            it.name
-        }.join(","), it.keywords ?: "", it.brand ? it.brand.name : "", it.taxRate ? it.taxRate.name : "", new SimpleDateFormat("yyyy-MM-dd").format(it.dateCreated), new SimpleDateFormat("yyyy-MM-dd").format(it.lastUpdated), it.i18n]
-    }
-
-    List<String> toArray(TicketType it, int catRowNum, int prdRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.externalCode, it.sku, it.name, ""+it.price, ""+it.minOrder, ""+it.maxOrder, ""+it.nbSales, it.startDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.startDate.getTime()) : "", it.stopDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.stopDate.getTime()) : "", it.xprivate?.toString(), it.stock?.stock?.toString(), it.stock ? ""+it.stock.stockUnlimited : "", it.stock ? ""+it.stock.stockOutSelling : "", it.description, it.availabilityDate ? new SimpleDateFormat("yyyy-MM-dd").format(it.availabilityDate.getTime()) : "", it.gtin, it.mpn, it.variation1?.variation?.name, it.variation1?.value, it.variation2?.variation?.name, it.variation2?.value, it.variation3?.variation?.name, it.variation3?.value, it.i18n]
-    }
-
-    List<String> toArray(ProductProperty it, int catRowNum, int prdRowNum) {
-        ["category!A" + catRowNum, "category!C" + catRowNum, "product!C" + prdRowNum, "product!E" + prdRowNum, it.uuid, it.name, it.value, it.i18n]
-    }
-
-    List<String> toArray(LocalTaxRate it, String name) {
-        [it.uuid, name, it.countryCode ?: "", it.stateCode ?: "", ""+it.rate, ""+it.active]
-    }
-
-
-//    private static def boolValidateCell(XSSFSheet sheet, List<Integer> cellNums) {
-//        //sheet.protectSheet("")
-//        XSSFDataValidationHelper dvHelper = new XSSFDataValidationHelper(sheet);
-//        DataValidationConstraint dvConstraint = dvHelper.createExplicitListConstraint(["TRUE", "FALSE"] as String[]);
-//        cellNums.each {
-//            CellRangeAddressList addressList = new CellRangeAddressList(1, 65000, it, it);
-//            XSSFDataValidation dataValidation = (XSSFDataValidation) dvHelper.createValidation(dvConstraint, addressList);
-//            dataValidation.setShowErrorBox(true);
-//            sheet.addValidationData(dataValidation)
-//        }
-//
-//    }
-
-    File export(long catalogId, File xlsFile, File zipFile, Category parent = null, boolean deleted = false) {
+    File exportAsXls(long catalogId, File xlsFile, File zipFile, Category parent = null, boolean deleted = false) {
         int catRownum = 0
         int catfeatRownum = 0
         int varRownum = 0
@@ -405,7 +428,7 @@ class ExportService {
         } else {
             folder.listFiles().sort { it.lastModified() }.each { File file ->
                 def srcFile = srcFolder + File.separator + file.getName()
-                if (path.equals("")) {
+                if (path == "") {
                     addFileToZip(folder.name, srcFile, zip, false)
                 } else {
                     addFileToZip(path + File.separator + folder.name, srcFile, zip, false)
@@ -472,7 +495,7 @@ class ExportService {
         XSSFSheet skuSheet = workbook.getSheet("sku");
 
 
-        List<Category> cats = Category.findAllByCatalogAndParent(Catalog.get(catalogId), parent, deleted)
+        List<Category> cats = Category.findAllByCatalogAndParentAndDeleted(Catalog.get(catalogId), parent, deleted)
         cats.each {
             int catCellnum = 0
             Row catRow = catSheet.createRow(catRownum++)
@@ -617,6 +640,79 @@ class ExportService {
             prdFeatRownum = rownums[5]
             skuRownum = rownums[6]
             prdPropRownum = rownums[7]
+        }
+    }
+
+    void doExportCategoriesAsJson(long catalogId, Writer writer, Category parent, boolean deleted, File exportDir) {
+        List<Category> cats = Category.findAllByCatalogAndParentAndDeleted(Catalog.get(catalogId), parent, deleted)
+        cats.each { cat ->
+            Map catMap = toMap(cat)
+            writer.println(JsonOutput.toJson(catMap))
+            List<Feature> features = featureService.getCategoryFeatures(cat.id, false)
+            features.each {
+                Map featMap = toMapForCat(it, cat)
+                writer.println(JsonOutput.toJson(featMap))
+            }
+
+            List<Variation> variations = Variation.findAllByCategory(cat, [sort: 'position', order: 'asc'])
+            variations.each { varit ->
+                Map varMap = toMap(varit, cat)
+                writer.println(JsonOutput.toJson(varMap))
+                List<VariationValue> values = VariationValue.findAllByVariation(varit)
+                values.each { valit ->
+                    Map valMap = toMap(valit, cat, varit)
+                    writer.println(JsonOutput.toJson(valMap))
+                }
+            }
+            log.info(cat.name + " category")
+            doExportCategoriesAsJson(catalogId, writer, cat, deleted, exportDir)
+        }
+    }
+
+    void doExportProductsAsJson(long catalogId, Writer writer, Category parent, boolean deleted, File exportDir) {
+        String resourcesPath = grailsApplication.config.resources.path
+
+        List<Category> cats = Category.findAllByCatalogAndParentAndDeleted(Catalog.get(catalogId), parent, deleted)
+        cats.each { cat ->
+            List<Product> products = Product.findAllByCategoryAndDeleted(cat, deleted)
+            products.each { prd ->
+                log.debug(prd)
+                toMap(prd, cat)
+                Map prdMap = toMap(prd, cat)
+                writer.println(JsonOutput.toJson(prdMap))
+
+                (new File(exportDir, prd.sanitizedName)).mkdirs()
+                List<Product2Resource> prdres = Product2Resource.findAllByProduct(prd, [sort: "position", order: "asc"])
+                prdres.each {
+                    Path resUrl = Paths.get(resourcesPath + (IperUtil.normalizeSeparator(it.resource.url) - resourcesPath))
+                    try {
+                        Files.copy(resUrl, Paths.get(exportDir.getAbsolutePath(), prd.sanitizedName, it.resource.name))
+                    }
+                    catch (IOException ioe) {
+                        // ioe.printStackTrace()
+                    }
+                }
+
+                List<Feature> pfeatures = featureService.getProductFeatures(prd.id, false)
+                pfeatures.each {
+                    Map pfeatMap = toMapForPrd(it, cat, prd)
+                    writer.println(JsonOutput.toJson(pfeatMap))
+                }
+
+                List<ProductProperty> pproperties = ProductProperty.findAllByProduct(Product.get(prd.id))
+                pproperties.each {
+                    Map ppropMap = toMap(it, cat, prd)
+                    writer.println(JsonOutput.toJson(ppropMap))
+                }
+
+                List<TicketType> ticketTypes = TicketType.findAllByProduct(prd)
+                ticketTypes.each {
+                    Map skuMap = toMap(it, cat, prd)
+                    writer.println(JsonOutput.toJson(skuMap))
+                }
+            }
+            log.info(cat.name + " products")
+            doExportProductsAsJson(catalogId, writer, cat, deleted, exportDir)
         }
     }
 }
