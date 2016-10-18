@@ -67,19 +67,19 @@ class CountryImportService {
 
         final Map<String, String> currencyMap = [:]
 
-        BlockingObservable.from(parseCsvFile(currencies, charset, "\t", trim)).forEach(
+        BlockingObservable.from(parseCsvFile(currencies, charset, "\t", trim, trim, false)).forEach(
                 new Action1<CsvLine>() {
                     void call(CsvLine csvLine) {
-                        currencyMap << ["${csvLine.fields[0]}": csvLine.fields[1]]
+                        currencyMap << ["${csvLine.values[0]}": csvLine.values[1]]
                     }
                 }
         )
 
-        parseCsvFile(countries, charset, "\t", trim).filter(
+        parseCsvFile(countries, charset, "\t", trim, trim, false).filter(
                 new Func1<CsvLine, Boolean>() {
                     Boolean call(CsvLine csvLine) {
                         try {
-                            final countryCode = csvLine.fields[0].trim().toUpperCase()
+                            final countryCode = csvLine.values[0].trim().toUpperCase()
                             def ret = countryCodes.empty || countryCodes.contains(countryCode)
                             if (!ret) {
                                 log.debug("CountryService.importCountries: ${csvLine.number} Not added (Country $countryCode not found within $countryCodes)")
@@ -94,13 +94,13 @@ class CountryImportService {
                     }
                 }
         ).subscribe(
-                { csvLine ->
-                    final String code = csvLine.fields[0].trim().toUpperCase()
-                    final String name = csvLine.fields[4]
-                    final String postalCodeRegex = csvLine.fields[14]
-                    final String phoneCode = csvLine.fields[12]
-                    final String currencyCode = csvLine.fields[10]
-                    final String currencyName = csvLine.fields[11]
+                { CsvLine csvLine ->
+                    final String code = csvLine.values[0].trim().toUpperCase()
+                    final String name = csvLine.values[4]
+                    final String postalCodeRegex = csvLine.values[14]
+                    final String phoneCode = csvLine.values[12]
+                    final String currencyCode = csvLine.values[10]
+                    final String currencyName = csvLine.values[11]
                     Country.withSession {
                         Country country = Country.findByCode(code)
                         if (country == null) {
@@ -150,7 +150,7 @@ class CountryImportService {
                     { countryCode ->
                         File countryDir = new File(countriesDir, countryCode as String)
                         File localAdmin1 = new File(countryDir, "admins1.txt")
-                        def instance = this.class.classLoader.loadClass(countryCode + ".Import", true)?.newInstance()
+                        def instance = this.class.classLoader.loadClass("${countryCode}.Import", true)?.newInstance()
                         instance?.importAdmin1(localAdmin1)
                     } as Action1<String>,
                     { th ->
@@ -162,11 +162,11 @@ class CountryImportService {
             )
         }
 
-        parseCsvFile(admins1, charset, "\t", trim).filter(
+        parseCsvFile(admins1, charset, "\t", trim, trim, false).filter(
                 new Func1<CsvLine, Boolean>() {
                     Boolean call(CsvLine csvLine) {
                         try {
-                            final String countryCode = csvLine.fields[0].tokenize(".").get(0).trim().toUpperCase()
+                            final String countryCode = csvLine.values[0].tokenize(".").get(0).trim().toUpperCase()
                             boolean ret = countryCodes.empty || countryCodes.contains(countryCode)
                             if (ret) {
                                 File countryDir = new File(countriesDir, countryCode)
@@ -187,9 +187,9 @@ class CountryImportService {
                     }
                 }
         ).subscribe(
-                { csvLine ->
-                    final String code = csvLine.fields[0]
-                    final String name = csvLine.fields[2]
+                { CsvLine csvLine ->
+                    final String code = csvLine.values[0]
+                    final String name = csvLine.values[2]
                     final String countryCode = code.tokenize(".").get(0)
                     CountryAdmin.withSession {
                         CountryAdmin admin = CountryAdmin.findByCodeAndLevel(code, 1)
@@ -228,10 +228,10 @@ class CountryImportService {
 
         def importLocal = {
             Observable.from(local).subscribe(
-                    { countryCode ->
+                    { String countryCode ->
                         File countryDir = new File(countriesDir, countryCode)
                         File localAdmin2 = new File(countryDir, "admins2.txt")
-                        def instance = this.class.classLoader.loadClass(countryCode + ".Import", true)?.newInstance()
+                        def instance = this.class.classLoader.loadClass("${countryCode}.Import", true)?.newInstance()
                         instance?.importAdmin2(localAdmin2)
                     } as Action1<String>,
                     { th ->
@@ -243,11 +243,11 @@ class CountryImportService {
             )
         }
 
-        parseCsvFile(admins2, charset, "\t", trim).filter(
+        parseCsvFile(admins2, charset, "\t", trim, trim, false).filter(
                 new Func1<CsvLine, Boolean>() {
                     Boolean call(CsvLine csvLine) {
                         try {
-                            final countryCode = csvLine.fields[0].tokenize(".").get(0).trim().toUpperCase()
+                            final countryCode = csvLine.values[0].tokenize(".").get(0).trim().toUpperCase()
                             def ret = countryCodes.empty || countryCodes.contains(countryCode)
                             if (ret) {
                                 File countryDir = new File(countriesDir, countryCode)
@@ -266,9 +266,9 @@ class CountryImportService {
                         }
                     }
                 }).subscribe(
-                { csvLine ->
-                    final String code = csvLine.fields[0]
-                    String name = csvLine.fields[2]
+                { CsvLine csvLine ->
+                    final String code = csvLine.values[0]
+                    String name = csvLine.values[2]
                     final String countryCode = code.tokenize(".").get(0).trim().toUpperCase()
                     CountryAdmin.withSession {
                         CountryAdmin admin2 = CountryAdmin.findByCodeAndLevel(code, 2)
@@ -321,18 +321,18 @@ class CountryImportService {
                         void call(String countryCode) {
                             File countryDir = new File(countriesDir, countryCode)
                             File localCities = new File(countryDir, "cities.txt")
-                            def instance = this.class.classLoader.loadClass(countryCode + ".Import", true)?.newInstance()
+                            def instance = this.class.classLoader.loadClass("${countryCode}.Import", true)?.newInstance()
                             instance?.importCities(localCities)
                         }
                     }
             )
         }
         int count = 0
-        parseCsvFile(cities, charset, "\t", trim).filter(
+        parseCsvFile(cities, charset, "\t", trim, trim, false).filter(
                 new Func1<CsvLine, Boolean>() {
                     Boolean call(CsvLine csvLine) {
                         try {
-                            final countryCode = csvLine.fields[8]
+                            final countryCode = csvLine.values[8]
                             def ret = countryCodes.empty || countryCodes.contains(countryCode)
                             if (ret) {
                                 File countryDir = new File(countriesDir, countryCode)
@@ -351,11 +351,11 @@ class CountryImportService {
                         }
                     }
                 }).subscribe(
-                { csvLine ->
-                    final String cityCode = csvLine.fields[2]
-                    final String countryCode = csvLine.fields[8]
-                    String a1code = csvLine.fields[10]
-                    String a2code = csvLine.fields[11]
+                { CsvLine csvLine ->
+                    final String cityCode = csvLine.values[2]
+                    final String countryCode = csvLine.values[8]
+                    String a1code = csvLine.values[10]
+                    String a2code = csvLine.values[11]
 
                     if (a1code.length() == 1) a1code = "0" + a1code
                     if (a2code.length() == 1) a2code = "0" + a2code
