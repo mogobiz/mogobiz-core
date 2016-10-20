@@ -1022,7 +1022,7 @@ class ImportService {
                             l.countryCode = countryCode ?: null
                             l.stateCode = stateCode ?: null
                             l.rate = rate.toFloat()
-                            TaxRate tr = TaxRate.find {
+                            List<TaxRate> tr = TaxRate.findAll() {
                                 localTaxRates.uuid == l.uuid
                             }
                             if (tr != null && tr.company != catalog.company) {
