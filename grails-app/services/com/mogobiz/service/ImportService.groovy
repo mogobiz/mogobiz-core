@@ -1015,9 +1015,13 @@ class ImportService {
 
                             LocalTaxRate l = LocalTaxRate.findByUuid(uuid)
                             boolean isNewLocalTaxRate = l == null
-                            if (isNewLocalTaxRate)
+                            if (isNewLocalTaxRate){
                                 l = new LocalTaxRate()
-                            l.uuid = uuid
+                                l.uuid = uuid
+                            }
+                            else {
+                                l.uuid = UUID.randomUUID().toString()
+                            }
                             l.active = active.equalsIgnoreCase("true")
                             l.countryCode = countryCode ?: null
                             l.stateCode = stateCode ?: null
@@ -1031,11 +1035,10 @@ class ImportService {
                                 l.uuid = UUID.randomUUID().toString()
                             }
                             if (l.validate()) {
-                                l.save(flush: true)
-                                if (isNewLocalTaxRate) {
+                                    l.save(flush: true)
                                     t.addToLocalTaxRates(l)
                                     t.save(flush: true)
-                                }
+
                             } else {
                                 l.errors.allErrors.each { log.error(it) }
                                 return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
