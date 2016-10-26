@@ -1022,7 +1022,7 @@ class ImportService {
                             l.countryCode = countryCode ?: null
                             l.stateCode = stateCode ?: null
                             l.rate = rate.toFloat()
-                            TaxRate tr = TaxRate.find {
+                            List<TaxRate> tr = TaxRate.findAll() {
                                 localTaxRates.uuid == l.uuid
                             }
                             if (tr != null && tr.company != catalog.company) {
@@ -1031,11 +1031,10 @@ class ImportService {
                                 l.uuid = UUID.randomUUID().toString()
                             }
                             if (l.validate()) {
-                                l.save(flush: true)
-                                if (isNewLocalTaxRate) {
+                                    l.save(flush: true)
                                     t.addToLocalTaxRates(l)
                                     t.save(flush: true)
-                                }
+
                             } else {
                                 l.errors.allErrors.each { log.error(it) }
                                 return [errors: l.errors.allErrors, sheet: "taxrate", line: rownum]
