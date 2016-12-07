@@ -155,14 +155,12 @@ hibernate {
 		    ,com.mogobiz.store.domain.Variation
 		    ,com.mogobiz.store.domain.UserPermission
 		    ,com.mogobiz.store.domain.EventPeriodSale
-		    ,com.mogobiz.store.domain.BOTicketType
 		    ,com.mogobiz.store.domain.Suggestion
 		    ,com.mogobiz.store.domain.Shipping
 		    ,com.mogobiz.store.domain.RolePermission
 		    ,com.mogobiz.store.domain.Category
 		    ,com.mogobiz.store.domain.Resource
 		    ,com.mogobiz.store.domain.Product2Resource
-		    ,com.mogobiz.store.domain.BOProduct
 		    ,com.mogobiz.store.domain.Company
 		    ,com.mogobiz.store.domain.DatePeriod
 		]

@@ -461,66 +461,6 @@ public class CommonService {
         return boCart;
     }
 
-    public BOCartItem createBOCartItem(BOCart boCart, Product product, TicketType ticketType, Calendar startDate, Calendar endDate, RegisteredCartItemVO registeredCartItem) {
-        // Création du BOProduct correspondant au produit principal
-        BOProduct boProduct = new BOProduct(
-                principal : true,
-                product : product,
-                price : 10000)
-        saveEntity(boProduct);
-
-        if (registeredCartItem != null) {
-            // Création des BOTicketType (SKU)
-            BOTicketType boTicket = new BOTicketType(
-                    quantity : 1,
-                    price : 10000,
-                    ticketType : ticketType.name,
-                    firstname : registeredCartItem.firstname,
-                    lastname : registeredCartItem.lastname,
-                    email : registeredCartItem.email,
-                    phone : registeredCartItem.phone,
-                    birthdate : registeredCartItem.birthdate?.getTime(),
-                    startDate : startDate,
-                    endDate : endDate,
-                    bOProduct : boProduct)
-            saveEntity(boTicket);
-
-            //génération du qr code uniquement pour les services
-            if (product.xtype == ProductType.SERVICE)
-            {
-                boTicket.shortCode = "P" + boProduct.id + "T" + boTicket.id
-                String qrCodeContent = "EventId:"+product.id+";BoProductId:"+boProduct.id+";BoTicketId:"+boTicket.id
-                qrCodeContent += ";EventName:" + product.name + ";EventDate:" + DateUtilitaire.format(startDate, "dd/MM/yyyy HH:mm") + ";FirstName:"
-                qrCodeContent += boTicket.firstname + ";LastName:" + boTicket.lastname + ";Phone:" + boTicket.phone
-                qrCodeContent += ";TicketType:" +boTicket.ticketType + ";shortCode:" + boTicket.shortCode
-                qrCodeContent = SecureCodec.encrypt(qrCodeContent, product.company.aesPassword);
-                ByteArrayOutputStream output = new ByteArrayOutputStream()
-                QRCodeUtils.createQrCode(output, qrCodeContent, 256,"png")
-                String qrCodeBase64 = Base64.encode(output.toByteArray())
-                boTicket.qrcode = qrCodeBase64
-                boTicket.qrcodeContent = qrCodeContent
-            }
-            saveEntity(boTicket);
-        }
-
-        //create Sale
-        BOCartItem sale = new BOCartItem(
-                code : "SALE_" + boCart.id + "_" + boProduct.id,
-                price: 10000,
-                tax: 0,
-                endPrice: 10000,
-                totalPrice: 10000,
-                totalEndPrice: 10000,
-                hidden : false,
-                quantity : 1,
-                startDate : product.startDate,
-                endDate : product.stopDate,
-                bOCart : boCart,
-                bOProducts : [boProduct])
-        saveEntity(sale);
-        return sale;
-    }
-
 	/**
 	 * Create a Role if it does not exist
 	 * @param roleName

@@ -271,10 +271,8 @@ class CommerceService {
         commonService.createIntraDayPeriod(cinema, commonService.getDateDebutMois(21), commonService.getDateFinMois(23), false, false, false, false, false, true, true)
 
         BOCart sale1 = commonService.createBOCart(company, "1");
-        commonService.createBOCartItem(sale1, theatre, theatreAdulte, commonService.getDateDebutMois(), commonService.getDateFinMois(), new RegisteredCartItemVO(email: "test@test.com", lastname: "Test", firstname: "Test"));
 
         BOCart sale2 = commonService.createBOCart(company, "2");
-        commonService.createBOCartItem(sale2, produitPull, produitPullBancTailleS, null, null, null);
 
         // Coupon
         ReductionRule regle3achete1Offer = commonService.createReductionRule(ReductionRuleType.X_PURCHASED_Y_OFFERED, null, 3, 1)
