@@ -443,24 +443,6 @@ public class CommonService {
 		return sku;
 	}
 
-    public BOCart createBOCart(Company company, String transactionUUID) {
-        BOCart boCart = BOCart.findByTransactionUuid(transactionUUID)
-        if(boCart == null){
-            boCart = new BOCart(
-                    transactionUuid : transactionUUID,
-                    buyer: "yoann.baudy@ebiznext.com",
-                    date : Calendar.getInstance(),
-                    price : 10000,
-                    status : TransactionStatus.PENDING,
-                    currencyCode : "EUR",
-                    currencyRate : 0.01,
-                    company: company
-            )
-            saveEntity(boCart);
-        }
-        return boCart;
-    }
-
 	/**
 	 * Create a Role if it does not exist
 	 * @param roleName

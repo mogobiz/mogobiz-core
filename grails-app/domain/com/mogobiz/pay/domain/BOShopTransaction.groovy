@@ -43,7 +43,7 @@ class BOShopTransaction
 
         tablePerHierarchy false
 
-        table 'b_o_transaction'
+        table 'b_o_shop_transaction'
 
         version false
 

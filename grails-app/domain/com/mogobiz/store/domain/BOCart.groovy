@@ -58,7 +58,7 @@ class BOCart
 
         id name:'id',column:'id',generator:'native'
         transactionUuid column:"transaction_uuid",insertable:true,updateable:true,lazy:false,cache:false
-        extra column:"buyer",insertable:true,updateable:true,lazy:false,type:"text",cache:false
+        extra column:"extra",insertable:true,updateable:true,lazy:false,type:"text",cache:false
 
         company column:"company_fk",insertable:true,updateable:true,lazy:true,cache:'read-write'
     }
