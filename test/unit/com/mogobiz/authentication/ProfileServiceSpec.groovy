@@ -12,6 +12,8 @@ import spock.lang.Specification
 
 import static com.mogobiz.utils.ProfileUtils.*
 
+import static grails.util.Holders.*
+
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
@@ -50,7 +52,7 @@ class ProfileServiceSpec extends Specification {
 
     def cleanup() {
         // Tear down logic here
-        resetGrailsApplication()
+        reset()
     }
 
     void "when getWildcardPermission is called the corresponding permission should be returned"() {

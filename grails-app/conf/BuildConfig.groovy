@@ -36,7 +36,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // compile "org.springframework:spring-orm:$springVersion"
-        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.5.2') { excludes "groovy" }
+        compile ('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') { excludes "groovy" }
         compile 'com.fasterxml.jackson.core:jackson-core:2.7.0'
         compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
         compile group:"org.twitter4j", name:"twitter4j-async", version:"2.2.5"
@@ -76,31 +76,31 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":release:3.0.1",
-                ":rest-client-builder:1.0.3") {
+        build(":release:3.1.2",
+                ":rest-client-builder:2.1.1") {
             export = false
         }
 
 // plugins needed at runtime but not for compilation
         runtime ':hibernate:3.6.10.15' // ':hibernate4:4.3.5.3' for Hibernate 4
-        runtime ':database-migration:1.4.0'
+        runtime ':database-migration:1.4.1'
         compile ":facebook-graph:0.14"
         compile ':platform-core:1.0.0'
         compile ":google-data:0.1.3"
-        runtime ":resources:1.2.8"
-        compile (":email-confirmation:2.0.8") {
+        runtime ":resources:1.2.14"
+        compile ("com.mogobiz:email-confirmation:${mogobiz.version}") {
             excludes 'quartz'
         }
         compile (":shiro:1.2.1") {
             excludes 'shiro-quartz'
         }
-        compile ":mail:1.0.5"
-        compile ":quartz:1.0.1"
-        compile ':recaptcha:0.6.8'
-        compile ":cache-headers:1.1.6"
+        compile ":mail:1.0.7"
+        compile ":quartz:1.0.2"
+        compile ':recaptcha:1.7.0'
+        compile ":cache-headers:1.1.7"
         compile ":cached-resources:1.0"
         compile ":rest:0.8"
-        compile ":joda-time:1.4"
+        compile ":joda-time:1.5"
         compile ":executor:0.3"
     }
 }
