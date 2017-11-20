@@ -27,7 +27,7 @@ class ProductService
 	def sanitizeUrlService
 	def taxRateService
 
-    ESRiver river = ESRivers.instance.loadRiver("product")
+    ESRiver river = ESRivers.instance.loadRiver("product").get()
 
     def servletContext = SCH.servletContext
 
