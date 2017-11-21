@@ -10,8 +10,8 @@
 package com.mogobiz.service
 
 import com.mogobiz.constant.IperConstant
-import com.mogobiz.elasticsearch.rivers.ESRivers
-import com.mogobiz.elasticsearch.rivers.spi.ESRiver
+//import com.mogobiz.elasticsearch.rivers.ESRivers
+//import com.mogobiz.elasticsearch.rivers.spi.ESRiver
 import com.mogobiz.store.domain.*
 import com.mogobiz.store.exception.CurrencyRateException
 import com.mogobiz.store.exception.ProductNotFoundException
@@ -27,7 +27,7 @@ class ProductService
 	def sanitizeUrlService
 	def taxRateService
 
-    ESRiver river = ESRivers.instance.loadRiver("product").get()
+//    ESRiver river = ESRivers.instance.loadRiver("product").get()
 
     def servletContext = SCH.servletContext
 
@@ -120,12 +120,12 @@ class ProductService
 	}
 
 
-	com.mogobiz.store.domain.Resource retrievePicture(Product entity) {
+	Resource retrievePicture(Product entity) {
 		def pictures = getPictures(entity)
 		return (pictures && pictures.size() > 0)?pictures[0]:null
 	}
 
-	java.util.Collection getPictures(Product entity) {
+	Collection getPictures(Product entity) {
 		def pictures = []
 		if(entity.id > 0){
 			Map params = [:]
@@ -144,7 +144,7 @@ class ProductService
 		return pictures
 	}
 
-	public com.mogobiz.store.domain.Resource retrieveVideo(Product entity) {
+	public Resource retrieveVideo(Product entity) {
 		def params = [:]
 		params['product'] = entity
 		params['xtype'] = ResourceType.VIDEO
@@ -169,7 +169,7 @@ class ProductService
 		Product.findAll()
 	}
 
-	Product saveProduct(Product entity, Map params, Seller seller, com.mogobiz.store.domain.EventType eventType) {
+	Product saveProduct(Product entity, Map params, Seller seller, EventType eventType) {
 		if(params['product.state.name']){
 			if (params['product.state.name'] == 'ACTIVE') {
 				params['product']?.startDate = IperUtil.parseDateFromParam('01/01/2011')
