@@ -97,7 +97,6 @@ dependencies {
     compile "org.grails.plugins:executor:0.3"
     compile "log4j:log4j:1.2.17"
 
-//    runtime "org.grail:grails-resources:${grailsVersion}"
     runtime "org.grails.plugins:hibernate:3.6.10.19"
     runtime "org.grails.plugins:database-migration:1.4.1"
     runtime "org.grails.plugins:resources:1.2.14"
