@@ -7,3 +7,10 @@ target/*
 out
 MogobizCoreGrailsPlugin.groovy
 plugin.xml
+.gradle
+build
+buildPlugins
+gradle
+*.zip
+*.sql
+.settings
