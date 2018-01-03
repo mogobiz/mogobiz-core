@@ -26,7 +26,7 @@ import static com.mogobiz.constant.IperConstant.QUEUE_SOCIAL
 class UploadController {
 
     def ajaxResponseService
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
     def sanitizeUrlService
     def resService
     def authenticationService

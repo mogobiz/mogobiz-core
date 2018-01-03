@@ -14,12 +14,12 @@ import grails.util.Holders
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.crypto.hash.Sha256Hash
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 class SellerService {
     static transactional = true
 
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
     def emailConfirmationService
     def authenticationService
     def companyService

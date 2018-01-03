@@ -13,7 +13,7 @@ class GoogleEnvController {
 
     def authenticationService
 
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
 
     @Transactional(readOnly = true)
     def show() {

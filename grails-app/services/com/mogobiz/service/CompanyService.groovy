@@ -24,7 +24,7 @@ import static com.mogobiz.utils.ProfileUtils.ALL
  */
 class CompanyService
 {
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
 
     def authenticationService
 

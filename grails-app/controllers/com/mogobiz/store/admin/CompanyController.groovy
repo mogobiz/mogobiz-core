@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse
 
 class CompanyController {
 
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
     AjaxResponseService ajaxResponseService
     AuthenticationService authenticationService
     CountryService countryService

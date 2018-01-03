@@ -9,7 +9,7 @@ import com.mogobiz.geolocation.domain.Poi
 import com.mogobiz.store.domain.*
 import grails.converters.JSON
 import grails.util.Holders
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.grails.web.json.JSONObject
 
 /**
  * Translation manager service

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse
 
 class DownloadableController {
 
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
 
     def authenticationService
 

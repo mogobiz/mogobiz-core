@@ -259,7 +259,7 @@ static transactional = false
         def session = sessionFactory.currentSession
         session.flush()
         session.clear()
-        ThreadLocal<Map> propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+        ThreadLocal<Map> propertyInstanceMap = org.grails.plugins.domain.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
         propertyInstanceMap.get().clear()
     }
 

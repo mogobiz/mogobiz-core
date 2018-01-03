@@ -1,0 +1,60 @@
+package com.mogobiz.grails
+
+import grails.util.Holders
+import grails.databinding.converters.ValueConverter
+
+import java.text.ParseException
+import java.text.SimpleDateFormat
+
+class CalendarValueConverter implements ValueConverter {
+
+	private String expectedFormats;
+	private final List<String> formats;
+
+	public CalendarValueConverter()
+	{
+		def formats = Holders.config.grails.date.formats
+		expectedFormats = "";
+		List<String> formatList = new ArrayList<String>(formats.size());
+		for (Object format : formats) {
+			formatList.add(format.toString()); // Force String values (eg. for GStrings)
+			expectedFormats += ((expectedFormats.length() > 0) ? ", " : "") + format.toString()
+		}
+		this.formats = Collections.unmodifiableList(formatList);
+	}
+	
+	boolean canConvert(value) {
+		value == null || (value instanceof String)
+	}
+
+	def convert(value) {
+		if (value == null)
+		{
+			return null;
+		}
+		String text = (String)value
+		if (text.trim().length() > 0)
+		{
+			for (String format : formats)
+			{
+				try
+				{
+					SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+					Date d = dateFormat.parse(text);
+					Calendar c = Calendar.getInstance();
+					c.setTime(d);
+					return c;
+				}
+				catch (ParseException ex)
+				{
+				}
+			}
+			throw new IllegalArgumentException("Could not parse date " + text + ": expected format = " + expectedFormats);
+		}
+		return null;
+	}
+
+	Class<?> getTargetType() { 
+		Calendar
+	} 
+}

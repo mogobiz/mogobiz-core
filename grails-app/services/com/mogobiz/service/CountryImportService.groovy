@@ -8,7 +8,7 @@ import com.mogobiz.store.domain.Country
 import com.mogobiz.store.domain.CountryAdmin
 import com.mogobiz.tools.CsvLine
 import grails.util.Holders
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
+import org.grails.plugins.domain.DomainClassGrailsPlugin
 import rx.Observable
 import rx.functions.Action0
 import rx.functions.Action1

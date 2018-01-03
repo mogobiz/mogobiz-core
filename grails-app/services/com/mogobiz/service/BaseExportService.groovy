@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat
 class BaseExportService {
     def categoryService
     def featureService
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
 
     final List<String> brandHeaders = ["uuid", "name", "website", "facebook", "twitter", "description", "hide", "i18n"]
     final List<String> taxHeaders = ["uuid", "name", "country-code", "state-code", "rate", "active"]

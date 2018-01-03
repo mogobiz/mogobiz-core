@@ -26,7 +26,7 @@ import grails.transaction.Transactional
  */
 
 class ExternalAuthController {
-	def grailsApplication
+	grails.core.GrailsApplication grailsApplication
 
     def authenticationService
 

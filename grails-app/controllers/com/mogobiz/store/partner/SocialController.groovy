@@ -13,7 +13,7 @@ import grails.transaction.Transactional
 
 public class SocialController {
 	def authenticationService
-	def grailsApplication
+	grails.core.GrailsApplication grailsApplication
 
 	@Transactional(readOnly = true)
 	def index() {

@@ -20,7 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
+import org.grails.plugins.domain.DomainClassGrailsPlugin
 import org.jsoup.Jsoup
 import org.springframework.validation.ObjectError
 
@@ -35,7 +35,7 @@ class ImportService {
 
     def sanitizeUrlService
     def resService
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
     def sessionFactory
     def profileService
 

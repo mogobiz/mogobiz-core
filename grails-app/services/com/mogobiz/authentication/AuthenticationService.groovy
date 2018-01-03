@@ -20,7 +20,7 @@ import static com.mogobiz.utils.ProfileUtils.computePermission
  */
 class AuthenticationService {
 
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
 
     def profileService
 

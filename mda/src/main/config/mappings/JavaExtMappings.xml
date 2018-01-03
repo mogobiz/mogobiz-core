@@ -14,7 +14,7 @@
     </mapping>  
     <mapping> 
         <from>groovytype::ListeProgressive</from> 
-        <to>com.com.mogobiz.utils.ListeProgressive</to>
+        <to>com.mogobiz.utils.ListeProgressive</to>
     </mapping>  
     
 </mappings>   

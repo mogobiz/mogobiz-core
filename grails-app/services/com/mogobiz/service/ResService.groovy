@@ -15,7 +15,7 @@ import com.mogobiz.utils.IperUtil
 
 
 class ResService {
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
     def sanitizeUrlService
 
     def uploadResource(Company company, Resource resource, File file, String contentType) {

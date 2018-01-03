@@ -3881,7 +3881,7 @@
 			</xmi:Extension>
 		</packagedElement>
 		<packagedElement xmi:type='uml:Model' xmi:id='_16_9_f20035f_1297700120475_831348_4517' name='geolocalisation' visibility='public'>
-			<packagedElement xmi:type='uml:Package' xmi:id='_16_9_f20035f_1297700150887_171353_4518' name='com.com.mogobiz.geolocation' visibility='public'>
+			<packagedElement xmi:type='uml:Package' xmi:id='_16_9_f20035f_1297700150887_171353_4518' name='com.mogobiz.geolocation' visibility='public'>
 				<packagedElement xmi:type='uml:Package' xmi:id='_16_9_f20035f_1297700150887_881876_4520' name='vo' visibility='public'/>
 				<packagedElement xmi:type='uml:Package' xmi:id='_16_9_f20035f_1297700150887_52978_4521' name='web' visibility='public'/>
 				<packagedElement xmi:type='uml:Package' xmi:id='_16_9_f20035f_1297700150887_431145_4519' name='domain' visibility='public'>
@@ -33397,7 +33397,7 @@ Les p√©riodes pendant lesquelles le Produit et/ou Package sera accessible sont √
 	<persistence:Entity xmi:id='_16_9_f20035f_1296478649736_805765_6939' base_Class='_16_9_f20035f_1296478649735_421630_6938'/>
 	<persistence:Entity xmi:id='_16_9_f20035f_1297700150968_154180_4739' base_Class='_16_9_f20035f_1297700150893_864029_4553'/>
 	<persistence:Unique xmi:id='_16_9_f20035f_1299254104148_993525_4153' base_Property='_16_9_f20035f_1299254071905_954542_4150'/>
-	<persistence:FinderMethod xmi:id='_16_9_5eb0206_1299176872155_101462_3446' base_Operation='_16_9_5eb0206_1299176872139_219939_3439' _andromda_hibernate_query='SELECT product FROM com.com.mogobiz.store.domain.Buyer AS buyer JOIN buyer.sales AS sale JOIN sale.acquisitions AS acqui JOIN acqui.bOPackage AS pack JOIN pack.bOProducts AS product JOIN product.company AS company WHERE buyer.id = :idBuyer AND (acqui.debut is null OR acqui.debut &lt; :dateConsomation) AND (acqui.fin is null OR acqui.unlimited = true OR acqui.fin &gt; :dateConsomation) AND product.externalCode = :codeOffre AND company.id = :idCompany AND product.consumptions.size &lt; acqui.quantity'/>
+	<persistence:FinderMethod xmi:id='_16_9_5eb0206_1299176872155_101462_3446' base_Operation='_16_9_5eb0206_1299176872139_219939_3439' _andromda_hibernate_query='SELECT product FROM com.mogobiz.store.domain.Buyer AS buyer JOIN buyer.sales AS sale JOIN sale.acquisitions AS acqui JOIN acqui.bOPackage AS pack JOIN pack.bOProducts AS product JOIN product.company AS company WHERE buyer.id = :idBuyer AND (acqui.debut is null OR acqui.debut &lt; :dateConsomation) AND (acqui.fin is null OR acqui.unlimited = true OR acqui.fin &gt; :dateConsomation) AND product.externalCode = :codeOffre AND company.id = :idCompany AND product.consumptions.size &lt; acqui.quantity'/>
 	<persistence:Entity xmi:id='_16_9_f20035f_1297092093897_192267_4207' base_Class='_16_9_f20035f_1297092093897_200157_4206'/>
 	<MagicDraw_Profile:DiagramInfo xmi:id='_16_9_5eb0206_1298631837338_601047_4495' base_Diagram='_16_9_5eb0206_1298631837311_619221_4434' Modification_date='25/02/11 12:03' Last_modified_by='Yoann' Author='Yoann' Creation_date='25/02/11 12:03'/>
 	<persistence:Entity xmi:id='_16_9_f20035f_1296478410461_64929_6816' base_Class='_16_9_f20035f_1296478410461_397416_6815'/>
@@ -33432,7 +33432,7 @@ Les p√©riodes pendant lesquelles le Produit et/ou Package sera accessible sont √
 	<MagicDraw_Profile:DiagramInfo xmi:id='_16_9_f20035f_1296751542000_695242_5005' base_Diagram='_16_9_f20035f_1296751541998_193491_4993' Modification_date='03/02/11 17:45' Last_modified_by='smanciot' Author='smanciot' Creation_date='03/02/11 17:45'/>
 	<persistence:Entity xmi:id='_16_9_f40036a_1301244388127_496906_4455' base_Class='_16_9_f40036a_1301244388127_74251_4454'/>
 	<MagicDraw_Profile:DiagramInfo xmi:id='_16_9_5eb0206_1297706788994_555407_4287' base_Diagram='_16_9_5eb0206_1297706788987_351811_4273' Modification_date='14/02/11 19:06' Last_modified_by='Yoann' Author='Yoann' Creation_date='14/02/11 19:06'/>
-	<persistence:FinderMethod xmi:id='_16_9_5eb0206_1298975774964_829699_3325' base_Operation='_16_9_5eb0206_1298975774961_368734_3321' _andromda_hibernate_query='SELECT sale FROM com.com.mogobiz.store.domain.Buyer AS buyer JOIN buyer.sales AS sale WHERE buyer.id = :idBuyer AND sale.hidden = false'/>
+	<persistence:FinderMethod xmi:id='_16_9_5eb0206_1298975774964_829699_3325' base_Operation='_16_9_5eb0206_1298975774961_368734_3321' _andromda_hibernate_query='SELECT sale FROM com.mogobiz.store.domain.Buyer AS buyer JOIN buyer.sales AS sale WHERE buyer.id = :idBuyer AND sale.hidden = false'/>
 	<MagicDraw_Profile:DiagramInfo xmi:id='_16_9_f20035f_1298956133339_32622_3092' base_Diagram='_16_9_f20035f_1298956133337_525472_3080' Modification_date='01/03/11 06:08' Last_modified_by='smanciot' Author='smanciot' Creation_date='01/03/11 06:08'/>
 	<MagicDraw_Profile:DiagramInfo xmi:id='_16_9_f20035f_1297091845439_506308_3941' base_Diagram='_16_9_f20035f_1297091845437_27251_3929' Modification_date='2/17/11 3:28 PM' Last_modified_by='Hayssam Saleh' Author='smanciot' Creation_date='07/02/11 16:17'/>
 	<persistence:Entity xmi:id='_16_9_f40036a_1300520720209_572263_4283' base_Class='_16_9_f40036a_1300520720208_92598_4282'/>

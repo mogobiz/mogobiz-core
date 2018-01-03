@@ -16,7 +16,7 @@ import com.mogobiz.utils.IperUtil
 import grails.converters.JSON
 import grails.converters.XML
 import grails.transaction.Transactional
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import grails.web.context.ServletContextHolder
 
 /**
  * @author stephane.manciot@ebiznext.com

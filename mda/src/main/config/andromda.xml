@@ -96,17 +96,17 @@
                 <!-- gorm properties -->
 				<property name="optimisticLocking">false</property>
 
-                <property name="enumerations">${pom.basedir}/src/groovy</property>
+                <property name="enumerations">${pom.basedir}/src/main/groovy</property>
                 <property name="entities">${grails.output.dir}/domain</property>
-                <property name="entity-delegators">${pom.basedir}/src/groovy</property>
-                <property name="json">${pom.basedir}/src/groovy</property>
-                <property name="service-interfaces">${pom.basedir}/src/groovy</property>
-                <property name="services">${pom.basedir}/src/groovy</property>
+                <property name="entity-delegators">${pom.basedir}/src/main/groovy</property>
+                <property name="json">${pom.basedir}/src/main/groovy</property>
+                <property name="service-interfaces">${pom.basedir}/src/main/groovy</property>
+                <property name="services">${pom.basedir}/src/main/groovy</property>
                 <property name="service-impls">${grails.output.dir}/services</property>
-                <property name="entity-tools">${pom.basedir}/src/groovy</property>
+                <property name="entity-tools">${pom.basedir}/src/main/groovy</property>
                 <property name="configuration">${grails.output.dir}/conf</property>
                 <!-- <property name="unit-tests">${pom.basedir}/test/unit</property>
-                <property name="controllers">${pom.basedir}/src/groovy</property>
+                <property name="controllers">${pom.basedir}/src/main/groovy</property>
                 <property name="controller-impls">${grails.output.dir}/controllers</property>
                 <property name="views">${grails.output.dir}/views</property>
                  -->
@@ -116,12 +116,12 @@
 			<properties>
 				<property name="useArraysForMultiplicitiesOfTypeMany">true</property>
 				<!--
-				<property name="enumerations">${pom.basedir}/src/java</property>
-				<property name="interfaces">${pom.basedir}/src/java</property>
-				<property name="services">${pom.basedir}/src/java</property>
+				<property name="enumerations">${pom.basedir}/src/main/groovy</property>
+				<property name="interfaces">${pom.basedir}/src/main/groovy</property>
+				<property name="services">${pom.basedir}/src/main/groovy</property>
 				-->
-				<property name="exceptions">${pom.basedir}/src/java</property>
-				<property name="value-objects">${pom.basedir}/src/java</property>
+				<property name="exceptions">${pom.basedir}/src/main/groovy</property>
+				<property name="value-objects">${pom.basedir}/src/main/groovy</property>
 			</properties>
 		</namespace>
 	</namespaces>

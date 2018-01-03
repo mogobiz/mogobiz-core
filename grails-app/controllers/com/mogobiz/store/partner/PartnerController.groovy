@@ -20,7 +20,7 @@ import grails.transaction.Transactional
 class PartnerController {
 
 	def authenticationService
-	def grailsApplication
+	grails.core.GrailsApplication grailsApplication
 	def index = {	}
 
 	@Transactional(readOnly = true)

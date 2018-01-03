@@ -12,16 +12,16 @@
 
         <to><![CDATA[
 	/*
-	messageSource(com.com.mogobiz.i18n.SiteMessageSource)
+	messageSource(com.mogobiz.i18n.SiteMessageSource)
 	{ messageBundleMessageSource = ref("messageBundleMessageSource") }
-	messageBundleMessageSource(org.codehaus.groovy.grails.context.support.PluginAwareResourceBundleMessageSource) {
+	messageBundleMessageSource(org.grails.spring.context.support.PluginAwareResourceBundleMessageSource) {
 		basenames = [
 			"WEB-INF/grails-app/i18n/messages",
 			"WEB-INF/grails-app/i18n/cmd_errors"
 		]
 	}
-	 customPropertyEditorRegistrar(com.com.mogobiz.utils.CustomPropertyEditorRegistrar) {
-	 dateEditor = { com.com.mogobiz.utils.CustomDateEditor e ->
+	 customPropertyEditorRegistrar(com.mogobiz.utils.CustomPropertyEditorRegistrar) {
+	 dateEditor = { com.mogobiz.utils.CustomDateEditor e ->
 	 formats = [
 	 'yyyy/MM/dd',
 	 'yy-MM-dd HH:mm',
@@ -36,23 +36,23 @@
 
 	credentialMatcher(org.apache.shiro.authc.credential.Sha256CredentialsMatcher)
 
-	calendarConverter com.com.mogobiz.grails.CalendarValueConverter
-	defaultDateConverter com.com.mogobiz.grails.DateValueConverter
+	calendarConverter com.mogobiz.grails.CalendarValueConverter
+	defaultDateConverter com.mogobiz.grails.DateValueConverter
 
 	//loadBeans("classpath:*defaultResources.groovy")
 
-	sanitizeUrlService (com.com.mogobiz.service.SanitizeUrlService)
-	taxRateService (com.com.mogobiz.service.TaxRateService)
+	sanitizeUrlService (com.mogobiz.service.SanitizeUrlService)
+	taxRateService (com.mogobiz.service.TaxRateService)
 
-	productService (com.com.mogobiz.service.ProductService) {
+	productService (com.mogobiz.service.ProductService) {
 		sanitizeUrlService = ref("sanitizeUrlService")
 		taxRateService = ref("taxRateService")
 	}
-	productRender (com.com.mogobiz.store.domain.ProductRender) {
+	productRender (com.mogobiz.store.domain.ProductRender) {
 		productService = ref("productService")
 		taxRateService = ref("taxRateService")
 	}
-	suggestionRender (com.com.mogobiz.store.domain.SuggestionRender) {
+	suggestionRender (com.mogobiz.store.domain.SuggestionRender) {
 		productService = ref("productService")
 		}
 

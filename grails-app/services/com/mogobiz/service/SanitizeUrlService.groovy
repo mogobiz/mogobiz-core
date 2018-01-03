@@ -2,12 +2,12 @@
  * Copyright (C) 2015 Mogobiz SARL. All rights reserved.
  */
 
-package com.mogobiz.service;
+package com.mogobiz.service
 
-import groovy.transform.CompileStatic;
+import groovy.transform.CompileStatic
 
 
-@CompileStatic
+// FIXME @CompileStatic
 class SanitizeUrlService {
         
         static transactional = false

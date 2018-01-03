@@ -17,7 +17,7 @@ import com.mogobiz.store.exception.CurrencyRateException
 import com.mogobiz.store.exception.ProductNotFoundException
 import com.mogobiz.utils.Html2Text
 import com.mogobiz.utils.IperUtil
-import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
+import grails.web.context.ServletContextHolder as SCH
 
 /**
  *

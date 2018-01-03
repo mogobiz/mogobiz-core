@@ -12,7 +12,7 @@ import com.mogobiz.store.domain.Seller
 import com.mogobiz.store.domain.User
 import com.mogobiz.tools.RandomPassword
 import com.mogobiz.utils.SymmetricCrypt
-import grails.plugin.mail.MailService
+import grails.plugins.mail.MailService
 import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.shiro.SecurityUtils
@@ -28,7 +28,7 @@ import java.util.regex.Pattern
  */
 class SellerPasswordController {
     AjaxResponseService ajaxResponseService
-    def grailsApplication
+    grails.core.GrailsApplication grailsApplication
 
     MailService mailService
 
