@@ -13,8 +13,6 @@ dependencyManagement {
 //test.onlyIf { false }
 
 dependencies {
-    /* grails */
-//    provided  "org.grails:grails-dependencies"
 
     compile('net.sourceforge.nekohtml:nekohtml:1.9.15'){
         exclude group: 'xerces', module: 'xercesImpl'
@@ -79,7 +77,6 @@ dependencies {
     compile project(":plugins:grails-google-data")
     compile project(":plugins:grails-platform-core")
     compile project(":plugins:grails-shiro:shiro3:grails-shiro")
-
     compile "org.grails.plugins:cache:3.0.3"
     compile 'org.grails.plugins:quartz:2.0.12' 
     compile 'org.grails.plugins:mail:2.0.0' 
@@ -87,15 +84,12 @@ dependencies {
         exclude group: 'org.grails', module: 'grails-datastore-rest-client'
     }
     compile "org.grails:grails-datastore-rest-client:${gormVersion}.RELEASE"
-
     compile 'org.grails.plugins:cookie:2.0.5'
     compile("org.grails.plugins:http-builder-helper:1.1.0"){
         exclude group: "org.codehaus.groovy.modules.http-builder", module: "http-builder"
     }
     compile "org.grails.plugins:joda-time:2.0.0"
-
-	compile "org.grails.plugins:hibernate:4.3.10.7"
-
+	compile "org.grails.plugins:hibernate:$grailsHibernateVersion"
     runtime "org.grails.plugins:database-migration:2.0.1" //v 2.x for hibernate4, v 3.x for hibernate5
 
     /* akka */
